@@ -1,0 +1,8 @@
+{
+  "Windsor EV/Pro": ["WINDSOR_EV", "WINDSOR_PRO"],
+  "MG Comet EV": ["MG_COMET_EV"],
+  "Hector MCE": ["HECTOR"],
+  "Hector BS4/BS6": ["HECTOR"],
+  "ZS EV": ["MG_ZS_EV"],
+  "M9": ["MG_M9"]
+}

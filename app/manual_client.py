@@ -1,36 +1,33 @@
-"""Client for the DTC manual service (GET /v1/dtc/manual/modules and /v1/dtc/manual/page).
+"""Client for the DTC manual service (GET {base}/v1/dtc/manual/modules and /page).
 
-The service (mounted under /api, so set MANUAL_API_BASE_URL=http://host:3001/api) returns raw manual HTML, which is untrusted: it is converted to plain text here and only
-ever shown to the LLM as data. This function never raises; failures become a status.
+Set MANUAL_API_BASE_URL including the route prefix, e.g. http://localhost:3001/api.
+The service returns raw manual HTML, which is untrusted: it is converted to plain text here and only ever shown
+to the LLM as data. fetch_manual never raises; failures become a status.
 """
+import asyncio
 import logging
+import re
 import time
-from dataclasses import dataclass, field
 from html.parser import HTMLParser
 
 import httpx
 
 from app.config import Settings
+from app.manual import ManualBundle, Section
 
 logger = logging.getLogger("dtcbot.manual")
 
 MAX_RESPONSE_BYTES = 3_000_000
-MAX_MANUAL_CHARS = 12_000
+TOTAL_CHARS = 60_000  # budget for all modules of one DTC together
+MAX_CHARS_PER_MODULE = 8_000
+MIN_CHARS_PER_MODULE = 1_500
+CONCURRENCY = 4
 CACHE_TTL_SECONDS = 6 * 3600
 MODULES_PATH = "/v1/dtc/manual/modules"
 PAGE_PATH = "/v1/dtc/manual/page"
 
 _BLOCK_TAGS = {"p", "div", "br", "tr", "li", "h1", "h2", "h3", "h4", "h5", "h6", "table", "section"}
 _SKIP_TAGS = {"script", "style", "iframe", "object", "embed", "noscript"}
-
-
-@dataclass
-class ManualResult:
-    # used | needs_module | not_found | unavailable | disabled
-    status: str
-    text: str = ""
-    module: str | None = None
-    modules: list[dict] = field(default_factory=list)  # [{"id": ..., "name": ...}] for a picker
 
 
 class _TextExtractor(HTMLParser):
@@ -56,14 +53,35 @@ class _TextExtractor(HTMLParser):
             self.parts.append(data)
 
 
+_NUMBERING = re.compile(r"^(\d+(\.\d+)*\.?|[–•ˆ-])$")
+
+
+def reflow(text: str) -> str:
+    """PDF-derived HTML arrives roughly one word per line; join lines back into paragraphs."""
+    paragraphs: list[str] = []
+    current = ""
+    for line in text.split("\n"):
+        line = line.strip()
+        if not line:
+            continue
+        if current and not _NUMBERING.match(current) and (current[-1] in ".?!:：" or _NUMBERING.match(line)):
+            paragraphs.append(current)
+            current = line
+        else:
+            current = f"{current} {line}" if current else line
+    if current:
+        paragraphs.append(current)
+    return "\n".join(paragraphs)
+
+
 def html_to_text(html: str) -> str:
     parser = _TextExtractor()
     parser.feed(html)
     lines = (" ".join(line.split()) for line in "".join(parser.parts).splitlines())
-    return "\n".join(line for line in lines if line)
+    return reflow("\n".join(line for line in lines if line))
 
 
-_cache: dict[tuple, tuple[float, ManualResult]] = {}
+_cache: dict[tuple, tuple[float, ManualBundle]] = {}
 
 
 def _model_name_variants(model: str) -> list[str]:
@@ -113,26 +131,17 @@ def _parse_pages(body: object) -> str:
     for p in pages if isinstance(pages, list) else []:
         html = p if isinstance(p, str) else (p.get("html") or p.get("content") or "") if isinstance(p, dict) else ""
         chunks.append(html_to_text(html))
-    return "\n\n".join(c for c in chunks if c)[:MAX_MANUAL_CHARS]
-
-
-def _choose(modules: list[dict], wanted: str | None) -> dict | None:
-    if wanted:
-        w = wanted.strip().lower()
-        for m in modules:
-            if str(m["id"]).lower() == w or m["name"].lower() == w:
-                return m
-        return None
-    return modules[0] if len(modules) == 1 else None
+    return "\n\n".join(c for c in chunks if c)
 
 
 async def fetch_manual(
-    settings: Settings, dtc: str, model: str, module: str | None = None, transport: httpx.AsyncBaseTransport | None = None
-) -> ManualResult:
+    settings: Settings, dtc: str, model: str, transport: httpx.AsyncBaseTransport | None = None
+) -> ManualBundle:
+    """All manual modules for this DTC and model, each trimmed so the total stays within TOTAL_CHARS."""
     if not settings.manual_api_base_url:
-        return ManualResult("disabled")
+        return ManualBundle("disabled")
 
-    key = (dtc, model, (module or "").lower())
+    key = (dtc, model)
     hit = _cache.get(key)
     if hit and time.monotonic() - hit[0] < CACHE_TTL_SECONDS:
         return hit[1]
@@ -144,19 +153,19 @@ async def fetch_manual(
     )
     try:
         async with httpx.AsyncClient(
-            base_url=settings.manual_api_base_url, auth=auth, timeout=15, follow_redirects=False, transport=transport
+            base_url=settings.manual_api_base_url, auth=auth, timeout=20, follow_redirects=False, transport=transport
         ) as client:
-            result = await _lookup(client, dtc, model, module)
+            bundle = await _lookup(client, dtc, model)
     except (httpx.HTTPError, ValueError) as exc:
         logger.error("manual lookup failed: %s", type(exc).__name__)
-        return ManualResult("unavailable")
+        return ManualBundle("unavailable")
 
-    if result.status in ("used", "not_found"):
-        _cache[key] = (time.monotonic(), result)
-    return result
+    if bundle.status in ("used", "not_found"):
+        _cache[key] = (time.monotonic(), bundle)
+    return bundle
 
 
-async def _lookup(client: httpx.AsyncClient, dtc: str, model: str, module: str | None) -> ManualResult:
+async def _lookup(client: httpx.AsyncClient, dtc: str, model: str) -> ManualBundle:
     modules: list[dict] = []
     name_used = model
     for name in _model_name_variants(model):
@@ -166,18 +175,25 @@ async def _lookup(client: httpx.AsyncClient, dtc: str, model: str, module: str |
             name_used = name
             break
     if not modules:
-        return ManualResult("not_found")
+        return ManualBundle("not_found")
 
-    chosen = _choose(modules, module)
-    if chosen is None:
-        if module:  # asked for a module that does not exist
-            return ManualResult("not_found", modules=modules)
-        return ManualResult("needs_module", modules=modules)
+    per_module = max(MIN_CHARS_PER_MODULE, min(MAX_CHARS_PER_MODULE, TOTAL_CHARS // len(modules)))
+    sem = asyncio.Semaphore(CONCURRENCY)
 
-    status, body = await _get_json(
-        client, PAGE_PATH, {"code": dtc, "model_name": name_used, "module": str(chosen["id"] if chosen["id"] is not None else chosen["name"])}
-    )
-    text = _parse_pages(body) if status == 200 else ""
-    if not text:
-        return ManualResult("not_found", modules=modules)
-    return ManualResult("used", text=text, module=chosen["name"], modules=modules)
+    async def one(m: dict) -> Section | None:
+        async with sem:
+            ref = str(m["id"] if m["id"] is not None else m["name"])
+            status, body = await _get_json(client, PAGE_PATH, {"code": dtc, "model_name": name_used, "module": ref})
+        text = _parse_pages(body) if status == 200 else ""
+        return Section(m["name"], text) if text else None
+
+    results = await asyncio.gather(*(one(m) for m in modules))
+    sections, truncated = [], False
+    for s in results:
+        if s is None:
+            continue
+        if len(s.text) > per_module:
+            s.text, truncated = s.text[:per_module], True
+        sections.append(s)
+    names = [m["name"] for m in modules]
+    return ManualBundle("used", sections, names, truncated) if sections else ManualBundle("not_found", [], names)

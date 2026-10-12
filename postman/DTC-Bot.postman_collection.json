@@ -1,0 +1,205 @@
+{
+  "info": {
+    "name": "DTC Bot",
+    "description": "Local tests for the DTC Bot API. Set api_key in the DTC Bot Local environment (copy API_KEY from .env).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Health (public)",
+      "request": { "method": "GET", "url": "{{base_url}}/health" },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 and ok', () => { pm.response.to.have.status(200); pm.expect(pm.response.json().status).to.eql('ok'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Health DB (needs key) - expect 13345 cases",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "X-API-Key", "value": "{{api_key}}" }],
+        "url": "{{base_url}}/health/db"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 and cases loaded', () => { pm.response.to.have.status(200); pm.expect(pm.response.json().cases).to.be.above(0); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Analyze - common DTC, exact match (tier 1)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "X-API-Key", "value": "{{api_key}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"dtc_code\": \"P200200\",\n  \"model_line\": \"HECTOR\",\n  \"complaint\": \"MIL light glowing while driving\"\n}"
+        },
+        "url": "{{base_url}}/analyze"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const d = pm.response.json();",
+              "pm.test('200', () => pm.response.to.have.status(200));",
+              "pm.test('has evidence with stats and cases', () => { pm.expect(d.evidence.stats.total_cases).to.be.above(0); pm.expect(d.evidence.cases.length).to.be.above(0); });",
+              "pm.test('exact DTC+model cases come first (tier 1)', () => pm.expect(d.evidence.cases[0].tier).to.eql(1));",
+              "pm.test('retrieval_mode present', () => pm.expect(['keyword','hybrid']).to.include(d.evidence.retrieval_mode));",
+              "pm.test('no raw phone numbers leak', () => pm.expect(JSON.stringify(d)).to.not.match(/(?<!\\d)[6-9]\\d{9}(?!\\d)/));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Analyze - DTC on a different model (tier 2 fallback)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "X-API-Key", "value": "{{api_key}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"dtc_code\": \"P200200\",\n  \"model_line\": \"ASTOR\",\n  \"complaint\": \"engine light on\"\n}"
+        },
+        "url": "{{base_url}}/analyze"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const d = pm.response.json();",
+              "pm.test('200', () => pm.response.to.have.status(200));",
+              "pm.test('fell back to same DTC on another model (tier 2)', () => pm.expect(d.evidence.cases[0].tier).to.eql(2));",
+              "pm.test('stats scope covers all models', () => pm.expect(d.evidence.stats.scope).to.eql('dtc_all_models'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Analyze - unknown DTC (tier 3: similar complaints)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "X-API-Key", "value": "{{api_key}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"dtc_code\": \"P999999\",\n  \"model_line\": \"HECTOR\",\n  \"complaint\": \"AC not working properly\"\n}"
+        },
+        "url": "{{base_url}}/analyze"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const d = pm.response.json();",
+              "pm.test('200', () => pm.response.to.have.status(200));",
+              "pm.test('no stats for unknown DTC', () => pm.expect(d.evidence.stats.total_cases).to.eql(0));",
+              "pm.test('similar complaints from other DTCs (tier 3)', () => pm.expect(d.evidence.cases[0].tier).to.eql(3));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Negative - missing API key (expect 401)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"dtc_code\": \"P200200\",\n  \"model_line\": \"HECTOR\",\n  \"complaint\": \"MIL light glowing\"\n}"
+        },
+        "url": "{{base_url}}/analyze"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('401 Unauthorized', () => pm.response.to.have.status(401));"]
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Negative - bad input + extra field (expect 422)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "X-API-Key", "value": "{{api_key}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"dtc_code\": \"x\",\n  \"model_line\": \"HECTOR\",\n  \"complaint\": \"hi\",\n  \"is_admin\": true\n}"
+        },
+        "url": "{{base_url}}/analyze"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('422 validation error', () => pm.response.to.have.status(422));"]
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Analyze - full LLM answer (needs OPENAI_API_KEY)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "X-API-Key", "value": "{{api_key}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"dtc_code\": \"P200200\",\n  \"model_line\": \"HECTOR\",\n  \"complaint\": \"MIL light glowing while driving\"\n}"
+        },
+        "url": "{{base_url}}/analyze"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const d = pm.response.json();",
+              "pm.test('200', () => pm.response.to.have.status(200));",
+              "pm.test('LLM analysis present (null means OPENAI_API_KEY not set)', () => { pm.expect(d.analysis).to.not.eql(null); pm.expect(d.analysis.fix_steps.length).to.be.above(0); pm.expect(d.analysis.likely_causes.length).to.be.above(0); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

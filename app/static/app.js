@@ -16,6 +16,9 @@
   let vehicle = { dtc: "", model: "" };
   let timer = null;
   let busy = false;
+  let inlineBusy = false; // true while only the question card shows a small loader
+  let asking = false; // whether the current diagnosis is waiting for an answer
+  let modelCases = new Map(); // model_line -> number of past repairs
 
   // ---------- helpers: text only, never parsed as markup ----------
   function el(tag, props = {}, children = []) {
@@ -39,10 +42,13 @@
     const started = Date.now();
     $("loading-title").textContent = title;
     $("status-text").textContent = text;
-    $("status-time").textContent = "0 s";
+    $("status-time").textContent = "0:00";
     show($("status"));
     clearInterval(timer);
-    timer = setInterval(() => { $("status-time").textContent = `${Math.round((Date.now() - started) / 1000)} s`; }, 1000);
+    timer = setInterval(() => {
+      const t = Math.round((Date.now() - started) / 1000);
+      $("status-time").textContent = `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}`;
+    }, 1000);
     document.querySelectorAll("button").forEach((b) => { b.disabled = true; });
   }
   function clearBusy() {
@@ -51,18 +57,55 @@
     show($("status"), false);
     document.querySelectorAll("button").forEach((b) => { b.disabled = false; });
   }
+  // Small loader for follow-up questions: only the question card changes, the rest of the page stays as it is.
+  function setInlineBusy(on, text = "Working out the next question…") {
+    inlineBusy = on;
+    busy = on;
+    clearInterval(timer);
+    show($("q-loader"), on);
+    $("answers").hidden = on || !asking;
+    $("note-wrap").hidden = on || !asking;
+    if (on) {
+      const started = Date.now();
+      $("q-loader-text").textContent = text;
+      $("q-loader-time").textContent = "";
+      timer = setInterval(() => {
+        const s = Math.round((Date.now() - started) / 1000);
+        $("q-loader-time").textContent = s >= 2 ? `${s} s` : "";
+      }, 1000);
+    }
+  }
   function showError(msg) { const e = $("error"); e.textContent = msg; show(e); }
   const hideError = () => show($("error"), false);
 
   function screen(name) {
-    for (const id of ["login", "blocked", "start", "work"]) show($(`screen-${id}`), id === name);
+    for (const id of ["login", "blocked", "start", "work", "done"]) show($(`screen-${id}`), id === name);
+    document.body.classList.toggle("on-start", name === "start");
+    show($("action-bar"), name === "start" || name === "work");
+    show($("start-btn"), name === "start");
+    show($("reset"), name === "work");
+    if (name === "start") { show($("copy-btn"), false); show($("print-btn"), false); updateStartNote(); }
   }
-  function setStep(n) {
+  function updateStartNote() {
+    const note = $("action-note");
+    note.classList.remove("strong");
+    const code = $("dtc").value;
+    note.textContent = code ? `${code} on ${friendly($("model").value)}. Ready to start.` : "Choose a car model and a fault code.";
+  }
+  const STEP_NAMES = ["Fault code", "Questions", "Diagnosis", "Feedback"];
+  function setStep(n) { // n = 1..4 is the current step; 5 means every step is done
     document.querySelectorAll("#stepper li").forEach((li) => {
       const s = Number(li.dataset.step);
       li.classList.toggle("is-current", s === n);
       li.classList.toggle("is-done", s < n);
+      li.querySelector(".dot").textContent = s < n ? "✓" : String(s);
+      if (s === n) li.setAttribute("aria-current", "step"); else li.removeAttribute("aria-current");
     });
+    document.querySelectorAll("#step-bars span").forEach((bar, i) => {
+      bar.className = i + 1 < n ? "is-done" : i + 1 === n ? "is-current" : "";
+    });
+    $("step-label").textContent = n > STEP_NAMES.length ? "Complete" : STEP_NAMES[n - 1];
+    $("step-count").textContent = n > STEP_NAMES.length ? "All steps done" : `Step ${n} of ${STEP_NAMES.length}`;
   }
 
   async function api(path, { method = "GET", body, timeoutMs = 120000 } = {}) {
@@ -97,16 +140,18 @@
     }
   }
 
-  async function run(busyText, fn, busyTitle) {
+  // inline = true: small loader inside the question card only (follow-up questions).
+  // inline = false: full banner that locks the page (first load after picking a code, resume, saving feedback).
+  async function run(busyText, fn, busyTitle, inline = false) {
     hideError();
-    setBusy(busyText, busyTitle);
+    if (inline) setInlineBusy(true, busyText); else setBusy(busyText, busyTitle);
     try {
       await fn();
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) { await boot(); }
       else showError(err.message || "Something went wrong. Please try again.");
     } finally {
-      clearBusy();
+      if (inline) setInlineBusy(false); else clearBusy();
     }
   }
 
@@ -135,6 +180,8 @@
     const models = await api("/catalog");
     const sel = $("model");
     clear(sel);
+    modelCases = new Map(models.models.map((m) => [m.model_line, m.cases]));
+    $("f-models").textContent = String(models.models.length);
     for (const m of models.models) sel.append(el("option", { text: friendly(m.model_line), attrs: { value: m.model_line } }));
     screen("start");
     setStep(1);
@@ -151,6 +198,8 @@
     clear(select);
     select.append(el("option", { text: "Select a fault code", attrs: { value: "" } }));
     for (const d of data.dtcs) select.append(el("option", { text: d.dtc_code, attrs: { value: d.dtc_code } }));
+    $("f-codes").textContent = String(data.dtcs.length);
+    $("f-cases").textContent = String(modelCases.get(model) ?? 0);
     updateDtcMeta();
   }
   $("model").addEventListener("change", () => run("Loading fault codes…", loadDtcs));
@@ -160,6 +209,7 @@
     $("dtc-meta").textContent = !dtcOptions.size
       ? "No fault codes with complete manual procedures are available for this model."
       : !code ? "Only fault codes with complete manuals and matching past cases are shown." : "";
+    updateStartNote();
   }
   $("dtc").addEventListener("change", updateDtcMeta);
 
@@ -210,14 +260,16 @@
     if (!diagnosisId || busy) return;
     const note = $("note").value.trim();
     const asked = $("question").textContent;
+    const id = diagnosisId;
     run("Updating the likely causes…", async () => {
-      const d = await api(`/diagnoses/${diagnosisId}/answers`, { method: "POST", body: { answer, note } });
+      const d = await api(`/diagnoses/${id}/answers`, { method: "POST", body: { answer, note } });
+      if (id !== diagnosisId) return; // the user started a new diagnosis while this answer was in flight
       history.push({ question: asked, answer, note });
       $("note").value = "";
       $("note-wrap").open = false;
       renderState(d);
       await refreshCost();
-    });
+    }, undefined, true);
   }
   $("answers").addEventListener("click", (ev) => {
     const btn = ev.target.closest("button[data-answer]");
@@ -233,7 +285,7 @@
 
   // ---------- rendering ----------
   function renderState(d) {
-    const asking = d.status === "asking";
+    asking = d.status === "asking";
     const concluded = d.status === "concluded";
     setStep(concluded ? 3 : 2);
     renderCandidates(d.candidates || []);
@@ -243,9 +295,17 @@
       : "There are no past repairs or manual text for this code and model, so there is nothing to base a diagnosis on.";
     $("q-count").textContent = asking ? `${d.questions_asked + 1} of up to ${d.max_questions}` : "";
     $("q-meter").style.width = `${Math.min(100, Math.round(((asking ? d.questions_asked : d.max_questions) / d.max_questions) * 100))}%`;
-    show($("answers"), asking);
-    show($("note-wrap"), asking);
+    show($("answers"), asking && !inlineBusy); // while the small loader is up, the buttons stay hidden until it clears
+    show($("note-wrap"), asking && !inlineBusy);
+    show($("question-card"), !concluded);
     show($("conclusion-card"), Boolean(d.conclusion));
+    const note = $("action-note");
+    note.textContent = asking ? `Question ${d.questions_asked + 1} of up to ${d.max_questions}. Answer Yes, No or Not sure.`
+      : concluded ? "Diagnosis ready. Review the repair steps, then give feedback after the repair."
+      : "No diagnosis is possible for this code and model.";
+    note.classList.toggle("strong", concluded);
+    show($("copy-btn"), concluded);
+    show($("print-btn"), concluded);
     show($("outcome-card"), concluded);
     if (d.conclusion) renderConclusion(d.conclusion);
     $("diag-id").textContent = `Diagnosis id: ${d.diagnosis_id}`;
@@ -259,7 +319,7 @@
     for (const c of cands) {
       const fill = el("span");
       fills.push([fill, Math.max(0, Math.min(100, c.likelihood))]);
-      ul.append(el("li", {}, [
+      ul.append(el("li", { cls: `rank-${Math.min(cands.indexOf(c) + 1, 3)}` }, [
         el("div", { cls: "cand-head" }, [el("span", { text: c.cause }), el("strong", { text: `${c.likelihood}%` })]),
         el("div", { cls: "bar", attrs: { role: "img", "aria-label": `${c.likelihood} percent` } }, [fill]),
         el("div", { cls: "cand-why", text: c.reasoning }),
@@ -272,13 +332,20 @@
     const ol = $("history");
     clear(ol);
     show($("history-empty"), history.length === 0);
-    history.forEach((h) => {
-      ol.append(el("li", {}, [
-        el("span", { text: h.question }),
-        el("span", { cls: `tag ${h.answer}`, text: ANSWER_LABEL[h.answer] || h.answer }),
-        ...(h.note ? [el("span", { cls: "muted", text: `Note: ${h.note}` })] : []),
+    show(ol, history.length > 0);
+    history.forEach((h, i) => {
+      ol.append(el("li", { cls: "row-item" }, [
+        el("div", { cls: "h-top" }, [
+          el("div", {}, [el("p", { cls: "h-n", text: `Q${i + 1}` }), el("p", { cls: "h-q", text: h.question })]),
+          el("span", { cls: `tag ${h.answer}`, text: ANSWER_LABEL[h.answer] || h.answer }),
+        ]),
+        ...(h.note ? [el("p", { cls: "h-note", text: `Note: ${h.note}` })] : []),
       ]));
     });
+    const count = (a) => history.filter((h) => h.answer === a).length;
+    $("t-yes").textContent = String(count("yes"));
+    $("t-no").textContent = String(count("no"));
+    $("t-unsure").textContent = String(count("not_sure"));
   }
 
   function renderEvidence(ev) {
@@ -313,17 +380,35 @@
     const badge = $("confidence");
     badge.textContent = `${k.confidence} confidence`;
     badge.className = `badge ${k.confidence}`;
-    const list = (cls, items) => el(cls === "steps" ? "ol" : "ul", { cls: cls === "steps" ? "steps" : "" }, items.map((t) => el("li", { text: t })));
+
+    const list = (items, cls = "") => el(cls ? "ol" : "ul", cls ? { cls } : {}, items.map((t) => el("li", { text: t })));
+    const stat = (n, label) => el("div", {}, [el("p", { cls: "tally-n", text: String(n) }), el("p", { cls: "tally-l", text: label })]);
+    const meta = (text) => (text ? [el("span", { cls: "acc-meta", text })] : []);
+    const card = (title, metaText, body) => el("section", { cls: "mini-card" }, [
+      el("div", { cls: "mini-head" }, [el("h3", { text: title }), ...meta(metaText)]), body,
+    ]);
+    const fold = (title, body) => el("details", { cls: "acc" }, [
+      el("summary", {}, [el("span", { cls: "acc-title", text: title })]),
+      el("div", { cls: "acc-body" }, [body]),
+    ]);
+
     box.append(
-      el("p", { cls: "problem", text: k.problem }),
-      el("h3", { text: "Why we think so" }), list("", k.evidence),
-      el("h3", { text: "Repair steps" }), list("steps", k.fix_steps),
-      el("h3", { text: "Parts" }),
-      k.parts.length ? el("div", { cls: "parts" }, k.parts.map((p) => el("span", { cls: "part", text: p }))) : el("p", { cls: "muted", text: "No part replacement is supported by the evidence." }),
-      el("h3", { text: "Confirm the repair" }), list("", k.verify_fix),
-      el("h3", { text: "If it does not fix it" }),
-      k.alternatives.length ? list("", k.alternatives.map((a) => `${a.cause}: ${a.when_to_consider}`)) : el("p", { cls: "muted", text: "No alternatives listed." }),
-      el("p", { cls: "safety", text: k.safety_note }),
+      el("div", { cls: "problem-card" }, [
+        el("p", { cls: "problem-kicker", text: "Most likely problem" }),
+        el("p", { cls: "problem", text: k.problem }),
+        el("div", { cls: "problem-stats" }, [stat(k.fix_steps.length, "Repair steps"), stat(k.parts.length, "Parts"), stat(history.length, "Questions answered")]),
+      ]),
+      el("div", { cls: "safety-banner", attrs: { role: "note" } }, [el("strong", { text: "Safety first. " }), document.createTextNode(k.safety_note)]),
+      card("Repair steps", `${k.fix_steps.length} step${k.fix_steps.length === 1 ? "" : "s"}`, list(k.fix_steps, "steps")),
+      el("div", { cls: "two-up" }, [
+        card("Parts", k.parts.length ? String(k.parts.length) : "none",
+          k.parts.length ? el("div", { cls: "parts" }, k.parts.map((p) => el("span", { cls: "part", text: p }))) : el("p", { cls: "muted", text: "No part replacement is supported by the evidence." })),
+        card("Confirm the repair", "", list(k.verify_fix)),
+      ]),
+      el("div", { cls: "acc-list" }, [
+        fold("Why we think so", list(k.evidence)),
+        fold("If it does not fix it", k.alternatives.length ? list(k.alternatives.map((a) => `${a.cause}: ${a.when_to_consider}`)) : el("p", { cls: "muted", text: "No alternatives listed." })),
+      ]),
     );
   }
 
@@ -331,21 +416,27 @@
     const data = await api(`/diagnoses/${diagnosisId}/cost`);
     const t = data.run_total;
     const dl = $("cost");
-    const tbody = $("calls").querySelector("tbody");
+    const list = $("calls");
     clear(dl);
-    clear(tbody);
-    if (!t) { dl.append(el("dd", { text: "No model calls yet." })); show($("calls"), false); return; }
+    clear(list);
+    if (!t) { dl.append(el("dd", { text: "No model calls yet." })); show(list, false); return; }
+    const n = (v) => Number(v).toLocaleString("en-US");
     const row = (k, v) => dl.append(el("dt", { text: k }), el("dd", { text: v }));
     row("Cost of this run", `$${t.cost_usd.toFixed(5)}`);
     row("Model calls", String(t.calls));
-    row("Input tokens", `${t.input_tokens} (${t.cached_input_tokens} cached)`);
-    row("Output tokens", `${t.output_tokens} (${t.reasoning_tokens} thinking)`);
+    row("Input tokens", `${n(t.input_tokens)} (${n(t.cached_input_tokens)} cached)`);
+    row("Output tokens", `${n(t.output_tokens)} (${n(t.reasoning_tokens)} thinking)`);
     for (const c of data.calls) {
-      tbody.append(el("tr", {}, [c.purpose, c.input_tokens, c.cached_input_tokens, c.output_tokens, c.reasoning_tokens,
-        `${(c.latency_ms / 1000).toFixed(1)}s`, c.cost_usd === null ? "n/a" : c.cost_usd.toFixed(5)]
-        .map((v) => el("td", { text: String(v) }))));
+      list.append(el("li", {}, [
+        el("div", { cls: "call-top" }, [
+          el("strong", { text: c.purpose }),
+          el("span", { cls: "muted", text: `${(c.latency_ms / 1000).toFixed(1)} s` }),
+          el("span", { cls: "call-cost", text: c.cost_usd === null ? "n/a" : `$${c.cost_usd.toFixed(5)}` }),
+        ]),
+        el("div", { cls: "call-tokens", text: `in ${n(c.input_tokens)} (${n(c.cached_input_tokens)} cached) · out ${n(c.output_tokens)} (${n(c.reasoning_tokens)} thinking)` }),
+      ]));
     }
-    show($("calls"));
+    show(list);
   }
 
   // ---------- copy / print ----------
@@ -369,10 +460,23 @@
   $("print-btn").addEventListener("click", () => window.print());
 
   // ---------- outcome feedback ----------
+  // Final, read-only page shown once the feedback is saved.
+  function showDone(o) {
+    $("d-code").textContent = vehicle.dtc;
+    $("d-model").textContent = friendly(vehicle.model);
+    $("d-result").textContent = { worked: "Fixed it", partly: "Partly fixed", not_worked: "Did not fix it" }[o.result] || o.result;
+    $("d-id").textContent = diagnosisId;
+    screen("done");
+    setStep(5);
+    window.scrollTo({ top: 0 });
+    $("done-title").focus();
+  }
+
   function markOutcomeSaved(o) {
     const s = $("outcome-saved");
     s.textContent = `Saved: ${RESULT_LABEL[o.result] || o.result}. Thank you.`;
     show(s);
+    setStep(5);
   }
   $("outcome-form").addEventListener("submit", (ev) => {
     ev.preventDefault();
@@ -384,21 +488,26 @@
         body: { result, actual_cause: $("actual-cause").value.trim(), parts_replaced: parts, notes: $("outcome-notes").value.trim() },
       });
       markOutcomeSaved(o);
+      showDone(o);
     });
   });
 
   // ---------- reset ----------
-  $("reset").addEventListener("click", () => {
+  function newDiagnosis() {
     diagnosisId = null;
     history = [];
     lastConclusion = null;
     hideError();
     show($("outcome-saved"), false);
+    show($("copy-note"), false);
     $("outcome-form").reset();
     screen("start");
     setStep(1);
     window.scrollTo({ top: 0 });
-  });
+  }
+  $("reset").addEventListener("click", newDiagnosis);
+  $("done-new").addEventListener("click", newDiagnosis);
+  $("done-view").addEventListener("click", () => { screen("work"); setStep(5); window.scrollTo({ top: 0 }); });
 
   boot();
 })();

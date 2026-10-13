@@ -1,0 +1,124 @@
+SERVICE MANUAL TEXT FOR P187973 ON MG_COMET_EV (exactly as stored in the database)
+==========================================================================================
+
+Manual model: MG Comet EV | Section 1: BMS (LG) DTC List | 2,501 characters | COMPLETE procedure (used by the AI)
+------------------------------------------------------------------------------------------
+--- Page 155 ---
+
+## DTC P187873 or P187973
+
+## Diagnostic Description
+
+ Be sure to perform the Diagnostic
+Circuit/System Inspection - Vehicle
+prior to using the diagnostic
+procedure.
+ Refer to Strategy-based Diagnosis
+for the overview of diagnostic
+method.
+ The introduction for various
+diagnosis categories is provided in
+Diagnostic Description.
+
+## DTC Description
+
+DTC P187873：Main switch: main
+positive switch stick
+DTC P187973：Main switch: main
+negative switch stick
+
+## System Description
+
+Hybrid/EV Battery Pack monitors the
+cell temp sensor.
+
+## DTC Operating Conditions
+
+ Start 100ms after off.
+
+## DTC Setting Conditions
+
+ DTC P187873：BMS does not
+close the precharge relay and main
+positive relay, and the detected total
+voltage is ≥ 95% of total battery
+voltage and the total battery voltage
+is ≥ 30V.
+ DTC P187973：BMS does not
+close the main negative relay, the
+detected total voltage is ≥ 95% of
+total battery voltage and the total
+battery voltage is ≥ 30V.
+
+## Strategy After DTC Appears
+
+ Record the DTC.
+
+## Clear Fault Information Conditions
+
+ After 40 non-fault operating cycles
+(from ignition on to ignition off), the
+historical DTCs shall be clarified.
+ ECU receives a command of
+clearing DTCs from the tester.
+
+## Reference Information
+
+## Electrical Information Reference
+
+ Bypass testing
+ Connector repair
+ Refer to the Testing for Intermittent
+Conditions and Poor Connections
+ Circuit repair
+
+## Diagnosis Tool Reference
+
+Refer to the Control module reference to
+obtain the information of diagnosis tool.
+
+## Circuit/System Inspection
+
+1. Clear the malfunction codes and
+check if the malfunction codes do
+not reoccur?
+─ Yes. Refer to the Testing for
+intermittent conditions and poor
+connections for intermittent
+malfunctions.
+─ No. Proceed to the next
+inspection.
+2. Check if other DTCs are set for the
+system?
+─ Yes. Perform the corresponding
+malfunction diagnosis according
+to the malfunction codes.
+─ No. Proceed to the next
+inspection.
+3. Inspect the wiring harness
+connectors for broken, poor contact,
+aging and looseness?
+─ Yes. Inspect and repair the
+relevant malfunctions.
+─ No. Proceed to the next
+inspection.
+4. Replacement the Hybrid/EV Battery
+Pack. Operate the vehicle in the
+DTC Operating Conditions. Whether
+the DTC is set?
+─ No. Diagnosis completed.
+
+--- Page 156 ---
+
+─ Yes. Install the original module
+and contact the technical
+engineer.
+
+## Maintenance Guide
+
+ Hybrid/EV Battery Pack
+Replacement
+ Hybrid/EV Battery Pack
+Programming and Setup
+
+==========================================================================================

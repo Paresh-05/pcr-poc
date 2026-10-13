@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     llm_api_key: SecretStr | None = None
     llm_base_url: str | None = None
     llm_model: str | None = None
+    llm_pack_model: str | None = None  # stronger model for the once-per-code knowledge pack; defaults to llm_model
     # How much the model "thinks" before answering (none | low | medium | high ...). Lower = faster and cheaper.
     # STEP applies to the yes/no question turns (speed matters); REASONING applies to the case digest and the final
     # conclusion (quality matters). Unset = the model's own default.

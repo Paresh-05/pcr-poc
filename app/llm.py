@@ -30,12 +30,16 @@ def _extract_json(text: str, schema: type[T]) -> T:
 class OpenAILLM:
     def __init__(self, settings: Settings, recorder: UsageRecorder | None = None) -> None:
         self.model = settings.llm_model
+        self.pack_model = settings.llm_pack_model or settings.llm_model
         self.effort = settings.llm_reasoning_effort
         self.step_effort = settings.llm_step_effort
         self.recorder = recorder
         self.client = AsyncOpenAI(
-            api_key=settings.llm_api_key.get_secret_value(), base_url=settings.llm_base_url, timeout=90, max_retries=2
+            api_key=settings.llm_api_key.get_secret_value(), base_url=settings.llm_base_url, timeout=300, max_retries=2
         )
+
+    def _model(self, purpose: str) -> str:
+        return self.pack_model if purpose == "pack" else self.model
 
     def _extra(self, purpose: str) -> dict:
         effort = self.step_effort if purpose in ("propose", "step") else self.effort
@@ -53,13 +57,13 @@ class OpenAILLM:
 
     async def _record(self, resp, purpose: str, started: float) -> None:
         if self.recorder:
-            await self.recorder.record(self.model, purpose, usage_from_response(resp), int((time.monotonic() - started) * 1000))
+            await self.recorder.record(self._model(purpose), purpose, usage_from_response(resp), int((time.monotonic() - started) * 1000))
 
     async def summarize(self, system: str, user: str, purpose: str = "summarize") -> str:
         started = time.monotonic()
         resp = await self._call(
             self.client.chat.completions.create, purpose,
-            model=self.model, messages=[{"role": "system", "content": system}, {"role": "user", "content": user}],
+            model=self._model(purpose), messages=[{"role": "system", "content": system}, {"role": "user", "content": user}],
         )
         await self._record(resp, purpose, started)
         return (resp.choices[0].message.content or "").strip()
@@ -69,7 +73,7 @@ class OpenAILLM:
         started = time.monotonic()
         try:
             completion = await self._call(
-                self.client.chat.completions.parse, purpose, model=self.model, messages=messages, response_format=schema
+                self.client.chat.completions.parse, purpose, model=self._model(purpose), messages=messages, response_format=schema
             )
             await self._record(completion, purpose, started)
             parsed = completion.choices[0].message.parsed
@@ -84,6 +88,6 @@ class OpenAILLM:
             + json.dumps(schema.model_json_schema()),
         }
         started = time.monotonic()
-        completion = await self._call(self.client.chat.completions.create, purpose, model=self.model, messages=messages)
+        completion = await self._call(self.client.chat.completions.create, purpose, model=self._model(purpose), messages=messages)
         await self._record(completion, purpose, started)
         return _extract_json(completion.choices[0].message.content or "", schema)

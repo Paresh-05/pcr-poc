@@ -136,3 +136,18 @@ INSERT INTO model_prices (model, input_per_mtok, cached_input_per_mtok, output_p
     ('gpt-6-luna', 0.10, 0.01, 0.50, 'OpenRouter catalog openai/gpt-6-luna, 2026-10-13 (rates for prompts under 272k tokens)'),
     ('gpt-6-sol',  2.00, 0.20, 10.00, 'OpenRouter catalog openai/gpt-6-sol, 2026-10-13 (rates for prompts under 272k tokens)')
 ON CONFLICT (model) DO NOTHING;
+
+-- Knowledge pack: what is known about one fault code, built once from the manual and the past repairs (see app/pack.py)
+CREATE TABLE IF NOT EXISTS knowledge_packs (
+    dtc_code      TEXT NOT NULL,
+    model_line    TEXT NOT NULL,
+    version       INTEGER NOT NULL,
+    source_counts JSONB NOT NULL,
+    checks        JSONB NOT NULL,
+    pack          JSONB NOT NULL,
+    built_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (dtc_code, model_line)
+);
+
+ALTER TABLE diagnosis_steps ADD COLUMN IF NOT EXISTS explanation TEXT;
+ALTER TABLE knowledge_packs ADD COLUMN IF NOT EXISTS build_cost_usd NUMERIC(12, 6);

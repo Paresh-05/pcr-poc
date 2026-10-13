@@ -239,7 +239,7 @@
     run("Loading the diagnosis…", async () => {
       const d = await api(`/diagnoses/${id}`);
       diagnosisId = d.diagnosis_id;
-      history = d.steps.map((s) => ({ question: s.question, answer: s.answer, note: s.note || "" }));
+      history = d.steps.map((s) => ({ question: s.question, answer: s.answer, note: s.note || "", showed: s.explanation || "" }));
       vehicle = { dtc: d.dtc_code, model: d.model_line };
       enterWork(d, { scope: d.scope, manual: { status: d.manual_status, modules: [] }, resumed: true });
       if (d.outcome) markOutcomeSaved(d.outcome);
@@ -264,7 +264,7 @@
     run("Updating the likely causes…", async () => {
       const d = await api(`/diagnoses/${id}/answers`, { method: "POST", body: { answer, note } });
       if (id !== diagnosisId) return; // the user started a new diagnosis while this answer was in flight
-      history.push({ question: asked, answer, note });
+      history.push({ question: asked, answer, note, showed: d.explanation || "" });
       $("note").value = "";
       $("note-wrap").open = false;
       renderState(d);
@@ -340,6 +340,7 @@
           el("span", { cls: `tag ${h.answer}`, text: ANSWER_LABEL[h.answer] || h.answer }),
         ]),
         ...(h.note ? [el("p", { cls: "h-note", text: `Note: ${h.note}` })] : []),
+        ...(h.showed ? [el("p", { cls: "h-note", text: `What it showed: ${h.showed}` })] : []),
       ]));
     });
     const count = (a) => history.filter((h) => h.answer === a).length;
@@ -359,7 +360,7 @@
     const manualLoaded = m.status === "used";
     if (ev.total_cases !== undefined) {
       chips.append(el("span", { cls: "chip", text: `${ev.total_cases} past repairs` }));
-      row("Past repairs", `${ev.total_cases}`);
+      row("Past repairs", ev.distinct_cases ? `${ev.total_cases} (${ev.distinct_cases} distinct)` : `${ev.total_cases}`);
     }
     if (ev.scope === "dtc_all_models") {
       chips.append(el("span", { cls: "chip warn", text: "From other models" }));
@@ -398,6 +399,7 @@
         el("p", { cls: "problem", text: k.problem }),
         el("div", { cls: "problem-stats" }, [stat(k.fix_steps.length, "Repair steps"), stat(k.parts.length, "Parts"), stat(history.length, "Questions answered")]),
       ]),
+      ...(k.confidence_note ? [el("p", { cls: "hint", text: `Confidence: ${k.confidence_note}` })] : []),
       el("div", { cls: "safety-banner", attrs: { role: "note" } }, [el("strong", { text: "Safety first. " }), document.createTextNode(k.safety_note)]),
       card("Repair steps", `${k.fix_steps.length} step${k.fix_steps.length === 1 ? "" : "s"}`, list(k.fix_steps, "steps")),
       el("div", { cls: "two-up" }, [
@@ -405,8 +407,11 @@
           k.parts.length ? el("div", { cls: "parts" }, k.parts.map((p) => el("span", { cls: "part", text: p }))) : el("p", { cls: "muted", text: "No part replacement is supported by the evidence." })),
         card("Confirm the repair", "", list(k.verify_fix)),
       ]),
+      ...((k.how_we_got_here || []).length ? [card("How we reached this finding", `${history.length} answer${history.length === 1 ? "" : "s"}`, list(k.how_we_got_here, "steps"))] : []),
       el("div", { cls: "acc-list" }, [
         fold("Why we think so", list(k.evidence)),
+        ...((k.ruled_out || []).length ? [fold("What was ruled out", list(k.ruled_out))] : []),
+        ...((k.uncertain || []).length ? [fold("What is still uncertain", list(k.uncertain))] : []),
         fold("If it does not fix it", k.alternatives.length ? list(k.alternatives.map((a) => `${a.cause}: ${a.when_to_consider}`)) : el("p", { cls: "muted", text: "No alternatives listed." })),
       ]),
     );
@@ -422,7 +427,12 @@
     if (!t) { dl.append(el("dd", { text: "No model calls yet." })); show(list, false); return; }
     const n = (v) => Number(v).toLocaleString("en-US");
     const row = (k, v) => dl.append(el("dt", { text: k }), el("dd", { text: v }));
-    row("Cost of this run", `$${t.cost_usd.toFixed(5)}`);
+    const pk = data.pack || {};
+    row("Questions and result", `$${(pk.built_in_this_run && pk.cost_usd !== null ? t.cost_usd - pk.cost_usd : t.cost_usd).toFixed(5)}`);
+    if (pk.cost_usd !== null && pk.cost_usd !== undefined) {
+      row("Knowledge pack", `$${pk.cost_usd.toFixed(5)} (built once for this code${pk.built_in_this_run ? ", built during this run" : ", shared by every diagnosis"})`);
+    }
+    row("Total for this run", `$${t.cost_usd.toFixed(5)}${pk.built_in_this_run || pk.cost_usd === null || pk.cost_usd === undefined ? "" : ` (+ $${pk.cost_usd.toFixed(5)} pack, built earlier = $${(t.cost_usd + pk.cost_usd).toFixed(5)} all-in)`}`);
     row("Model calls", String(t.calls));
     row("Input tokens", `${n(t.input_tokens)} (${n(t.cached_input_tokens)} cached)`);
     row("Output tokens", `${n(t.output_tokens)} (${n(t.reasoning_tokens)} thinking)`);
@@ -443,7 +453,8 @@
   function summaryText() {
     const k = lastConclusion;
     if (!k) return "";
-    const lines = [`${vehicle.dtc} on ${friendly(vehicle.model)}`, "", `Most likely problem: ${k.problem}`, `Confidence: ${k.confidence}`, "", "Why:", ...k.evidence.map((e) => `- ${e}`),
+    const lines = [`${vehicle.dtc} on ${friendly(vehicle.model)}`, "", `Most likely problem: ${k.problem}`, `Confidence: ${k.confidence}${k.confidence_note ? ` (${k.confidence_note})` : ""}`, "", "Why:", ...k.evidence.map((e) => `- ${e}`),
+      "", "How we reached this finding:", ...(k.how_we_got_here || []).map((h) => `- ${h}`),
       "", "Repair steps:", ...k.fix_steps.map((s, i) => `${i + 1}. ${s}`), "", `Parts: ${k.parts.length ? k.parts.join("; ") : "none supported"}`,
       "", "Confirm the repair:", ...k.verify_fix.map((v) => `- ${v}`), "", `Safety: ${k.safety_note}`];
     return lines.join("\n");

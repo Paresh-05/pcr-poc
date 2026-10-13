@@ -5,10 +5,11 @@ from decimal import Decimal
 
 import pytest
 
-from app import diagnosis, digest
+from app import diagnosis
 from app.config import Settings
 from app.db import create_pool
 from app.diagnosis_graph import Candidate, Conclusion, StepOut, build_graph
+from app.pack import Pack, PackCause, PackQuestion, Quote
 from app.usage import UsageRecorder, Usage
 
 DTC, MODEL, NO_DATA_DTC, PRICED = "ZZTEST1", "TESTMODEL", "ZZTEST9", "test-model"
@@ -33,20 +34,34 @@ class FakeLLM:
 
     async def structured(self, system, user, schema, purpose):
         await self._bill(purpose, Usage(input_tokens=2000, cached_input_tokens=1500, output_tokens=300, reasoning_tokens=50))
+        if schema is Pack:  # the once-per-code knowledge pack
+            return Pack(
+                fault_meaning="m", setting_conditions="s", gaps=[],
+                causes=[
+                    PackCause(cause="Sensor X", origin="both", matching_parts=["SENSOR-1"], replaces_nothing=False,
+                              quotes=[Quote(source="manual", text="Is the connector damaged?")], how_to_tell=["t"], repair_steps=["s1"]),
+                    PackCause(cause="Wiring", origin="manual", matching_parts=[], replaces_nothing=False,
+                              quotes=[Quote(source="manual", text="Repair the signal circuit")], how_to_tell=[], repair_steps=[]),
+                    PackCause(cause="ECU", origin="manual", matching_parts=[], replaces_nothing=False,
+                              quotes=[Quote(source="manual", text="this quote is invented")], how_to_tell=[], repair_steps=[]),
+                ],
+                question_bank=[PackQuestion(question="Is check number 1 positive?", source="manual",
+                                            yes_points_to=["Sensor X"], no_points_to=["Wiring"])],
+            )
         if schema is Conclusion:
-            return Conclusion(problem="Sensor X", confidence="high", evidence=["e"], fix_steps=["s1"], parts=["p"],
-                              verify_fix=["v"], safety_note="n", alternatives=[])
-        script = [[("Sensor X", 45), ("Wiring", 35), ("ECU", 20)], [("Sensor X", 55), ("Wiring", 30), ("ECU", 15)],
-                  [("Sensor X", 70), ("Wiring", 20), ("ECU", 10)], [("Sensor X", 85), ("Wiring", 10), ("ECU", 5)]]
+            return Conclusion(problem="Sensor X", confidence="high", evidence=["e"], how_we_got_here=["h"], ruled_out=[],
+                              uncertain=["u"], fix_steps=["s1"], parts=["p"], verify_fix=["v"], safety_note="n", alternatives=[])
+        script = [[("Sensor X", 55), ("Wiring", 30)], [("Sensor X", 70), ("Wiring", 20)],
+                  [("Sensor X", 80), ("Wiring", 15)], [("Sensor X", 90), ("Wiring", 6)]]
         likes = script[self.n_steps]
         self.n_steps += 1
         return StepOut(candidates=[Candidate(cause=c, likelihood=n, reasoning="r") for c, n in likes],
-                       next_question=f"Is check number {self.n_steps} positive?", ready_to_conclude=False)
+                       what_it_showed=f"answer {self.n_steps} moved the ranking", next_question=f"Is check number {self.n_steps + 1} positive?", ready_to_conclude=False)
 
 
 async def _seed(pool) -> None:
     async with pool.connection() as conn:
-        for i in range(digest.DIRECT_LIMIT + digest.BATCH_SIZE + 5):  # forces 2 batches + 1 merge
+        for i in range(60):
             await conn.execute(
                 "INSERT INTO cases (source_row, dtc_code, model_line, customer_verbatim, diagnosis, failed_parts) "
                 "VALUES (%s,%s,%s,'engine light on',%s,'[\"SENSOR-1\"]'::jsonb)", (-2000 - i, DTC, MODEL, f"replaced sensor {i}"))
@@ -71,7 +86,7 @@ async def _cleanup(pool) -> None:
         await conn.execute("DELETE FROM llm_calls WHERE model = %s OR run_id = ANY(%s)", (PRICED, ids))
         await conn.execute("DELETE FROM run_costs WHERE run_id = ANY(%s)", (ids,))
         await conn.execute("DELETE FROM diagnoses WHERE id = ANY(%s)", (ids,))
-        await conn.execute("DELETE FROM case_digests WHERE dtc_code = %s", (DTC,))
+        await conn.execute("DELETE FROM knowledge_packs WHERE dtc_code = %s", (DTC,))
         await conn.execute("DELETE FROM manual_dtcs WHERE manual_model = 'TESTMANUAL'")
         await conn.execute("DELETE FROM manual_model_map WHERE manual_model = 'TESTMANUAL'")
         await conn.execute("DELETE FROM cases WHERE dtc_code = %s", (DTC,))
@@ -92,32 +107,43 @@ async def _scenario() -> None:
         assert started["status"] == "asking" and started["question"] == "Is check number 1 positive?"
         assert started["answer_options"] == ["yes", "no", "not_sure"]
         assert started["evidence"]["manual"]["status"] == "used" and started["evidence"]["total_cases"] == 60
-        assert [c["cause"] for c in started["candidates"]] == ["Sensor X", "Wiring", "ECU"]
-        assert started["cost"]["calls"] == 4  # 2 digest batches + 1 merge + propose
+        assert [c["cause"] for c in started["candidates"]] == ["Sensor X", "Wiring"]  # the invented-quote cause was dropped
+        assert started["start_candidates"] == started["candidates"]
+        assert started["cost"]["calls"] == 1  # only the knowledge-pack call; the opening needs no AI
+        async with pool.connection() as conn:
+            cur = await conn.execute("SELECT pack FROM knowledge_packs WHERE dtc_code = %s", (DTC,))
+            (stored,) = await cur.fetchone()
+        assert stored["causes"][0]["cases_counted"] == 60 and stored["causes"][0]["share_pct"] == 100
+        assert stored["checks"]["quotes_dropped"] == 1 and stored["stats"]["distinct_cases"] == 60
 
         step = await diagnosis.answer_diagnosis(pool, llm, graph, did, "yes", "rust visible")
-        assert step["status"] == "asking" and step["questions_asked"] == 1 and step["candidates"][0]["likelihood"] == 55
+        assert step["status"] == "asking" and step["questions_asked"] == 1 and step["candidates"][0]["likelihood"] == 65
+        assert step["explanation"] == "answer 1 moved the ranking"
         step = await diagnosis.answer_diagnosis(pool, llm, graph, did, "not_sure", "")
         assert step["status"] == "asking" and step["questions_asked"] == 2
-        done = await diagnosis.answer_diagnosis(pool, llm, graph, did, "no", "")
+        step = await diagnosis.answer_diagnosis(pool, llm, graph, did, "no", "")
+        assert step["status"] == "asking"  # only two Yes/No answers so far: "not sure" does not count
+        done = await diagnosis.answer_diagnosis(pool, llm, graph, did, "yes", "")
         assert done["status"] == "concluded" and done["conclusion"]["problem"] == "Sensor X" and done["question"] is None
-        assert done["cost"]["calls"] == 8  # 4 at start + 3 answer steps + conclusion
+        assert done["conclusion"]["confidence"] == "high" and "confidence_note" in done["conclusion"]
+        assert done["cost"]["calls"] == 6  # pack + 4 answer steps + conclusion
 
-        # cost tables: 3 digest calls + 5 structured calls, priced at 0.10 / 0.01 / 0.50 per million tokens
-        expected = Decimal("3") * Decimal("0.00015") + Decimal("5") * Decimal("0.000215")
+        # cost tables: 6 structured calls, priced at 0.10 / 0.01 / 0.50 per million tokens
+        expected = Decimal("6") * Decimal("0.000215")
         async with pool.connection() as conn:
             cur = await conn.execute("SELECT calls, input_tokens, cached_input_tokens, output_tokens, reasoning_tokens, cost_usd, unpriced_calls FROM run_costs WHERE run_id = %s", (did,))
             calls, i, c, o, r, cost, unpriced = await cur.fetchone()
             cur = await conn.execute("SELECT count(*), sum(cost_usd), sum(total_tokens) FROM llm_calls WHERE run_id = %s", (did,))
             n_rows, summed, total_tokens = await cur.fetchone()
-        assert (calls, unpriced) == (8, 0) and n_rows == 8
-        assert (i, c, o, r) == (3 * 1000 + 5 * 2000, 5 * 1500, 3 * 100 + 5 * 300, 5 * 50)
+        assert (calls, unpriced) == (6, 0) and n_rows == 6
+        assert (i, c, o, r) == (6 * 2000, 6 * 1500, 6 * 300, 6 * 50)
         assert cost == summed == expected and total_tokens == i + o
         assert (await diagnosis.list_calls(pool, did))["run_total"]["cost_usd"] == pytest.approx(float(expected))
 
         shown = await diagnosis.get_diagnosis(pool, did)
-        assert shown["status"] == "concluded" and [s["answer"] for s in shown["steps"]] == ["yes", "not_sure", "no"]
-        assert shown["steps"][0]["note"] == "rust visible" and shown["steps"][2]["candidates_after"][0]["likelihood"] == 85
+        assert shown["status"] == "concluded" and [s["answer"] for s in shown["steps"]] == ["yes", "not_sure", "no", "yes"]
+        assert shown["steps"][0]["note"] == "rust visible" and shown["steps"][3]["candidates_after"][0]["likelihood"] == 91
+        assert shown["steps"][0]["explanation"] == "answer 1 moved the ranking" and shown["start_candidates"]
 
         # outcome feedback: stored once per diagnosis, private details removed, later answers replace earlier ones
         saved = await diagnosis.save_outcome(pool, did, "worked", "Sensor X failed, call 9876543210", ["SENSOR-1"], "all good")

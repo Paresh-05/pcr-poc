@@ -37,12 +37,14 @@ def _view(diag_id: uuid.UUID, status: str, state: dict) -> dict:
         "questions_asked": len(state.get("history", [])),
         "max_questions": MAX_QUESTIONS,
         "candidates": state.get("candidates", []),
+        "start_candidates": state.get("start_candidates", []),
+        "explanation": (state.get("history") or [{}])[-1].get("showed"),
         "conclusion": state.get("conclusion"),
     }
 
 
 def _stored_state(result: dict) -> dict:
-    keys = ("candidates", "history", "pending_question", "conclusion")
+    keys = ("candidates", "start_candidates", "history", "pending_question", "forced", "conclusion")
     return {k: result.get(k) for k in keys} | {"history": result.get("history", [])}
 
 
@@ -66,6 +68,7 @@ async def start_diagnosis(pool: AsyncConnectionPool, llm: LLM, graph, dtc: str, 
         summary = {
             "scope": evidence.scope,
             "total_cases": evidence.stats["total_cases"],
+            "distinct_cases": evidence.stats["distinct_cases"],
             "top_parts": evidence.stats["top_parts"],
             "manual": {"status": evidence.manual.status, "modules": evidence.manual.module_names,
                        "truncated": evidence.manual.truncated},
@@ -74,7 +77,9 @@ async def start_diagnosis(pool: AsyncConnectionPool, llm: LLM, graph, dtc: str, 
             state = {"candidates": [], "history": [], "pending_question": None, "conclusion": None}
             status = "no_evidence"
         else:
-            result = await graph.ainvoke({"mode": "start", "case_file": evidence.case_file, "candidates": [], "history": []})
+            result = await graph.ainvoke({
+                "mode": "start", "case_file": evidence.case_file, "pack": evidence.pack, "candidates": [], "history": [],
+            })
             state, status = _stored_state(result), result["status"]
 
         async with pool.connection() as conn:
@@ -102,7 +107,8 @@ async def answer_diagnosis(pool: AsyncConnectionPool, llm: LLM, graph, diag_id: 
     try:
         result = await graph.ainvoke({
             "mode": "answer", "case_file": case_file, "candidates": state["candidates"], "history": state["history"],
-            "pending_question": state["pending_question"], "answer": answer, "note": note,
+            "start_candidates": state.get("start_candidates", []), "pending_question": state["pending_question"],
+            "forced": state.get("forced", False), "answer": answer, "note": note,
         })
     finally:
         current_run.reset(token)
@@ -114,9 +120,10 @@ async def answer_diagnosis(pool: AsyncConnectionPool, llm: LLM, graph, diag_id: 
         async with pool.connection() as conn:
             async with conn.transaction():
                 await conn.execute(
-                    "INSERT INTO diagnosis_steps (diagnosis_id, step_no, question, answer, note, candidates) "
-                    "VALUES (%s,%s,%s,%s,%s,%s)",
-                    (diag_id, step_no, last["question"], last["answer"], last["note"] or None, Jsonb(new_state["candidates"])),
+                    "INSERT INTO diagnosis_steps (diagnosis_id, step_no, question, answer, note, candidates, explanation) "
+                    "VALUES (%s,%s,%s,%s,%s,%s,%s)",
+                    (diag_id, step_no, last["question"], last["answer"], last["note"] or None,
+                     Jsonb(new_state["candidates"]), last.get("showed")),
                 )
                 await conn.execute(
                     "UPDATE diagnoses SET status = %s, state = %s, updated_at = now() WHERE id = %s",
@@ -136,9 +143,10 @@ async def get_diagnosis(pool: AsyncConnectionPool, diag_id: uuid.UUID) -> dict:
         if row is None:
             raise NotFound
         cur = await conn.execute(
-            "SELECT step_no, question, answer, note, candidates FROM diagnosis_steps WHERE diagnosis_id = %s ORDER BY step_no",
+            "SELECT step_no, question, answer, note, candidates, explanation FROM diagnosis_steps WHERE diagnosis_id = %s ORDER BY step_no",
             (diag_id,))
-        steps = [{"step": n, "question": q, "answer": a, "note": nt, "candidates_after": c} for n, q, a, nt, c in await cur.fetchall()]
+        steps = [{"step": n, "question": q, "answer": a, "note": nt, "candidates_after": c, "explanation": ex}
+                 for n, q, a, nt, c, ex in await cur.fetchall()]
     return {
         **_view(diag_id, row[4], row[5]),
         "dtc_code": row[0], "model_line": row[1], "scope": row[2], "manual_status": row[3],
@@ -157,7 +165,13 @@ async def list_calls(pool: AsyncConnectionPool, diag_id: uuid.UUID) -> dict:
              "reasoning_tokens": r, "latency_ms": ms, "cost_usd": float(cost) if cost is not None else None, "at": at.isoformat()}
             for p, m, i, c, o, r, ms, cost, at in await cur.fetchall()
         ]
-    return {"diagnosis_id": str(diag_id), "run_total": await run_cost(pool, diag_id), "calls": calls}
+        cur = await conn.execute(
+            "SELECT k.build_cost_usd, EXISTS (SELECT 1 FROM llm_calls WHERE run_id = %s AND purpose = 'pack') "
+            "FROM diagnoses d LEFT JOIN knowledge_packs k ON k.dtc_code = d.dtc_code AND k.model_line = d.model_line "
+            "WHERE d.id = %s", (diag_id, diag_id))
+        row = await cur.fetchone()
+    pack = {"cost_usd": float(row[0]) if row and row[0] is not None else None, "built_in_this_run": bool(row and row[1])}
+    return {"diagnosis_id": str(diag_id), "run_total": await run_cost(pool, diag_id), "pack": pack, "calls": calls}
 
 
 async def get_outcome(pool: AsyncConnectionPool, diag_id: uuid.UUID) -> dict | None:

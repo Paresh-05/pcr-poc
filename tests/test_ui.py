@@ -49,9 +49,20 @@ def test_without_a_passcode_only_this_computer_is_served():
     assert _client(REMOTE).post("/ui-api/diagnoses", json={"dtc_code": "P187973", "model_line": "HECTOR"}).status_code == 403
 
 
+def test_trusting_the_network_serves_the_page_without_a_code_but_a_passcode_still_wins():
+    def trusted(passcode=None):
+        app.dependency_overrides[get_settings] = lambda: _settings(passcode).model_copy(update={"demo_trust_network": True})
+        return TestClient(app, client=REMOTE, raise_server_exceptions=False)
+
+    assert trusted().get("/ui-api/session").json() == {"passcode_required": False, "authenticated": True}
+    assert trusted().get("/ui-api/catalog").status_code not in (401, 403)  # allowed (fails later: no database here)
+    assert trusted("secret").get("/ui-api/session").json() == {"passcode_required": True, "authenticated": False}
+    assert trusted().get("/catalog").status_code == 401  # the programmatic API is unaffected
+
+
 def test_the_programmatic_api_still_needs_the_api_key():
     c = _client(LOCAL)  # being on localhost does not bypass the key on the normal API
-    for method, path in (("get", "/catalog"), ("get", "/catalog/featured"), ("get", "/outcomes/summary"), ("post", "/diagnoses")):
+    for method, path in (("get", "/catalog"), ("get", "/outcomes/summary"), ("post", "/diagnoses")):
         assert getattr(c, method)(path).status_code == 401, path
 
 

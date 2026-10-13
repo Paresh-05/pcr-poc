@@ -28,9 +28,18 @@
 
   <main class="wrap">
     <div id="status" class="status" role="status" aria-live="polite" hidden>
-      <span class="spinner" aria-hidden="true"></span>
-      <span id="status-text"></span>
-      <span id="status-time" class="muted"></span>
+      <div class="loading-card">
+        <div class="loading-mark" aria-hidden="true">
+          <span class="loading-ring"></span>
+          <svg viewBox="0 0 32 32" focusable="false">
+            <path d="M9 16.5l4.8 4.8L23 11.5"/>
+          </svg>
+        </div>
+        <p class="loading-kicker">DTC Assist</p>
+        <h1 id="loading-title">Working on it</h1>
+        <p id="status-text" class="loading-message"></p>
+        <p class="loading-time"><span id="status-time">0 s</span> elapsed</p>
+      </div>
     </div>
     <div id="error" class="error" role="alert" hidden></div>
 
@@ -54,27 +63,22 @@
     <section id="screen-start" hidden aria-labelledby="hero-title">
       <div class="hero">
         <h1 id="hero-title">Find the fault faster.</h1>
-        <p>Pick the car and fault code. The assistant reads every past repair for that code and the service manual, then asks a few yes / no questions to narrow down the real cause and the fix.</p>
+        <p>Choose a vehicle and fault code, then answer a few simple questions.</p>
       </div>
 
       <div class="start-grid">
         <form id="start-form" class="card" autocomplete="off" aria-labelledby="form-title">
           <h2 id="form-title">Start a diagnosis</h2>
-          <div class="grid2">
-            <div>
-              <label for="model">Car model</label>
-              <select id="model" required></select>
-            </div>
-            <div>
-              <label for="dtc">Fault code (DTC)</label>
-              <input id="dtc" list="dtc-list" maxlength="8" placeholder="e.g. P187973" autocapitalize="characters" spellcheck="false" required>
-              <datalist id="dtc-list"></datalist>
-            </div>
+          <div class="start-fields">
+            <label for="model">Car model</label>
+            <select id="model" required></select>
+            <label for="dtc">Fault code (DTC)</label>
+            <select id="dtc" required>
+              <option value="">Select a fault code</option>
+            </select>
           </div>
           <p id="dtc-meta" class="hint" aria-live="polite"></p>
-          <div class="row">
-            <button type="submit" class="btn primary big" id="start-btn">Start diagnosis</button>
-          </div>
+          <button type="submit" class="btn primary big start-action" id="start-btn">Start diagnosis</button>
           <details class="resume">
             <summary>Resume an earlier diagnosis</summary>
             <div class="row">
@@ -84,11 +88,6 @@
           </details>
         </form>
 
-        <section class="card" aria-labelledby="quick-title">
-          <h2 id="quick-title">Quick start</h2>
-          <p class="hint">Common faults with the service manual loaded. One click starts a diagnosis.</p>
-          <ul id="featured" class="featured"></ul>
-        </section>
       </div>
     </section>
 

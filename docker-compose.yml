@@ -32,8 +32,10 @@ services:
       POSTGRES_HOST: db
       POSTGRES_PORT: "5432"
       APP_ENV: dev
-      # Browsers reach the container through Docker's network, so the page cannot rely on "this computer only".
-      DEMO_PASSCODE: ${DOCKER_DEMO_PASSCODE:?Set DOCKER_DEMO_PASSCODE in .env (the access code for the demo page)}
+      # The port below is published on 127.0.0.1 only, so just this computer can reach the page: no access code needed.
+      DEMO_TRUST_NETWORK: "true"
+      # Optional: set DOCKER_DEMO_PASSCODE in .env to ask for an access code anyway (for example on a shared machine).
+      DEMO_PASSCODE: ${DOCKER_DEMO_PASSCODE:-}
     ports:
       - "127.0.0.1:8100:8100"
     read_only: true

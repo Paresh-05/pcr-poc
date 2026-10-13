@@ -1,6 +1,7 @@
 """Access control for the demo page's own API (/ui-api): the browser never holds the API key.
 
-- No DEMO_PASSCODE set: only requests from this computer (loopback) are served.
+- No DEMO_PASSCODE set: only requests from this computer (loopback) are served, or any request if
+  DEMO_TRUST_NETWORK is on (Docker: the published port is bound to 127.0.0.1 on the host).
 - DEMO_PASSCODE set: visitors enter it once; the server then sets an HttpOnly, SameSite=Strict cookie holding a
   signed, expiring token (HMAC keyed with the server's API key).
 State-changing requests must also come from the page's own origin.
@@ -45,6 +46,8 @@ def token_is_valid(settings: Settings, token: str | None) -> bool:
 def is_authenticated(request: Request, settings: Settings) -> bool:
     if settings.demo_passcode:
         return token_is_valid(settings, request.cookies.get(COOKIE))
+    if settings.demo_trust_network:
+        return True
     return (request.client.host if request.client else "") in LOOPBACK
 
 

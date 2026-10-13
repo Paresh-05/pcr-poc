@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     # Demo page (dev only). Its API runs on the server with the server's own key, so the browser never sees a key.
     # Empty = the page only answers requests from this computer. Set a passcode to let others use it (login screen).
     demo_passcode: SecretStr | None = None
+    # True only when the server is reachable from this computer alone (the Docker setup publishes its port on
+    # 127.0.0.1). Then the page is served without a code even though requests arrive from Docker's network.
+    demo_trust_network: bool = False
 
     # Chat model (OpenAI). LLM_BASE_URL is only for a custom OpenAI-compatible endpoint; empty = OpenAI.
     llm_api_key: SecretStr | None = None

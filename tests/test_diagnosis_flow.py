@@ -53,7 +53,12 @@ async def _seed(pool) -> None:
         await conn.execute("INSERT INTO manual_model_map (manual_model, model_line) VALUES ('TESTMANUAL', %s)", (MODEL,))
         cur = await conn.execute("INSERT INTO manual_dtcs (manual_model, dtc_code) VALUES ('TESTMANUAL', %s) RETURNING id", (DTC,))
         (dtc_id,) = await cur.fetchone()
-        await conn.execute("INSERT INTO manual_subsystems (manual_dtc_id, position, subsystem, content) VALUES (%s,1,'ECM TEST','Check connector first.')", (dtc_id,))
+        await conn.execute(
+            "INSERT INTO manual_subsystems (manual_dtc_id, position, subsystem, content) VALUES (%s,1,'ECM TEST',%s)",
+            (dtc_id, f"DTC {DTC} Diagnostic Description. Circuit/System Inspection. "
+                     "1. Is the connector damaged? Yes. Repair the connector. No. Proceed to the next inspection. "
+                     "2. Is the signal correct? Yes. Diagnosis completed. No. Repair the signal circuit. Diagnosis completed."),
+        )
         await conn.execute(
             "INSERT INTO model_prices (model, input_per_mtok, cached_input_per_mtok, output_per_mtok, source) "
             "VALUES (%s, 0.10, 0.01, 0.50, 'test') ON CONFLICT (model) DO NOTHING", (PRICED,))

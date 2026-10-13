@@ -6,24 +6,11 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 
 from app import diagnosis
+from app.manual import complete_manual_dtcs, has_complete_manual
 from app.ratelimit import rate_limit
-from app.redact import redact
 from app.schemas import AnswerIn, OutcomeIn, StartDiagnosis
 
 _MODEL_LINE = re.compile(r"^[A-Z0-9_]{2,32}$")
-
-# DTC + model pairs that have manual text AND enough past cases to make a good demo, with their typical complaint.
-_FEATURED_SQL = """
-    SELECT c.dtc_code, c.model_line, count(*) AS n,
-           (SELECT lower(btrim(x.customer_verbatim)) FROM cases x
-             WHERE x.dtc_code = c.dtc_code AND x.model_line = c.model_line
-             GROUP BY 1 ORDER BY count(*) DESC, 1 LIMIT 1) AS typical
-    FROM cases c
-    WHERE EXISTS (SELECT 1 FROM manual_dtcs d JOIN manual_model_map mm ON mm.manual_model = d.manual_model
-                  WHERE d.dtc_code = c.dtc_code AND mm.model_line = c.model_line)
-    GROUP BY c.dtc_code, c.model_line HAVING count(*) >= 40
-    ORDER BY n DESC LIMIT 12
-"""
 
 
 def require_llm(request: Request) -> None:
@@ -41,33 +28,42 @@ def make_router(auth) -> APIRouter:
             cur = await conn.execute("SELECT model_line, count(*) FROM cases GROUP BY 1 ORDER BY 2 DESC, 1")
             return {"models": [{"model_line": m, "cases": n} for m, n in await cur.fetchall()]}
 
-    @router.get("/catalog/featured")
-    async def catalog_featured(request: Request) -> dict:
-        async with request.app.state.pool.connection() as conn:
-            cur = await conn.execute(_FEATURED_SQL)
-            rows = await cur.fetchall()
-        return {"featured": [{"dtc_code": d, "model_line": m, "cases": n, "typical_complaint": redact(t or "")[:90]} for d, m, n, t in rows]}
-
     @router.get("/catalog/{model_line}")
     async def catalog_dtcs(model_line: str, request: Request):
-        """The most common DTCs for one model, with case counts and whether manual text is loaded."""
+        """DTCs that have both exact-model cases and a complete, non-truncated manual procedure."""
         model_line = model_line.strip().upper()
         if not _MODEL_LINE.match(model_line):
             return JSONResponse({"error": "Invalid model"}, status_code=422)
+        complete_dtcs = await complete_manual_dtcs(request.app.state.pool, model_line)
         async with request.app.state.pool.connection() as conn:
             cur = await conn.execute(
-                "SELECT c.dtc_code, count(*) AS n, bool_or(m.dtc_code IS NOT NULL) AS has_manual FROM cases c "
-                "LEFT JOIN (SELECT DISTINCT d.dtc_code, mm.model_line FROM manual_dtcs d "
-                "           JOIN manual_model_map mm ON mm.manual_model = d.manual_model) m "
-                "  ON m.dtc_code = c.dtc_code AND m.model_line = c.model_line "
-                "WHERE c.model_line = %s GROUP BY c.dtc_code ORDER BY n DESC, c.dtc_code LIMIT 300",
+                "SELECT dtc_code, count(*) AS n FROM cases WHERE model_line = %s "
+                "GROUP BY dtc_code ORDER BY n DESC, dtc_code",
                 (model_line,),
             )
-            return {"model_line": model_line, "dtcs": [{"dtc_code": d, "cases": n, "has_manual": bool(h)} for d, n, h in await cur.fetchall()]}
+            rows = await cur.fetchall()
+        return {"model_line": model_line, "dtcs": [
+            {"dtc_code": d, "cases": n, "has_manual": True} for d, n in rows if d in complete_dtcs
+        ]}
 
     @router.post("/diagnoses", status_code=201, dependencies=[Depends(rate_limit), Depends(require_llm)])
     async def start_diagnosis(body: StartDiagnosis, request: Request) -> dict:
         s = request.app.state
+        async with s.pool.connection() as conn:
+            cur = await conn.execute(
+                "SELECT 1 FROM cases WHERE dtc_code = %s AND model_line = %s LIMIT 1",
+                (body.dtc_code, body.model_line),
+            )
+            if await cur.fetchone() is None:
+                raise HTTPException(
+                    status.HTTP_404_NOT_FOUND,
+                    "This fault code was not found for the selected model",
+                )
+        if not await has_complete_manual(s.pool, body.dtc_code, body.model_line):
+            raise HTTPException(
+                status.HTTP_422_UNPROCESSABLE_ENTITY,
+                "A complete, non-truncated manual procedure is not available for this model and fault code",
+            )
         return await diagnosis.start_diagnosis(s.pool, s.llm, s.graph, body.dtc_code, body.model_line)
 
     @router.post("/diagnoses/{diagnosis_id}/answers", dependencies=[Depends(rate_limit), Depends(require_llm)])

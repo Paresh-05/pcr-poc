@@ -34,9 +34,10 @@
     constructor(message, status) { super(message); this.status = status; }
   }
 
-  function setBusy(text) {
+  function setBusy(text, title = "Working on it") {
     busy = true;
     const started = Date.now();
+    $("loading-title").textContent = title;
     $("status-text").textContent = text;
     $("status-time").textContent = "0 s";
     show($("status"));
@@ -82,7 +83,9 @@
         const msg = res.status === 429 ? "Too many requests. Please wait a minute and try again."
           : res.status === 422 ? "That input was not accepted."
           : res.status === 503 ? "The AI assistant is not available right now."
-          : (data && typeof data.error === "string" && data.error) || "Something went wrong. Please try again.";
+          : (data && typeof data.detail === "string" && data.detail)
+          || (data && typeof data.error === "string" && data.error)
+          || "Something went wrong. Please try again.";
         throw new ApiError(msg, res.status);
       }
       return data;
@@ -94,9 +97,9 @@
     }
   }
 
-  async function run(busyText, fn) {
+  async function run(busyText, fn, busyTitle) {
     hideError();
-    setBusy(busyText);
+    setBusy(busyText, busyTitle);
     try {
       await fn();
     } catch (err) {
@@ -129,11 +132,10 @@
   });
 
   async function init() {
-    const [models, featured] = await Promise.all([api("/catalog"), api("/catalog/featured")]);
+    const models = await api("/catalog");
     const sel = $("model");
     clear(sel);
-    for (const m of models.models) sel.append(el("option", { text: `${friendly(m.model_line)}  ·  ${m.cases} repairs`, attrs: { value: m.model_line } }));
-    renderFeatured(featured.featured);
+    for (const m of models.models) sel.append(el("option", { text: friendly(m.model_line), attrs: { value: m.model_line } }));
     screen("start");
     setStep(1);
     await loadDtcs();
@@ -145,52 +147,32 @@
     if (!model) return;
     const data = await api(`/catalog/${encodeURIComponent(model)}`);
     dtcOptions = new Map(data.dtcs.map((d) => [d.dtc_code, d]));
-    const list = $("dtc-list");
-    clear(list);
-    for (const d of data.dtcs) list.append(el("option", { text: `${d.cases} repairs${d.has_manual ? " · manual loaded" : ""}`, attrs: { value: d.dtc_code } }));
+    const select = $("dtc");
+    clear(select);
+    select.append(el("option", { text: "Select a fault code", attrs: { value: "" } }));
+    for (const d of data.dtcs) select.append(el("option", { text: d.dtc_code, attrs: { value: d.dtc_code } }));
     updateDtcMeta();
   }
   $("model").addEventListener("change", () => run("Loading fault codes…", loadDtcs));
 
   function updateDtcMeta() {
-    const code = $("dtc").value.trim().toUpperCase();
-    const info = dtcOptions.get(code);
-    $("dtc-meta").textContent = !code ? "Choose from the list (most common first) or type a code."
-      : info ? `${info.cases} past repairs on this model · ${info.has_manual ? "service manual loaded" : "no manual text loaded, so it will rely on past repairs"}`
-      : "No past repairs for this code on this model.";
+    const code = $("dtc").value;
+    $("dtc-meta").textContent = !dtcOptions.size
+      ? "No fault codes with complete manual procedures are available for this model."
+      : !code ? "Only fault codes with complete manuals and matching past cases are shown." : "";
   }
-  $("dtc").addEventListener("input", updateDtcMeta);
-
-  function renderFeatured(items) {
-    const ul = $("featured");
-    clear(ul);
-    if (!items.length) { ul.append(el("li", { cls: "muted", text: "No examples available yet." })); return; }
-    for (const f of items) {
-      const btn = el("button", { attrs: { type: "button", "data-dtc": f.dtc_code, "data-model": f.model_line } }, [
-        el("span", { cls: "f-top" }, [el("span", { cls: "f-code", text: f.dtc_code }), el("span", { cls: "f-model", text: `${friendly(f.model_line)} · ${f.cases} repairs` })]),
-        el("span", { cls: "f-note", text: f.typical_complaint ? `Typical complaint: “${f.typical_complaint.charAt(0).toUpperCase()}${f.typical_complaint.slice(1).replace(/\.$/, "")}”` : "Service manual loaded" }),
-      ]);
-      ul.append(el("li", {}, [btn]));
-    }
-  }
-  $("featured").addEventListener("click", (ev) => {
-    const btn = ev.target.closest("button[data-dtc]");
-    if (!btn || busy) return;
-    $("model").value = btn.dataset.model;
-    $("dtc").value = btn.dataset.dtc;
-    begin(btn.dataset.dtc, btn.dataset.model);
-  });
+  $("dtc").addEventListener("change", updateDtcMeta);
 
   // ---------- start / resume ----------
   $("start-form").addEventListener("submit", (ev) => {
     ev.preventDefault();
-    const dtc = $("dtc").value.trim().toUpperCase();
+    const dtc = $("dtc").value;
     if (!DTC_RE.test(dtc)) { showError("Enter a valid fault code, for example P187973."); return; }
     begin(dtc, $("model").value);
   });
 
   function begin(dtc, model) {
-    run(`Reading past repairs and the service manual for ${dtc}… The first time for a code with many repairs can take a minute or two; repeats take seconds.`, async () => {
+    run(`Checking ${dtc} for ${friendly(model)} and preparing the first question.`, async () => {
       const d = await api("/diagnoses", { method: "POST", body: { dtc_code: dtc, model_line: model }, timeoutMs: 600000 });
       history = [];
       lastConclusion = null;
@@ -198,7 +180,7 @@
       vehicle = { dtc, model };
       enterWork(d, d.evidence);
       await refreshCost();
-    });
+    }, "Preparing your diagnosis");
   }
 
   $("resume-btn").addEventListener("click", () => {

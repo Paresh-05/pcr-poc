@@ -1,4 +1,4 @@
-"""DTC manual content, read from the local `manual_sections` table (no external service call)."""
+"""DTC manual content, read from the local manual_* tables (no external service call)."""
 from dataclasses import dataclass, field
 
 from psycopg_pool import AsyncConnectionPool
@@ -41,11 +41,17 @@ def fit_budget(sections: list[Section]) -> tuple[list[Section], bool]:
 async def load_manual(pool: AsyncConnectionPool, dtc: str, model: str) -> ManualBundle:
     async with pool.connection() as conn:
         cur = await conn.execute(
-            "SELECT module_name, content FROM manual_sections WHERE dtc_code = %s AND model_line = %s ORDER BY module_name",
+            "SELECT d.manual_model, s.subsystem, s.content FROM manual_dtcs d "
+            "JOIN manual_model_map m ON m.manual_model = d.manual_model "
+            "JOIN manual_subsystems s ON s.manual_dtc_id = d.id "
+            "WHERE d.dtc_code = %s AND m.model_line = %s ORDER BY d.manual_model, s.position",
             (dtc, model),
         )
         rows = await cur.fetchall()
     if not rows:
         return ManualBundle("not_found")
-    sections, truncated = fit_budget([Section(name, content) for name, content in rows])
+    several_manuals = len({r[0] for r in rows}) > 1  # e.g. two Hector manuals: keep their sections apart
+    sections, truncated = fit_budget(
+        [Section(f"{mm} / {name}" if several_manuals else name, content) for mm, name, content in rows]
+    )
     return ManualBundle("used", sections, [s.module for s in sections], truncated)

@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Guided fault diagnosis from real repair history and the service manual.">
+  <title>DTC Assist</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site">
+    <div class="wrap site-row">
+      <a class="brand" href="/ui/" aria-label="DTC Assist home">
+        <svg class="logo" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+          <circle cx="16" cy="16" r="15" class="logo-ring"/>
+          <path d="M9 16.5l4.8 4.8L23 11.5" class="logo-tick"/>
+        </svg>
+        <span class="brand-text"><strong>DTC Assist</strong><small>Guided fault diagnosis</small></span>
+      </a>
+      <ol class="stepper" id="stepper" aria-label="Progress">
+        <li data-step="1" class="is-current"><span>1</span> Fault code</li>
+        <li data-step="2"><span>2</span> Questions</li>
+        <li data-step="3"><span>3</span> Fix</li>
+      </ol>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div id="status" class="status" role="status" aria-live="polite" hidden>
+      <span class="spinner" aria-hidden="true"></span>
+      <span id="status-text"></span>
+      <span id="status-time" class="muted"></span>
+    </div>
+    <div id="error" class="error" role="alert" hidden></div>
+
+    <!-- Passcode (only when the server has DEMO_PASSCODE set) -->
+    <section id="screen-login" class="card narrow" hidden aria-labelledby="login-title">
+      <h2 id="login-title">Enter the access code</h2>
+      <form id="login-form" autocomplete="off">
+        <label for="passcode">Access code</label>
+        <input id="passcode" type="password" autocomplete="off" required>
+        <div class="row"><button type="submit" class="btn primary">Continue</button></div>
+      </form>
+    </section>
+
+    <!-- Local-only notice (no passcode set and not on the server's computer) -->
+    <section id="screen-blocked" class="card narrow" hidden aria-labelledby="blocked-title">
+      <h2 id="blocked-title">This page is not shared</h2>
+      <p class="muted">The demo only opens on the computer that runs the server. To use it from another device, set an access code (DEMO_PASSCODE) in the server settings and restart.</p>
+    </section>
+
+    <!-- Step 1 -->
+    <section id="screen-start" hidden aria-labelledby="hero-title">
+      <div class="hero">
+        <h1 id="hero-title">Find the fault faster.</h1>
+        <p>Pick the car and fault code. The assistant reads every past repair for that code and the service manual, then asks a few yes / no questions to narrow down the real cause and the fix.</p>
+      </div>
+
+      <div class="start-grid">
+        <form id="start-form" class="card" autocomplete="off" aria-labelledby="form-title">
+          <h2 id="form-title">Start a diagnosis</h2>
+          <div class="grid2">
+            <div>
+              <label for="model">Car model</label>
+              <select id="model" required></select>
+            </div>
+            <div>
+              <label for="dtc">Fault code (DTC)</label>
+              <input id="dtc" list="dtc-list" maxlength="8" placeholder="e.g. P187973" autocapitalize="characters" spellcheck="false" required>
+              <datalist id="dtc-list"></datalist>
+            </div>
+          </div>
+          <p id="dtc-meta" class="hint" aria-live="polite"></p>
+          <div class="row">
+            <button type="submit" class="btn primary big" id="start-btn">Start diagnosis</button>
+          </div>
+          <details class="resume">
+            <summary>Resume an earlier diagnosis</summary>
+            <div class="row">
+              <input id="resume-id" placeholder="Diagnosis id" aria-label="Diagnosis id to resume" spellcheck="false">
+              <button type="button" class="btn" id="resume-btn">Resume</button>
+            </div>
+          </details>
+        </form>
+
+        <section class="card" aria-labelledby="quick-title">
+          <h2 id="quick-title">Quick start</h2>
+          <p class="hint">Common faults with the service manual loaded. One click starts a diagnosis.</p>
+          <ul id="featured" class="featured"></ul>
+        </section>
+      </div>
+    </section>
+
+    <!-- Step 2 and 3 -->
+    <section id="screen-work" hidden>
+      <div class="vehicle-bar">
+        <div>
+          <span class="chip code" id="v-code"></span>
+          <span class="chip" id="v-model"></span>
+        </div>
+        <div class="chips" id="v-evidence"></div>
+      </div>
+
+      <div class="layout">
+        <div class="col-main">
+          <section id="question-card" class="card question-card" aria-labelledby="q-title">
+            <div class="q-head">
+              <h2 id="q-title" tabindex="-1">Question <span id="q-count"></span></h2>
+              <div class="meter" aria-hidden="true"><span id="q-meter"></span></div>
+            </div>
+            <p id="question" class="question"></p>
+            <div id="answers" class="answers" hidden>
+              <button type="button" class="btn answer yes" data-answer="yes"><b>Yes</b><kbd>Y</kbd></button>
+              <button type="button" class="btn answer no" data-answer="no"><b>No</b><kbd>N</kbd></button>
+              <button type="button" class="btn answer unsure" data-answer="not_sure"><b>Not sure</b><kbd>S</kbd></button>
+            </div>
+            <details id="note-wrap" class="note" hidden>
+              <summary>Add a note (optional)</summary>
+              <input id="note" maxlength="300" placeholder="What you saw or measured. No personal details." aria-label="Note for this answer">
+            </details>
+          </section>
+
+          <section id="conclusion-card" class="card result" hidden aria-labelledby="c-title">
+            <div class="result-head">
+              <h2 id="c-title" tabindex="-1">Diagnosis</h2>
+              <span id="confidence" class="badge"></span>
+            </div>
+            <div id="conclusion"></div>
+            <div class="row no-print">
+              <button type="button" class="btn" id="copy-btn">Copy summary</button>
+              <button type="button" class="btn" id="print-btn">Print</button>
+              <span id="copy-note" class="ok" hidden>Copied</span>
+            </div>
+          </section>
+
+          <section id="outcome-card" class="card no-print" hidden aria-labelledby="o-title">
+            <h2 id="o-title">After the repair: did it work?</h2>
+            <p class="hint">Your feedback is saved with this diagnosis and shows how often the assistant gets it right.</p>
+            <form id="outcome-form" autocomplete="off">
+              <div class="choices" role="radiogroup" aria-label="Result">
+                <label class="choice"><input type="radio" name="result" value="worked" required><span>Fixed it</span></label>
+                <label class="choice"><input type="radio" name="result" value="partly"><span>Partly</span></label>
+                <label class="choice"><input type="radio" name="result" value="not_worked"><span>Did not fix it</span></label>
+              </div>
+              <details class="note">
+                <summary>Add details (optional)</summary>
+                <label for="actual-cause">Actual cause, if different</label>
+                <input id="actual-cause" maxlength="300">
+                <label for="parts">Parts replaced (comma separated)</label>
+                <input id="parts" maxlength="600">
+                <label for="outcome-notes">Notes</label>
+                <input id="outcome-notes" maxlength="500">
+              </details>
+              <div class="row"><button type="submit" class="btn primary">Save feedback</button><span id="outcome-saved" class="ok" hidden></span></div>
+            </form>
+          </section>
+
+          <section class="card no-print" aria-labelledby="h-title">
+            <h2 id="h-title">Answered so far</h2>
+            <ol id="history" class="history"></ol>
+            <p id="history-empty" class="muted">No answers yet.</p>
+          </section>
+        </div>
+
+        <aside class="col-side">
+          <section class="card" aria-labelledby="cand-title">
+            <h2 id="cand-title">Likely causes</h2>
+            <ul id="candidates" class="candidates"></ul>
+            <p class="hint">Updates after every answer.</p>
+          </section>
+
+          <section class="card no-print" aria-labelledby="ev-title">
+            <h2 id="ev-title">What this is based on</h2>
+            <dl id="evidence" class="facts"></dl>
+          </section>
+
+          <details class="card hood no-print">
+            <summary>Under the hood</summary>
+            <dl id="cost" class="facts"></dl>
+            <table id="calls" class="calls" hidden>
+              <thead><tr><th>Step</th><th>In</th><th>Cached</th><th>Out</th><th>Think</th><th>Time</th><th>USD</th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <p class="hint" id="diag-id"></p>
+          </details>
+
+          <div class="row no-print"><button type="button" class="btn" id="reset">New diagnosis</button></div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap site-foot">
+    <p class="muted">AI-assisted suggestions based on past repairs and the service manual. Always verify against the official manual and follow the vehicle's safety procedures, including high-voltage isolation on electric vehicles.</p>
+  </footer>
+
+  <script src="app.js" defer></script>
+</body>
+</html>

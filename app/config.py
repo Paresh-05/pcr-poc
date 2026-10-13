@@ -11,10 +11,19 @@ class Settings(BaseSettings):
     api_key: SecretStr
     rate_limit_per_minute: int = 30
 
+    # Demo page (dev only). Its API runs on the server with the server's own key, so the browser never sees a key.
+    # Empty = the page only answers requests from this computer. Set a passcode to let others use it (login screen).
+    demo_passcode: SecretStr | None = None
+
     # Chat model (OpenAI). LLM_BASE_URL is only for a custom OpenAI-compatible endpoint; empty = OpenAI.
     llm_api_key: SecretStr | None = None
     llm_base_url: str | None = None
     llm_model: str | None = None
+    # How much the model "thinks" before answering (none | low | medium | high ...). Lower = faster and cheaper.
+    # STEP applies to the yes/no question turns (speed matters); REASONING applies to the case digest and the final
+    # conclusion (quality matters). Unset = the model's own default.
+    llm_step_effort: str | None = None
+    llm_reasoning_effort: str | None = None
 
     # DTC manual service. Empty base URL = manual step skipped. Include the route prefix, e.g. http://host:3001/api
     manual_api_base_url: str | None = None

@@ -12,5 +12,33 @@ services:
     volumes:
       - dtcbot_pgdata:/var/lib/postgresql/data
       - ./schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    image: dtcbot-app:local
+    container_name: dtcbot-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env # secrets are passed at run time; they are never copied into the image
+    environment:
+      # Inside the compose network the database is "db" on its normal port.
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+      APP_ENV: dev
+      # Browsers reach the container through Docker's network, so the page cannot rely on "this computer only".
+      DEMO_PASSCODE: ${DOCKER_DEMO_PASSCODE:?Set DOCKER_DEMO_PASSCODE in .env (the access code for the demo page)}
+    ports:
+      - "127.0.0.1:8100:8100"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+
 volumes:
   dtcbot_pgdata:

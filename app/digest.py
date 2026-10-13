@@ -42,13 +42,13 @@ async def _summarize_batches(llm: LLM, cases: list[Case], with_model: bool) -> s
     async def one(batch: list[Case]) -> str:
         async with sem:
             text = "\n".join(_record(c, DIAGNOSIS_CHARS_BATCH, with_model) for c in batch)
-            return await llm.summarize(BATCH_SYSTEM, text)
+            return await llm.summarize(BATCH_SYSTEM, text, "digest_batch")
 
     parts = list(await asyncio.gather(*(one(cases[i : i + BATCH_SIZE]) for i in range(0, len(cases), BATCH_SIZE))))
     while len(parts) > 1:  # reduce in groups until one summary is left
         async def merge(group: list[str]) -> str:
             async with sem:
-                return await llm.summarize(MERGE_SYSTEM, "\n\n---\n\n".join(group))
+                return await llm.summarize(MERGE_SYSTEM, "\n\n---\n\n".join(group), "digest_merge")
 
         parts = list(await asyncio.gather(*(merge(parts[i : i + MERGE_GROUP]) for i in range(0, len(parts), MERGE_GROUP))))
     return parts[0]

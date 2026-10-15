@@ -116,7 +116,7 @@ async def _scenario() -> None:
         assert stored["causes"][0]["cases_counted"] == 60 and stored["causes"][0]["share_pct"] == 100
         assert stored["checks"]["quotes_dropped"] == 1 and stored["stats"]["distinct_cases"] == 60
 
-        step = await diagnosis.answer_diagnosis(pool, llm, graph, did, "yes", "rust visible")
+        step = await diagnosis.answer_diagnosis(pool, llm, graph, did, "yes")
         assert step["status"] == "asking" and step["questions_asked"] == 1 and step["candidates"][0]["likelihood"] == 65
         assert step["explanation"] == "answer 1 moved the ranking"
         step = await diagnosis.answer_diagnosis(pool, llm, graph, did, "not_sure", "")
@@ -142,7 +142,7 @@ async def _scenario() -> None:
 
         shown = await diagnosis.get_diagnosis(pool, did)
         assert shown["status"] == "concluded" and [s["answer"] for s in shown["steps"]] == ["yes", "not_sure", "no", "yes"]
-        assert shown["steps"][0]["note"] == "rust visible" and shown["steps"][3]["candidates_after"][0]["likelihood"] == 91
+        assert "note" not in shown["steps"][0] and shown["steps"][3]["candidates_after"][0]["likelihood"] == 91
         assert shown["steps"][0]["explanation"] == "answer 1 moved the ranking" and shown["start_candidates"]
 
         # outcome feedback: stored once per diagnosis, private details removed, later answers replace earlier ones

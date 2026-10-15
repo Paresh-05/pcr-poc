@@ -13,7 +13,6 @@ from langgraph.graph import END, START, StateGraph
 from pydantic import BaseModel
 
 from app.llm import LLM
-from app.redact import redact
 
 MIN_INFORMATIVE = 3  # yes/no answers needed before concluding ("not sure" is not evidence)
 MAX_QUESTIONS = 10
@@ -62,10 +61,9 @@ class DiagState(TypedDict, total=False):
     pack: dict | None  # the knowledge pack, only passed on start (the opening needs no AI)
     candidates: list[dict]
     start_candidates: list[dict]
-    history: list[dict]  # [{question, answer, note, showed}]
+    history: list[dict]  # [{question, answer, showed}]
     pending_question: str | None
     answer: str
-    note: str
     ready: bool
     forced: bool  # stopped because no new question was left, not because the evidence was clear
     status: str  # asking | concluded
@@ -232,7 +230,7 @@ def _history_text(history: list[dict]) -> str:
     if not history:
         return "none yet"
     return "\n".join(
-        f"{i}. Q: {h['question']} | A: {h['answer']}" + (f" | note: {h['note']}" if h.get("note") else "")
+        f"{i}. Q: {h['question']} | A: {h['answer']}"
         + (f" | showed: {h['showed']}" if h.get("showed") else "")
         for i, h in enumerate(history, start=1)
     )
@@ -268,13 +266,12 @@ def build_graph(llm: LLM):
 
     async def update(state: DiagState) -> DiagState:
         history = list(state.get("history", []))
-        note = redact(state.get("note", ""))[:300]
-        history.append({"question": state["pending_question"], "answer": state["answer"], "note": note})
+        history.append({"question": state["pending_question"], "answer": state["answer"]})
         system = SYSTEM.format(max_candidates=MAX_CANDIDATES, case_file=state["case_file"])
         user = (
             f"Current candidates:\n{_candidates_text(state['candidates'])}\n\n"
             f"Questions asked so far:\n{_history_text(history)}\n\n"
-            f"The mechanic just answered: {state['answer']}" + (f" (note: {note})" if note else "") + ".\n"
+            f"The mechanic just answered: {state['answer']}" + ".\n"
             "Re-rank the candidates, say what the answer showed, and give the next yes/no question."
         )
         out = await llm.structured(system, user, StepOut, "step")

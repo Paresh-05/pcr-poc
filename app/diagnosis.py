@@ -93,7 +93,7 @@ async def start_diagnosis(pool: AsyncConnectionPool, llm: LLM, graph, dtc: str, 
     return {**_view(diag_id, status, state), "evidence": summary, "cost": await run_cost(pool, diag_id)}
 
 
-async def answer_diagnosis(pool: AsyncConnectionPool, llm: LLM, graph, diag_id: uuid.UUID, answer: str, note: str) -> dict:
+async def answer_diagnosis(pool: AsyncConnectionPool, llm: LLM, graph, diag_id: uuid.UUID, answer: str) -> dict:
     async with pool.connection() as conn:
         cur = await conn.execute("SELECT case_file, status, state FROM diagnoses WHERE id = %s", (diag_id,))
         row = await cur.fetchone()
@@ -108,7 +108,7 @@ async def answer_diagnosis(pool: AsyncConnectionPool, llm: LLM, graph, diag_id: 
         result = await graph.ainvoke({
             "mode": "answer", "case_file": case_file, "candidates": state["candidates"], "history": state["history"],
             "start_candidates": state.get("start_candidates", []), "pending_question": state["pending_question"],
-            "forced": state.get("forced", False), "answer": answer, "note": note,
+            "forced": state.get("forced", False), "answer": answer,
         })
     finally:
         current_run.reset(token)
@@ -120,9 +120,9 @@ async def answer_diagnosis(pool: AsyncConnectionPool, llm: LLM, graph, diag_id: 
         async with pool.connection() as conn:
             async with conn.transaction():
                 await conn.execute(
-                    "INSERT INTO diagnosis_steps (diagnosis_id, step_no, question, answer, note, candidates, explanation) "
-                    "VALUES (%s,%s,%s,%s,%s,%s,%s)",
-                    (diag_id, step_no, last["question"], last["answer"], last["note"] or None,
+                    "INSERT INTO diagnosis_steps (diagnosis_id, step_no, question, answer, candidates, explanation) "
+                    "VALUES (%s,%s,%s,%s,%s,%s)",
+                    (diag_id, step_no, last["question"], last["answer"],
                      Jsonb(new_state["candidates"]), last.get("showed")),
                 )
                 await conn.execute(
@@ -143,10 +143,10 @@ async def get_diagnosis(pool: AsyncConnectionPool, diag_id: uuid.UUID) -> dict:
         if row is None:
             raise NotFound
         cur = await conn.execute(
-            "SELECT step_no, question, answer, note, candidates, explanation FROM diagnosis_steps WHERE diagnosis_id = %s ORDER BY step_no",
+            "SELECT step_no, question, answer, candidates, explanation FROM diagnosis_steps WHERE diagnosis_id = %s ORDER BY step_no",
             (diag_id,))
-        steps = [{"step": n, "question": q, "answer": a, "note": nt, "candidates_after": c, "explanation": ex}
-                 for n, q, a, nt, c, ex in await cur.fetchall()]
+        steps = [{"step": n, "question": q, "answer": a, "candidates_after": c, "explanation": ex}
+                 for n, q, a, c, ex in await cur.fetchall()]
     return {
         **_view(diag_id, row[4], row[5]),
         "dtc_code": row[0], "model_line": row[1], "scope": row[2], "manual_status": row[3],

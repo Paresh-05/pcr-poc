@@ -48,11 +48,11 @@ def _start(llm, pack=PACK):
     return g, asyncio.run(g.ainvoke({"mode": "start", "case_file": "CF", "pack": pack, "candidates": [], "history": []}))
 
 
-def _answer(g, state, answer="yes", note=""):
+def _answer(g, state, answer="yes"):
     return asyncio.run(g.ainvoke({
         "mode": "answer", "case_file": "CF", "candidates": state["candidates"], "history": state["history"],
         "start_candidates": state.get("start_candidates", []), "forced": state.get("forced", False),
-        "pending_question": state["pending_question"], "answer": answer, "note": note,
+        "pending_question": state["pending_question"], "answer": answer,
     }))
 
 
@@ -119,7 +119,7 @@ def test_answers_narrow_down_and_finish_with_a_capped_conclusion():
     g, state = _start(llm)
     state = _answer(g, state, "yes")
     assert state["status"] == "asking" and state["pending_question"] == "Q2?" and state["history"][0]["showed"] == "12V was low, A up"
-    state = _answer(g, state, "no", "looked fine")
+    state = _answer(g, state, "no")
     assert state["status"] == "asking" and len(state["history"]) == 2
     state = _answer(g, state, "yes")  # third yes/no answer and the leader is far ahead: concludes
     assert state["status"] == "concluded" and state["pending_question"] is None

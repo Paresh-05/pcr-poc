@@ -70,7 +70,7 @@ def make_router(auth) -> APIRouter:
     async def answer(diagnosis_id: uuid.UUID, body: AnswerIn, request: Request):
         s = request.app.state
         try:
-            return await diagnosis.answer_diagnosis(s.pool, s.llm, s.graph, diagnosis_id, body.answer, body.note)
+            return await diagnosis.answer_diagnosis(s.pool, s.llm, s.graph, diagnosis_id, body.answer)
         except diagnosis.NotFound:
             return JSONResponse({"error": "Diagnosis not found"}, status_code=404)
         except diagnosis.NotAsking:

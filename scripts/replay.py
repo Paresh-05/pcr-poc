@@ -29,7 +29,7 @@ async def main(dtc: str, model: str, answers: list[str]) -> None:
             if d["status"] != "asking":
                 break
             print(f"\nQ: {d['question']}\nA: {a}")
-            d = await diagnosis.answer_diagnosis(pool, llm, graph, did, a, "")
+            d = await diagnosis.answer_diagnosis(pool, llm, graph, did, a)
             print(f"   showed: {d['explanation']}\n   now: {top(d)}")
         k = d["conclusion"]
         print(f"\nSTATUS {d['status']} after {d['questions_asked']} answers")

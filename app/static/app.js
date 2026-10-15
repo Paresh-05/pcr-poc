@@ -10,7 +10,7 @@
   const UPPER_WORDS = new Set(["MG", "EV", "BS4", "BS6", "SUV"]);
 
   let diagnosisId = null;
-  let history = []; // [{question, answer, note}]
+  let history = []; // [{question, answer}]
   let dtcOptions = new Map(); // dtc_code -> {cases, has_manual} for the selected model
   let lastConclusion = null;
   let vehicle = { dtc: "", model: "" };
@@ -64,7 +64,6 @@
     clearInterval(timer);
     show($("q-loader"), on);
     $("answers").hidden = on || !asking;
-    $("note-wrap").hidden = on || !asking;
     if (on) {
       const started = Date.now();
       $("q-loader-text").textContent = text;
@@ -239,7 +238,7 @@
     run("Loading the diagnosis…", async () => {
       const d = await api(`/diagnoses/${id}`);
       diagnosisId = d.diagnosis_id;
-      history = d.steps.map((s) => ({ question: s.question, answer: s.answer, note: s.note || "", showed: s.explanation || "" }));
+      history = d.steps.map((s) => ({ question: s.question, answer: s.answer, showed: s.explanation || "" }));
       vehicle = { dtc: d.dtc_code, model: d.model_line };
       enterWork(d, { scope: d.scope, manual: { status: d.manual_status, modules: [] }, resumed: true });
       if (d.outcome) markOutcomeSaved(d.outcome);
@@ -258,15 +257,12 @@
   // ---------- answering ----------
   function submitAnswer(answer) {
     if (!diagnosisId || busy) return;
-    const note = $("note").value.trim();
     const asked = $("question").textContent;
     const id = diagnosisId;
     run("Updating the likely causes…", async () => {
-      const d = await api(`/diagnoses/${id}/answers`, { method: "POST", body: { answer, note } });
+      const d = await api(`/diagnoses/${id}/answers`, { method: "POST", body: { answer } });
       if (id !== diagnosisId) return; // the user started a new diagnosis while this answer was in flight
-      history.push({ question: asked, answer, note, showed: d.explanation || "" });
-      $("note").value = "";
-      $("note-wrap").open = false;
+      history.push({ question: asked, answer, showed: d.explanation || "" });
       renderState(d);
       await refreshCost();
     }, undefined, true);
@@ -296,7 +292,6 @@
     $("q-count").textContent = asking ? `${d.questions_asked + 1} of up to ${d.max_questions}` : "";
     $("q-meter").style.width = `${Math.min(100, Math.round(((asking ? d.questions_asked : d.max_questions) / d.max_questions) * 100))}%`;
     show($("answers"), asking && !inlineBusy); // while the small loader is up, the buttons stay hidden until it clears
-    show($("note-wrap"), asking && !inlineBusy);
     show($("question-card"), !concluded);
     show($("conclusion-card"), Boolean(d.conclusion));
     const note = $("action-note");
@@ -339,7 +334,6 @@
           el("div", {}, [el("p", { cls: "h-n", text: `Q${i + 1}` }), el("p", { cls: "h-q", text: h.question })]),
           el("span", { cls: `tag ${h.answer}`, text: ANSWER_LABEL[h.answer] || h.answer }),
         ]),
-        ...(h.note ? [el("p", { cls: "h-note", text: `Note: ${h.note}` })] : []),
         ...(h.showed ? [el("p", { cls: "h-note", text: `What it showed: ${h.showed}` })] : []),
       ]));
     });

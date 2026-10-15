@@ -6,7 +6,6 @@ _normalize = BeforeValidator(lambda v: v.strip().upper() if isinstance(v, str) e
 
 DtcCode = Annotated[str, _normalize, StringConstraints(pattern=r"^[A-Z][0-9A-Z]{5,7}$")]
 ModelLine = Annotated[str, _normalize, StringConstraints(pattern=r"^[A-Z0-9_]{2,32}$")]
-Note = Annotated[str, StringConstraints(strip_whitespace=True, max_length=300)]
 
 
 class StartDiagnosis(BaseModel):
@@ -20,7 +19,6 @@ class AnswerIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     answer: Literal["yes", "no", "not_sure"]
-    note: Note = ""
 
 
 ShortText = Annotated[str, StringConstraints(strip_whitespace=True, max_length=300)]

@@ -70,34 +70,25 @@
             <p class="page-eyebrow">Guided diagnosis from past repairs and the service manual</p>
             <h1 id="hero-title" class="page-title">Start diagnosis</h1>
             <dl class="facts-strip">
-              <div><dt>Car models</dt><dd id="f-models">0</dd></div>
-              <div><dt>Fault codes</dt><dd id="f-codes">0</dd></div>
               <div><dt>Past repairs</dt><dd id="f-cases">0</dd></div>
             </dl>
           </div>
 
           <div class="two-col">
             <form id="start-form" class="panel pad" autocomplete="off" aria-labelledby="form-title">
-              <h2 id="form-title">Vehicle and fault code</h2>
+              <h2 id="form-title">Describe the problem</h2>
               <div class="start-fields">
-                <label for="model">Car model</label>
-                <select id="model" required></select>
-                <label for="dtc">Fault code (DTC)</label>
-                <select id="dtc">
-                  <option value="">Select a fault code</option>
-                </select>
-                <label for="query-text">Or describe the problem (optional)</label>
-                <textarea id="query-text" rows="2" maxlength="500" placeholder="e.g. car shakes at idle, or mentions a code like P0420"></textarea>
+                <label for="query-text">Fault code or description</label>
+                <textarea id="query-text" rows="3" maxlength="500" placeholder="e.g. car shakes at idle, or P0420" required></textarea>
               </div>
-              <p id="dtc-meta" class="hint" aria-live="polite"></p>
             </form>
 
             <aside class="side">
               <section class="panel ref" aria-labelledby="how-title">
                 <header class="panel-head"><h2 id="how-title">How it works</h2><span class="panel-meta">3 steps</span></header>
                 <details class="ref-row" open>
-                  <summary>1. Pick the car and fault code</summary>
-                  <p>Only codes with past repairs and a complete service manual procedure are listed.</p>
+                  <summary>1. Describe the problem</summary>
+                  <p>Type a fault code, describe the symptom, or both. We match it against past repairs and the service manual.</p>
                 </details>
                 <details class="ref-row" open>
                   <summary>2. Answer simple questions</summary>

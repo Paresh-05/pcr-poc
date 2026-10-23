@@ -3,22 +3,20 @@
 (() => {
   const API = "/ui-api"; // the server holds the API key; this page never sees one
   const $ = (id) => document.getElementById(id);
-  const DTC_RE = /^[A-Z][0-9][0-9A-Z]{3,6}$/i;
   const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   const ANSWER_LABEL = { yes: "Yes", no: "No", not_sure: "Not sure" };
   const RESULT_LABEL = { worked: "fixed", partly: "partly fixed", not_worked: "did not fix" };
   const UPPER_WORDS = new Set(["MG", "EV", "BS4", "BS6", "SUV"]);
+  const DEFAULT_MODEL = "MG_COMET_EV"; // only model supported for now; no picker shown
 
   let diagnosisId = null;
   let history = []; // [{question, answer}]
-  let dtcOptions = new Map(); // dtc_code -> {cases, has_manual} for the selected model
   let lastConclusion = null;
   let vehicle = { dtc: "", model: "" };
   let timer = null;
   let busy = false;
   let inlineBusy = false; // true while only the question card shows a small loader
   let asking = false; // whether the current diagnosis is waiting for an answer
-  let modelCases = new Map(); // model_line -> number of past repairs
 
   // ---------- helpers: text only, never parsed as markup ----------
   function el(tag, props = {}, children = []) {
@@ -88,11 +86,9 @@
   function updateStartNote() {
     const note = $("action-note");
     note.classList.remove("strong");
-    const code = $("dtc").value;
-    const desc = $("query-text") ? $("query-text").value.trim() : "";
-    note.textContent = code ? `${code} on ${friendly($("model").value)}. Ready to start.`
-      : desc ? `Matching your description on ${friendly($("model").value)}. Ready to start.`
-      : "Choose a car model, pick a fault code, or describe the problem.";
+    const desc = $("query-text").value.trim();
+    note.textContent = desc ? `Matching your description on ${friendly(DEFAULT_MODEL)}. Ready to start.`
+      : "Describe the problem or enter a fault code.";
   }
   const STEP_NAMES = ["Fault code", "Questions", "Diagnosis", "Feedback"];
   function setStep(n) { // n = 1..4 is the current step; 5 means every step is done
@@ -180,50 +176,20 @@
 
   async function init() {
     const models = await api("/catalog");
-    const sel = $("model");
-    clear(sel);
-    modelCases = new Map(models.models.map((m) => [m.model_line, m.cases]));
-    $("f-models").textContent = String(models.models.length);
-    for (const m of models.models) sel.append(el("option", { text: friendly(m.model_line), attrs: { value: m.model_line } }));
+    const entry = models.models.find((m) => m.model_line === DEFAULT_MODEL);
+    $("f-cases").textContent = String(entry ? entry.cases : 0);
     screen("start");
     setStep(1);
-    await loadDtcs();
   }
 
-  // ---------- pickers ----------
-  async function loadDtcs() {
-    const model = $("model").value;
-    if (!model) return;
-    const data = await api(`/catalog/${encodeURIComponent(model)}`);
-    dtcOptions = new Map(data.dtcs.map((d) => [d.dtc_code, d]));
-    const select = $("dtc");
-    clear(select);
-    select.append(el("option", { text: "Select a fault code", attrs: { value: "" } }));
-    for (const d of data.dtcs) select.append(el("option", { text: d.dtc_code, attrs: { value: d.dtc_code } }));
-    $("f-codes").textContent = String(data.dtcs.length);
-    $("f-cases").textContent = String(modelCases.get(model) ?? 0);
-    updateDtcMeta();
-  }
-  $("model").addEventListener("change", () => run("Loading fault codes…", loadDtcs));
-
-  function updateDtcMeta() {
-    const code = $("dtc").value;
-    $("dtc-meta").textContent = !dtcOptions.size
-      ? "No fault codes with complete manual procedures are available for this model."
-      : !code ? "Only fault codes with complete manuals and matching past cases are shown." : "";
-    updateStartNote();
-  }
-  $("dtc").addEventListener("change", updateDtcMeta);
   $("query-text").addEventListener("input", updateStartNote);
 
   // ---------- start / resume ----------
   $("start-form").addEventListener("submit", (ev) => {
     ev.preventDefault();
-    const dtc = $("dtc").value;
     const queryText = $("query-text").value.trim();
-    if (!dtc && !queryText) { showError("Pick a fault code or describe the problem."); return; }
-    if (dtc && !DTC_RE.test(dtc)) { showError("Enter a valid fault code, for example P187973."); return; }
-    begin(dtc, queryText, $("model").value);
+    if (!queryText) { showError("Describe the problem or enter a fault code."); return; }
+    begin(queryText, DEFAULT_MODEL);
   });
 
   let currentTree = null; // {root, nodes[]} - the whole tree, walked locally
@@ -231,17 +197,14 @@
 
   function findNode(id) { return (currentTree.nodes || []).find((n) => n.id === id); }
 
-  function begin(dtc, queryText, model) {
-    const label = dtc ? dtc : "your description";
-    run(`Checking ${label} for ${friendly(model)} and preparing the first question.`, async () => {
-      const body = { model_line: model };
-      if (dtc) body.dtc_code = dtc;
-      if (queryText) body.query_text = queryText;
+  function begin(queryText, model) {
+    run(`Checking your description for ${friendly(model)} and preparing the first question.`, async () => {
+      const body = { model_line: model, query_text: queryText };
       const d = await api("/diagnoses", { method: "POST", body, timeoutMs: 600000 });
       history = [];
       lastConclusion = null;
       diagnosisId = d.diagnosis_id;
-      vehicle = { dtc: d.dtc_code || dtc || "(from description)", model };
+      vehicle = { dtc: d.dtc_code || "(from description)", model };
       currentTree = d.tree;
       currentNodeId = d.tree ? d.tree.root : null;
       enterWork(d, d.evidence);
@@ -509,6 +472,7 @@
     show($("outcome-saved"), false);
     show($("copy-note"), false);
     $("outcome-form").reset();
+    $("query-text").value = "";
     screen("start");
     setStep(1);
     window.scrollTo({ top: 0 });

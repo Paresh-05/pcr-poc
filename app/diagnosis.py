@@ -31,20 +31,34 @@ class NotFound(Exception): ...
 
 
 TREE_SYSTEM = """You build a small yes/no diagnostic decision tree for a service mechanic, for one vehicle fault \
-code, from real past repair cases and the official manual procedure.
+code, by synthesizing real past repair cases together with the official manual procedure into a genuine \
+differential diagnosis - not by transcribing the manual's checklist in its literal order.
 
-Rules:
-- Base every candidate cause, every question, and the conclusion strictly on the evidence given below. Never \
-invent causes, parts, test values or steps not present in it.
-- The evidence has two parts: fix counts from matched past cases (how many were resolved by replacing each \
-part) and, if available, the manual's own inspection procedure. Prioritize candidates with real fix-count \
-evidence over ones that only appear in the manual with no matching case.
-- Keep the tree small: at most {max_depth} levels deep. Each branch node asks exactly ONE yes/no question a \
-mechanic can check now (scan tool or physical inspection). Never invent test thresholds or PID names not \
-present in the evidence. Never repeat a question on a path.
-- Each node lists at most 5 candidate causes, ranked highest first, likelihoods are whole percentages summing \
-to 100. Each candidate's reasoning cites its source in at most 12 words: "manual: <module>" or \
-"past cases (about N)".
+Step 1 - form the hypothesis set (do this before building any tree):
+- From the fix-count evidence AND the manual's own listed causes/common problems, identify every DISTINCT \
+plausible underlying cause. Merge the two sources: a cause with real fix-count support is stronger evidence \
+than one only mentioned in the manual with no matching case, but the manual can surface a real candidate the \
+case data is too thin to show on its own.
+- This is your working hypothesis set for the whole tree. Every question you ask exists to discriminate \
+between these hypotheses - to rule some in and others out - not simply to walk the manual's steps in order.
+
+Step 2 - build the tree:
+- Keep it small: at most {max_depth} levels deep. Each branch node asks exactly ONE yes/no question a \
+mechanic can check now (scan tool or physical inspection). Choose each question for how much it narrows the \
+live hypothesis set at that point in the tree - prefer the check that best splits the remaining candidates \
+apart. You may draw the actual check from the manual's inspection steps, but the ORDER and CHOICE must be \
+driven by discriminating power, not by copying the manual's step sequence unchanged. Never invent test \
+thresholds or PID names not present in the evidence. Never repeat a question on a path.
+- Critical: the candidates list at every node must be freshly recomputed for that node, reflecting only the \
+hypotheses still consistent with the answers given on the path to reach it. NEVER repeat the same candidates \
+list unchanged from a parent or sibling node - if an answer provided no new discriminating information, say \
+so in that node's reasoning instead of pasting the prior list. As the tree gets deeper, the live candidate \
+set should visibly narrow, with the leading candidate's likelihood generally rising, until each leaf names a \
+single most-likely diagnosis (or, if evidence genuinely can't separate two causes, says so explicitly rather \
+than guessing).
+- Each node lists at most 5 remaining candidate causes, ranked highest first, likelihoods are whole \
+percentages summing to 100. Each candidate's reasoning cites its source in at most 12 words: "manual: \
+<module>" or "past cases (about N)".
 - Do not put any candidate above 60% unless either the fix-count evidence alone is overwhelming, or the \
 question path so far supports it.
 - A leaf node sets "conclusion" and leaves question/yes/no/not_sure null. A branch node sets question + \
@@ -53,6 +67,10 @@ yes/no/not_sure (each pointing to another node's id) and leaves conclusion null.
 medium for converging but incomplete evidence; low if thin/conflicting), confidence_note, evidence (cited \
 bullets), fix_steps (ordered, concrete, following the manual's sequence when available), parts, verify_fix, \
 alternatives, safety_note, how_we_got_here.
+
+Rules that apply throughout:
+- Base every candidate cause, every question, and the conclusion strictly on the evidence given below. Never \
+invent causes, parts, test values or steps not present in it.
 - If the manual is missing or few cases matched, reflect that with lower confidence and say so in \
 confidence_note.
 - If a step involves high-voltage parts, say it must be done after proper HV isolation.
@@ -123,6 +141,44 @@ def _validate_tree(tree: DiagnosisTree, max_depth: int) -> None:
                     stack.append((child, depth + 1))
 
 
+def _candidate_signature(node) -> tuple:
+    return tuple((c.cause, c.likelihood) for c in node.candidates)
+
+
+def _warn_if_candidates_static(tree: DiagnosisTree, dtc_code: str, model_line: str) -> None:
+    """Non-fatal check: flags branch nodes whose candidate list is identical to their parent's, which would
+    mean the model pasted the root's flat evidence instead of narrowing it per the TREE_SYSTEM instructions.
+    Only logs a warning (never raises) since the build already succeeded and retrying risks exhausting the
+    2-attempt budget over a quality signal rather than a structural defect."""
+    by_id = {n.id: n for n in tree.nodes}
+    static_nodes = []
+    stack = [(tree.root, None)]
+    seen: set[str] = set()
+    while stack:
+        node_id, parent_sig = stack.pop()
+        if node_id in seen:
+            continue
+        seen.add(node_id)
+        node = by_id.get(node_id)
+        if node is None:
+            continue
+        sig = _candidate_signature(node) if node.candidates else None
+        if node.question is not None:  # branch node
+            if parent_sig is not None and sig == parent_sig:
+                static_nodes.append(node_id)
+            for child in (node.yes, node.no, node.not_sure):
+                if child:
+                    stack.append((child, sig))
+    if static_nodes:
+        logger.warning(
+            "Tree quality check: dtc_code=%s model_line=%s - %d branch node(s) repeated their parent's "
+            "candidate list unchanged (not narrowed): %s",
+            dtc_code, model_line, len(static_nodes), static_nodes,
+        )
+    else:
+        logger.info("Tree quality check: dtc_code=%s model_line=%s - candidates narrow across all branch nodes, no static copies found", dtc_code, model_line)
+
+
 async def _get_or_build_tree(
     pool: AsyncConnectionPool, llm: LLM, settings: Settings, dtc_code: str, model_line: str, query_text: str | None
 ):
@@ -154,11 +210,12 @@ async def _get_or_build_tree(
     for attempt in range(1, 3):  # try once, retry once on a malformed tree
         logger.info("Tree build attempt %d/2: dtc_code=%s model_line=%s evidence_scope=%s cases=%d manual_chunks=%d",
                     attempt, dtc_code, model_line, ev.scope, len(ev.cases), len(ev.manual_chunks))
-        candidate = await llm.structured(system, user, DiagnosisTree, purpose="tree_build")
+        candidate = await llm.structured(system, user, DiagnosisTree, purpose="tree_build", effort="high")
         try:
             _validate_tree(candidate, settings.tree_max_depth)
             tree = candidate
             logger.info("Tree build succeeded on attempt %d: %d node(s), root=%s", attempt, len(candidate.nodes), candidate.root)
+            _warn_if_candidates_static(tree, dtc_code, model_line)
             break
         except ValueError as exc:
             last_error = exc

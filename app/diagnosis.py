@@ -35,10 +35,14 @@ code, by synthesizing real past repair cases together with the official manual p
 differential diagnosis - not by transcribing the manual's checklist in its literal order.
 
 Step 1 - form the hypothesis set (do this before building any tree):
-- From the fix-count evidence AND the manual's own listed causes/common problems, identify every DISTINCT \
-plausible underlying cause. Merge the two sources: a cause with real fix-count support is stronger evidence \
-than one only mentioned in the manual with no matching case, but the manual can surface a real candidate the \
-case data is too thin to show on its own.
+- You are given every matched past case's real complaint and resolution text, plus the manual's own listed \
+causes/common problems. Read all of it. From the past cases, work out for yourself which fixes recur and how \
+often - do not guess, count across the actual cases given. Also notice any pattern between what a case's \
+complaint describes and which fix resolved it; that pattern is what lets you ask good discriminating \
+questions later. Merge this with the manual's listed causes into one list of every DISTINCT plausible \
+underlying cause: a cause with real, frequently-recurring case support is stronger evidence than one only \
+mentioned in the manual with no matching case, but the manual can surface a real candidate the case data is \
+too thin to show on its own.
 - This is your working hypothesis set for the whole tree. Every question you ask exists to discriminate \
 between these hypotheses - to rule some in and others out - not simply to walk the manual's steps in order.
 
@@ -78,21 +82,24 @@ confidence_note.
 """
 
 
-def _case_lines(cases: list[dict[str, Any]], limit: int = 20) -> str:
+def _case_lines(cases: list[dict[str, Any]]) -> str:
+    """Every matched case, full complaint + resolution text (no truncation, no sampling) - exact duplicate
+    complaint/resolution pairs are dropped since they add no signal, only token cost."""
     lines = []
-    for c in cases[:limit]:
+    seen: set[tuple[str, str]] = set()
+    for c in cases:
+        complaint = redact(c["customer_verbatim"])
+        resolution = redact(c["conclusion_text"])
+        key = (complaint, resolution)
+        if key in seen:
+            continue
+        seen.add(key)
         parts = ", ".join(p.get("part_name") or p.get("part_code", "") for p in (c.get("failed_parts") or []))
         lines.append(
-            f"- complaint: {redact(c['customer_verbatim'])[:200]} | resolution: {redact(c['conclusion_text'])[:300]}"
+            f"- complaint: {complaint} | resolution: {resolution}"
             + (f" | parts replaced: {parts}" if parts else "")
         )
     return "\n".join(lines) or "(none)"
-
-
-def _fix_count_lines(top_parts: list[retrieval.PartCount]) -> str:
-    if not top_parts:
-        return "(no past cases matched for this fault code and model)"
-    return "\n".join(f"- {p.part}: {p.count} of the matched cases ({p.pct}%)" for p in top_parts)
 
 
 def _manual_lines(chunks: list[dict[str, Any]]) -> str:
@@ -108,8 +115,8 @@ def _build_prompt(dtc_code: str, model_line: str, ev: retrieval.Evidence, query_
     symptom_line = f"Mechanic's reported symptom: {redact(query_text)}\n\n" if query_text else ""
     return (
         f"Fault code: {dtc_code}\nVehicle model: {model_line}\n\n{symptom_line}"
-        f"Fix counts from {len(ev.cases)} matched past case(s):\n{_fix_count_lines(ev.top_parts)}\n\n"
-        f"Example matched cases:\n{_case_lines(ev.cases)}\n\n"
+        f"All {len(ev.cases)} matched past case(s) (read every one; determine the fix-rate distribution and "
+        f"any symptom-to-fix patterns yourself from this real data):\n{_case_lines(ev.cases)}\n\n"
         f"Manual procedure:\n{_manual_lines(ev.manual_chunks)}\n\n"
         "Build the diagnosis tree now."
     )

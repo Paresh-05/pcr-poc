@@ -82,27 +82,19 @@ confidence_note.
 """
 
 
-CASE_TEXT_LIMIT = 50  # after dedup; keeps high-volume codes (100+ cases) from blowing up prompt size/latency
-
-
-def _case_lines(cases: list[dict[str, Any]], limit: int = CASE_TEXT_LIMIT) -> str:
-    """Up to `limit` matched cases, full complaint + resolution text (no per-field truncation) - exact
-    duplicate complaint/resolution pairs are dropped first since they add no signal, only token cost, so the
-    cap is spent on distinct cases rather than wasted on repeats. Cases arrive pre-ordered (most recent first
-    for exact matches, most similar first for semantic), so capping after dedup keeps the most relevant ones."""
+def _case_lines(cases: list[dict[str, Any]]) -> str:
+    """Every matched case, full complaint + resolution text, no cap and no per-field truncation - the whole
+    point is the model gets the complete real data, not a sample. Exact duplicate complaint/resolution pairs
+    are still dropped since a literal repeat is not new information, only token cost with zero signal."""
     lines = []
     seen: set[tuple[str, str]] = set()
-    kept = 0
     for c in cases:
-        if kept >= limit:
-            break
         complaint = redact(c["customer_verbatim"])
         resolution = redact(c["conclusion_text"])
         key = (complaint, resolution)
         if key in seen:
             continue
         seen.add(key)
-        kept += 1
         parts = ", ".join(p.get("part_name") or p.get("part_code", "") for p in (c.get("failed_parts") or []))
         lines.append(
             f"- complaint: {complaint} | resolution: {resolution}"

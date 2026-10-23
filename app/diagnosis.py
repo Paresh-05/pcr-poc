@@ -148,6 +148,7 @@ async def _get_or_build_tree(
 
     system = TREE_SYSTEM.format(max_depth=settings.tree_max_depth)
     user = _build_prompt(dtc_code or "(not given; matched by symptom text)", model_line, ev, query_text)
+    logger.info("Prompt being sent to LLM for tree_build (dtc_code=%s model_line=%s):\n%s", dtc_code, model_line, user)
     tree = None
     last_error: Exception | None = None
     for attempt in range(1, 3):  # try once, retry once on a malformed tree

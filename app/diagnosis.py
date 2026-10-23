@@ -82,18 +82,27 @@ confidence_note.
 """
 
 
-def _case_lines(cases: list[dict[str, Any]]) -> str:
-    """Every matched case, full complaint + resolution text (no truncation, no sampling) - exact duplicate
-    complaint/resolution pairs are dropped since they add no signal, only token cost."""
+CASE_TEXT_LIMIT = 50  # after dedup; keeps high-volume codes (100+ cases) from blowing up prompt size/latency
+
+
+def _case_lines(cases: list[dict[str, Any]], limit: int = CASE_TEXT_LIMIT) -> str:
+    """Up to `limit` matched cases, full complaint + resolution text (no per-field truncation) - exact
+    duplicate complaint/resolution pairs are dropped first since they add no signal, only token cost, so the
+    cap is spent on distinct cases rather than wasted on repeats. Cases arrive pre-ordered (most recent first
+    for exact matches, most similar first for semantic), so capping after dedup keeps the most relevant ones."""
     lines = []
     seen: set[tuple[str, str]] = set()
+    kept = 0
     for c in cases:
+        if kept >= limit:
+            break
         complaint = redact(c["customer_verbatim"])
         resolution = redact(c["conclusion_text"])
         key = (complaint, resolution)
         if key in seen:
             continue
         seen.add(key)
+        kept += 1
         parts = ", ".join(p.get("part_name") or p.get("part_code", "") for p in (c.get("failed_parts") or []))
         lines.append(
             f"- complaint: {complaint} | resolution: {resolution}"
@@ -113,10 +122,13 @@ def _manual_lines(chunks: list[dict[str, Any]]) -> str:
 
 def _build_prompt(dtc_code: str, model_line: str, ev: retrieval.Evidence, query_text: str | None = None) -> str:
     symptom_line = f"Mechanic's reported symptom: {redact(query_text)}\n\n" if query_text else ""
+    case_text = _case_lines(ev.cases)
+    shown = case_text.count("\n- complaint:") + (1 if case_text != "(none)" else 0)
+    total_note = f" out of {len(ev.cases)} matched in total" if len(ev.cases) > shown else ""
     return (
         f"Fault code: {dtc_code}\nVehicle model: {model_line}\n\n{symptom_line}"
-        f"All {len(ev.cases)} matched past case(s) (read every one; determine the fix-rate distribution and "
-        f"any symptom-to-fix patterns yourself from this real data):\n{_case_lines(ev.cases)}\n\n"
+        f"{shown} matched past case(s){total_note} (read every one given below; determine the fix-rate "
+        f"distribution and any symptom-to-fix patterns yourself from this real data):\n{case_text}\n\n"
         f"Manual procedure:\n{_manual_lines(ev.manual_chunks)}\n\n"
         "Build the diagnosis tree now."
     )

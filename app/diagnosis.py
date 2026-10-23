@@ -1,5 +1,6 @@
 """Builds a small grounded diagnosis tree once per (dtc_code, model_line [, symptom]), caches it, and walks it."""
 import hashlib
+import logging
 import uuid
 from typing import Any
 
@@ -14,6 +15,8 @@ from app.query_analyzer import extract_dtc_code
 from app.redact import redact
 from app.schemas import DiagnosisTree
 from app.usage import RunInfo, current_run
+
+logger = logging.getLogger("dtcbot.diagnosis")
 
 
 def _symptom_hash(query_text: str | None) -> str:
@@ -131,28 +134,36 @@ async def _get_or_build_tree(
         )
         cached = await cur.fetchone()
     if cached:
+        logger.info("Tree cache HIT: dtc_code=%s model_line=%s symptom_hash=%s tree_id=%s", dtc_code, model_line, symptom_hash, cached["id"])
         return cached["id"], DiagnosisTree.model_validate(cached["tree"]), cached["evidence"], False
 
+    logger.info("Tree cache MISS: dtc_code=%s model_line=%s symptom_hash=%s -> retrieving evidence", dtc_code, model_line, symptom_hash)
     if query_text:
         ev = await retrieval.semantic_evidence(pool, llm, settings, query_text, model_line, dtc_code or None)
     else:
         ev = await retrieval.exact_evidence(pool, dtc_code, model_line)
     if ev.scope == "none":
+        logger.warning("No evidence found: dtc_code=%s model_line=%s -> returning no_evidence", dtc_code, model_line)
         return None, None, {"scope": "none"}, False
 
     system = TREE_SYSTEM.format(max_depth=settings.tree_max_depth)
     user = _build_prompt(dtc_code or "(not given; matched by symptom text)", model_line, ev, query_text)
     tree = None
     last_error: Exception | None = None
-    for _ in range(2):  # try once, retry once on a malformed tree
+    for attempt in range(1, 3):  # try once, retry once on a malformed tree
+        logger.info("Tree build attempt %d/2: dtc_code=%s model_line=%s evidence_scope=%s cases=%d manual_chunks=%d",
+                    attempt, dtc_code, model_line, ev.scope, len(ev.cases), len(ev.manual_chunks))
         candidate = await llm.structured(system, user, DiagnosisTree, purpose="tree_build")
         try:
             _validate_tree(candidate, settings.tree_max_depth)
             tree = candidate
+            logger.info("Tree build succeeded on attempt %d: %d node(s), root=%s", attempt, len(candidate.nodes), candidate.root)
             break
         except ValueError as exc:
             last_error = exc
+            logger.warning("Tree validation FAILED on attempt %d: %s", attempt, exc)
     if tree is None:
+        logger.error("Tree build failed after retries: dtc_code=%s model_line=%s error=%s", dtc_code, model_line, last_error)
         raise RuntimeError(f"model could not produce a valid diagnosis tree: {last_error}")
 
     evidence_summary = {
@@ -169,6 +180,7 @@ async def _get_or_build_tree(
             (dtc_code, model_line, symptom_hash, tree.model_dump_json(), Json(evidence_summary)),
         )
         (tree_id,) = await cur.fetchone()
+    logger.info("Tree cached: dtc_code=%s model_line=%s symptom_hash=%s tree_id=%s", dtc_code, model_line, symptom_hash, tree_id)
     return tree_id, tree, evidence_summary, True
 
 
@@ -176,6 +188,8 @@ async def start_diagnosis(
     pool: AsyncConnectionPool, llm: LLM, settings: Settings, model_line: str,
     dtc_code: str | None = None, query_text: str | None = None,
 ) -> dict:
+    logger.info("start_diagnosis: model_line=%s dtc_code=%s query_text_present=%s", model_line, dtc_code, bool(query_text))
+
     # A code typed inside the free text wins if no explicit code field was given.
     if not dtc_code and query_text:
         extracted, remaining = extract_dtc_code(query_text)
@@ -196,6 +210,8 @@ async def start_diagnosis(
             "INSERT INTO diagnoses (id, dtc_code, model_line, tree_id, status) VALUES (%s,%s,%s,%s,%s)",
             (diagnosis_id, resolved_code, model_line, tree_id, status),
         )
+    logger.info("start_diagnosis DONE: diagnosis_id=%s dtc_code=%s model_line=%s status=%s built_now=%s",
+                diagnosis_id, resolved_code, model_line, status, built_now)
 
     # The whole tree is sent once; the client walks it locally (no per-answer server round-trip, no resume).
     return {
@@ -219,6 +235,7 @@ async def save_outcome(pool: AsyncConnectionPool, diagnosis_id: uuid.UUID, resul
     async with pool.connection() as conn:
         cur = await conn.execute("SELECT 1 FROM diagnoses WHERE id = %s", (diagnosis_id,))
         if await cur.fetchone() is None:
+            logger.warning("save_outcome: diagnosis_id=%s not found", diagnosis_id)
             raise NotFound
         # No server-side step tracking (client walks the tree) - trust the client that a leaf was reached.
         await conn.execute(
@@ -227,6 +244,7 @@ async def save_outcome(pool: AsyncConnectionPool, diagnosis_id: uuid.UUID, resul
             "parts_replaced = EXCLUDED.parts_replaced, notes = EXCLUDED.notes, updated_at = now()",
             (diagnosis_id, result, actual_cause, Json(parts_replaced), notes),
         )
+    logger.info("save_outcome: diagnosis_id=%s result=%s parts_replaced=%s", diagnosis_id, result, parts_replaced)
     return {"result": result, "actual_cause": actual_cause, "parts_replaced": parts_replaced, "notes": notes}
 
 

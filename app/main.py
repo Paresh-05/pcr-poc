@@ -1,5 +1,6 @@
 import logging
 import secrets
+import time
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -11,10 +12,12 @@ from fastapi.staticfiles import StaticFiles
 from app.config import Settings, get_settings
 from app.db import create_pool
 from app.llm import OpenAILLM
+from app.logging_config import setup_logging
 from app.routes import make_router
 from app.ui_access import require_ui_access, session_router
 from app.usage import UsageRecorder
 
+setup_logging(get_settings())
 logger = logging.getLogger("dtcbot")
 api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 
@@ -23,12 +26,15 @@ api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 async def lifespan(app: FastAPI):
     settings = get_settings()
     app.state.settings = settings
+    logger.info("Starting DTC Bot (env=%s, llm_enabled=%s, model=%s)", settings.app_env, settings.llm_enabled, settings.llm_model)
     app.state.pool = create_pool(settings)
     await app.state.pool.open()
+    logger.info("Database pool opened (host=%s db=%s)", settings.postgres_host, settings.postgres_db)
     app.state.llm = OpenAILLM(settings, UsageRecorder(app.state.pool)) if settings.llm_enabled else None
     if app.state.llm is None:
         logger.warning("LLM not configured (LLM_API_KEY / LLM_MODEL); diagnosis endpoints are disabled")
     yield
+    logger.info("Shutting down: closing database pool")
     await app.state.pool.close()
 
 
@@ -54,6 +60,19 @@ UI_CSP = (
 
 
 @app.middleware("http")
+async def request_logging(request: Request, call_next):
+    started = time.monotonic()
+    try:
+        response = await call_next(request)
+    except Exception:
+        logger.exception("%s %s -> unhandled exception after %dms", request.method, request.url.path, int((time.monotonic() - started) * 1000))
+        raise
+    elapsed_ms = int((time.monotonic() - started) * 1000)
+    logger.info("%s %s -> %d (%dms)", request.method, request.url.path, response.status_code, elapsed_ms)
+    return response
+
+
+@app.middleware("http")
 async def security_headers(request: Request, call_next):
     response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
@@ -66,7 +85,7 @@ async def security_headers(request: Request, call_next):
 
 @app.exception_handler(Exception)
 async def unhandled(_: Request, exc: Exception) -> JSONResponse:
-    logger.error("unhandled error: %s", type(exc).__name__)
+    logger.exception("unhandled error: %s", type(exc).__name__)
     return JSONResponse({"error": "Something went wrong. Please try again later."}, status_code=500)
 
 

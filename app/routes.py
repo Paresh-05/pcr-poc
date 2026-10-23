@@ -1,4 +1,5 @@
 """The diagnosis API. Built twice from one definition: with API-key auth (/) and with demo-page auth (/ui-api)."""
+import logging
 import re
 import uuid
 
@@ -9,6 +10,8 @@ from app import diagnosis
 from app.manual import complete_manual_dtcs, has_complete_manual
 from app.ratelimit import rate_limit
 from app.schemas import OutcomeIn, StartDiagnosis
+
+logger = logging.getLogger("dtcbot.routes")
 
 _MODEL_LINE = re.compile(r"^[A-Z0-9_]{2,32}$")
 
@@ -47,6 +50,7 @@ def make_router(auth) -> APIRouter:
     @router.post("/diagnoses", status_code=201, dependencies=[Depends(rate_limit), Depends(require_llm)])
     async def start_diagnosis(body: StartDiagnosis, request: Request) -> dict:
         s = request.app.state
+        logger.info("POST /diagnoses: model_line=%s dtc_code=%s query_text_present=%s", body.model_line, body.dtc_code, bool(body.query_text))
         # The catalog (dropdown) flow gives an exact code up front, so it's worth a clear 404/422 before
         # spending an LLM call. Free-text queries may resolve to no code, or a code not yet in our catalog
         # check - those fall through to diagnosis.start_diagnosis, which returns status="no_evidence" instead.
@@ -57,11 +61,13 @@ def make_router(auth) -> APIRouter:
                     (body.dtc_code, body.model_line),
                 )
                 if await cur.fetchone() is None:
+                    logger.warning("start_diagnosis: dtc_code=%s not found for model_line=%s -> 404", body.dtc_code, body.model_line)
                     raise HTTPException(
                         status.HTTP_404_NOT_FOUND,
                         "This fault code was not found for the selected model",
                     )
             if not await has_complete_manual(s.pool, body.dtc_code, body.model_line):
+                logger.warning("start_diagnosis: no manual for dtc_code=%s model_line=%s -> 422", body.dtc_code, body.model_line)
                 raise HTTPException(
                     status.HTTP_422_UNPROCESSABLE_ENTITY,
                     "A manual procedure is not available for this model and fault code",

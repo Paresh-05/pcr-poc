@@ -8,9 +8,12 @@ State-changing requests must also come from the page's own origin.
 """
 import hashlib
 import hmac
+import logging
 import secrets
 import time
 from urllib.parse import urlparse
+
+logger = logging.getLogger("dtcbot.ui_access")
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from pydantic import BaseModel, ConfigDict, StringConstraints
@@ -69,11 +72,14 @@ async def session_state(request: Request, settings: Settings = Depends(get_setti
 async def log_in(body: PasscodeIn, request: Request, response: Response, settings: Settings = Depends(get_settings)) -> dict:
     origin = request.headers.get("origin")
     if origin and urlparse(origin).netloc != request.headers.get("host"):
+        logger.warning("Login rejected: cross-origin request (origin=%s)", origin)
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Cross-origin requests are not allowed")
     if not settings.demo_passcode:
         return {"passcode_required": False, "authenticated": is_authenticated(request, settings)}
     if not secrets.compare_digest(body.passcode.encode(), settings.demo_passcode.get_secret_value().encode()):
+        logger.warning("Login rejected: wrong passcode from %s", request.client.host if request.client else "unknown")
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Wrong passcode")
+    logger.info("Login succeeded from %s", request.client.host if request.client else "unknown")
     response.set_cookie(
         COOKIE, make_token(settings), max_age=SESSION_SECONDS, httponly=True, samesite="strict",
         secure=request.url.scheme == "https", path="/ui-api",

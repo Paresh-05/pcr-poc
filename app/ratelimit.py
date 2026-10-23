@@ -1,10 +1,13 @@
 """Minimal in-memory sliding-window rate limiter (single process; swap for Redis when scaling)."""
+import logging
 import time
 from collections import deque
 
 from fastapi import Depends, HTTPException, Request, status
 
 from app.config import Settings, get_settings
+
+logger = logging.getLogger("dtcbot.ratelimit")
 
 _hits: dict[str, deque] = {}
 
@@ -16,6 +19,7 @@ def rate_limit(request: Request, settings: Settings = Depends(get_settings)) -> 
     while window and now - window[0] > 60:
         window.popleft()
     if len(window) >= settings.rate_limit_per_minute:
+        logger.warning("Rate limit exceeded for %s (%d hits in last 60s)", key, len(window))
         raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, "Too many requests")
     window.append(now)
 

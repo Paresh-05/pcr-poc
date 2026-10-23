@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     api_key: SecretStr
     rate_limit_per_minute: int = 30
 
+    log_level: str = "INFO"
+    log_dir: str = "logs"
+
     demo_passcode: SecretStr | None = None
     demo_trust_network: bool = False
 

@@ -1,5 +1,8 @@
 """Pulls a DTC code out of raw free text, if one is typed inline (e.g. "getting P0420, car shakes")."""
+import logging
 import re
+
+logger = logging.getLogger("dtcbot.query_analyzer")
 
 # Letter prefix (P=Powertrain, B=Body, C=Chassis, U=Network), then a digit (real codes always have one
 # here - this is what stops case-insensitive matching from treating plain words like "Problems" or
@@ -13,8 +16,10 @@ def extract_dtc_code(text: str) -> tuple[str | None, str]:
         return None, ""
     match = _DTC_RE.search(text)
     if not match:
+        logger.info("No DTC code found inline in free text (len=%d)", len(text))
         return None, text.strip()
     code = match.group(1).upper()
     remaining = (text[: match.start()] + text[match.end() :]).strip()
     remaining = re.sub(r"\s{2,}", " ", remaining)
+    logger.info("Extracted DTC code %s from free text (remaining_len=%d)", code, len(remaining))
     return code, remaining

@@ -12,6 +12,10 @@ scripts/diagnosis_manuals/*
 /mg_comets_dtc_diagnosis_manual.pdf
 /mg_comets_ev.csv
 
+# Logs
+/logs/
+*.log
+
 # Python caches and test artifacts
 *.py[cod]
 *$py.class

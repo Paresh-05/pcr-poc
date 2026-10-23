@@ -6,6 +6,7 @@ Two retrieval modes:
 - semantic: a free-text query -> filter by model (+code if present in the text), then rank by embedding
   similarity, dropping anything below the threshold. Not wired to a route yet; ready for a future free-text box.
 """
+import logging
 from dataclasses import dataclass
 from typing import Any
 
@@ -15,6 +16,8 @@ from psycopg_pool import AsyncConnectionPool
 
 from app.config import Settings
 from app.llm import LLM
+
+logger = logging.getLogger("dtcbot.retrieval")
 
 
 @dataclass(frozen=True)
@@ -46,6 +49,7 @@ async def _fix_counts(cases: list[dict[str, Any]]) -> list[PartCount]:
 
 async def exact_evidence(pool: AsyncConnectionPool, dtc_code: str, model_line: str) -> Evidence:
     """Used by the catalog flow: the DTC code is already exact, so no semantic search is needed."""
+    logger.info("Exact evidence lookup: dtc_code=%s model_line=%s (no embedding search)", dtc_code, model_line)
     async with pool.connection() as conn, conn.cursor(row_factory=dict_row) as cur:
         await cur.execute(
             "SELECT ticket_no, customer_verbatim, conclusion_text, failed_parts, model_variant, fuel, updated_date "
@@ -63,6 +67,10 @@ async def exact_evidence(pool: AsyncConnectionPool, dtc_code: str, model_line: s
         manual_chunks = await cur.fetchall()
 
     scope = "exact" if cases else ("manual_only" if manual_chunks else "none")
+    logger.info(
+        "Exact evidence result: dtc_code=%s model_line=%s cases=%d manual_chunks=%d scope=%s",
+        dtc_code, model_line, len(cases), len(manual_chunks), scope,
+    )
     return Evidence(cases=cases, manual_chunks=manual_chunks, top_parts=await _fix_counts(cases), scope=scope)
 
 
@@ -70,6 +78,10 @@ async def semantic_evidence(
     pool: AsyncConnectionPool, llm: LLM, settings: Settings, query_text: str, model_line: str, dtc_code: str | None
 ) -> Evidence:
     """Free-text flow: filter by model (+code if known), rank the rest by embedding similarity."""
+    logger.info(
+        "Semantic evidence lookup: model_line=%s dtc_code=%s query_len=%d threshold=%.2f top_k=%d",
+        model_line, dtc_code, len(query_text), settings.similarity_threshold, settings.retrieval_top_k,
+    )
     query_vec = Vector(await llm.embed(query_text))
 
     async with pool.connection() as conn, conn.cursor(row_factory=dict_row) as cur:
@@ -93,6 +105,7 @@ async def semantic_evidence(
             )
         ranked = await cur.fetchall()
         cases = [c for c in ranked if c["similarity"] >= settings.similarity_threshold][: settings.retrieval_keep]
+        logger.info("Case similarity search: ranked=%d kept_after_threshold=%d", len(ranked), len(cases))
 
         if dtc_code:
             # Filter by code first (a code can span many submodules - e.g. B100016 in 13), THEN rank by
@@ -118,4 +131,8 @@ async def semantic_evidence(
             manual_chunks = [m for m in manual_rows if m["similarity"] >= settings.similarity_threshold][: settings.retrieval_keep]
 
     scope = "semantic" if cases else ("manual_only" if manual_chunks else "none")
+    logger.info(
+        "Semantic evidence result: model_line=%s dtc_code=%s cases=%d manual_chunks=%d scope=%s",
+        model_line, dtc_code, len(cases), len(manual_chunks), scope,
+    )
     return Evidence(cases=cases, manual_chunks=manual_chunks, top_parts=await _fix_counts(cases), scope=scope)

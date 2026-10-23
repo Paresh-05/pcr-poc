@@ -112,5 +112,7 @@ class UsageRecorder:
                          usage.input_tokens, usage.cached_input_tokens, usage.output_tokens, usage.reasoning_tokens,
                          cost if cost is not None else Decimal(0)),
                     )
+            logger.info("usage recorded: model=%s purpose=%s tokens=%d cost_usd=%s latency=%dms",
+                        model, purpose, usage.total_tokens, cost, latency_ms)
         except Exception as exc:  # noqa: BLE001
             logger.error("usage recording failed: %s", type(exc).__name__)

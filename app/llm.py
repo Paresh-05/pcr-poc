@@ -1,5 +1,6 @@
 """OpenAI access: embeddings, schema-checked structured output."""
 import json
+import logging
 import re
 import time
 from typing import Protocol, TypeVar
@@ -9,6 +10,8 @@ from pydantic import BaseModel, ValidationError
 
 from app.config import Settings
 from app.usage import UsageRecorder, usage_from_response
+
+logger = logging.getLogger("dtcbot.llm")
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -57,6 +60,8 @@ class OpenAILLM:
     async def embed(self, text: str) -> list[float]:
         started = time.monotonic()
         resp = await self.client.embeddings.create(model=self.embedding_model, input=text[:8000])
+        elapsed_ms = int((time.monotonic() - started) * 1000)
+        logger.info("embed call: model=%s chars=%d latency=%dms", self.embedding_model, len(text), elapsed_ms)
         await self._record(resp, "embed", self.embedding_model, started)
         return resp.data[0].embedding
 
@@ -64,17 +69,24 @@ class OpenAILLM:
         """`effort` overrides the configured default reasoning effort for this one call (e.g. "high" for a
         call that benefits from deeper reasoning, like turning a messy manual into structured analysis)."""
         messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
+        logger.info("structured call: purpose=%s model=%s schema=%s", purpose, self.model, schema.__name__)
         started = time.monotonic()
         try:
             completion = await self._call(
                 self.client.chat.completions.parse, purpose, effort, model=self.model, messages=messages, response_format=schema
             )
+            elapsed_ms = int((time.monotonic() - started) * 1000)
+            usage = usage_from_response(completion)
+            logger.info(
+                "structured call OK (native): purpose=%s model=%s latency=%dms input_tokens=%s output_tokens=%s",
+                purpose, self.model, elapsed_ms, usage.input_tokens if usage else None, usage.output_tokens if usage else None,
+            )
             await self._record(completion, purpose, self.model, started)
             parsed = completion.choices[0].message.parsed
             if parsed is not None:
                 return parsed
-        except (BadRequestError, LengthFinishReasonError, ValidationError):
-            pass  # model without structured-output support: fall back to prompted JSON
+        except (BadRequestError, LengthFinishReasonError, ValidationError) as exc:
+            logger.warning("structured call: native structured output failed (%s), falling back to prompted JSON", type(exc).__name__)
 
         messages[0] = {
             "role": "system",
@@ -83,5 +95,11 @@ class OpenAILLM:
         }
         started = time.monotonic()
         completion = await self._call(self.client.chat.completions.create, purpose, effort, model=self.model, messages=messages)
+        elapsed_ms = int((time.monotonic() - started) * 1000)
+        usage = usage_from_response(completion)
+        logger.info(
+            "structured call OK (prompted-JSON fallback): purpose=%s model=%s latency=%dms input_tokens=%s output_tokens=%s",
+            purpose, self.model, elapsed_ms, usage.input_tokens if usage else None, usage.output_tokens if usage else None,
+        )
         await self._record(completion, purpose, self.model, started)
         return _extract_json(completion.choices[0].message.content or "", schema)

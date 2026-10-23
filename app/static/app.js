@@ -3,7 +3,7 @@
 (() => {
   const API = "/ui-api"; // the server holds the API key; this page never sees one
   const $ = (id) => document.getElementById(id);
-  const DTC_RE = /^[A-Z][0-9A-Z]{5,7}$/;
+  const DTC_RE = /^[A-Z][0-9][0-9A-Z]{3,6}$/i;
   const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   const ANSWER_LABEL = { yes: "Yes", no: "No", not_sure: "Not sure" };
   const RESULT_LABEL = { worked: "fixed", partly: "partly fixed", not_worked: "did not fix" };
@@ -89,7 +89,10 @@
     const note = $("action-note");
     note.classList.remove("strong");
     const code = $("dtc").value;
-    note.textContent = code ? `${code} on ${friendly($("model").value)}. Ready to start.` : "Choose a car model and a fault code.";
+    const desc = $("query-text") ? $("query-text").value.trim() : "";
+    note.textContent = code ? `${code} on ${friendly($("model").value)}. Ready to start.`
+      : desc ? `Matching your description on ${friendly($("model").value)}. Ready to start.`
+      : "Choose a car model, pick a fault code, or describe the problem.";
   }
   const STEP_NAMES = ["Fault code", "Questions", "Diagnosis", "Feedback"];
   function setStep(n) { // n = 1..4 is the current step; 5 means every step is done
@@ -211,61 +214,58 @@
     updateStartNote();
   }
   $("dtc").addEventListener("change", updateDtcMeta);
+  $("query-text").addEventListener("input", updateStartNote);
 
   // ---------- start / resume ----------
   $("start-form").addEventListener("submit", (ev) => {
     ev.preventDefault();
     const dtc = $("dtc").value;
-    if (!DTC_RE.test(dtc)) { showError("Enter a valid fault code, for example P187973."); return; }
-    begin(dtc, $("model").value);
+    const queryText = $("query-text").value.trim();
+    if (!dtc && !queryText) { showError("Pick a fault code or describe the problem."); return; }
+    if (dtc && !DTC_RE.test(dtc)) { showError("Enter a valid fault code, for example P187973."); return; }
+    begin(dtc, queryText, $("model").value);
   });
 
-  function begin(dtc, model) {
-    run(`Checking ${dtc} for ${friendly(model)} and preparing the first question.`, async () => {
-      const d = await api("/diagnoses", { method: "POST", body: { dtc_code: dtc, model_line: model }, timeoutMs: 600000 });
+  let currentTree = null; // {root, nodes[]} - the whole tree, walked locally
+  let currentNodeId = null;
+
+  function findNode(id) { return (currentTree.nodes || []).find((n) => n.id === id); }
+
+  function begin(dtc, queryText, model) {
+    const label = dtc ? dtc : "your description";
+    run(`Checking ${label} for ${friendly(model)} and preparing the first question.`, async () => {
+      const body = { model_line: model };
+      if (dtc) body.dtc_code = dtc;
+      if (queryText) body.query_text = queryText;
+      const d = await api("/diagnoses", { method: "POST", body, timeoutMs: 600000 });
       history = [];
       lastConclusion = null;
       diagnosisId = d.diagnosis_id;
-      vehicle = { dtc, model };
+      vehicle = { dtc: d.dtc_code || dtc || "(from description)", model };
+      currentTree = d.tree;
+      currentNodeId = d.tree ? d.tree.root : null;
       enterWork(d, d.evidence);
       await refreshCost();
     }, "Preparing your diagnosis");
   }
-
-  $("resume-btn").addEventListener("click", () => {
-    const id = $("resume-id").value.trim();
-    if (!UUID_RE.test(id)) { showError("That is not a diagnosis id."); return; }
-    run("Loading the diagnosis…", async () => {
-      const d = await api(`/diagnoses/${id}`);
-      diagnosisId = d.diagnosis_id;
-      history = d.steps.map((s) => ({ question: s.question, answer: s.answer, showed: s.explanation || "" }));
-      vehicle = { dtc: d.dtc_code, model: d.model_line };
-      enterWork(d, { scope: d.scope, manual: { status: d.manual_status, modules: [] }, resumed: true });
-      if (d.outcome) markOutcomeSaved(d.outcome);
-      await refreshCost();
-    });
-  });
 
   function enterWork(d, evidence) {
     screen("work");
     $("v-code").textContent = vehicle.dtc;
     $("v-model").textContent = friendly(vehicle.model);
     renderEvidence(evidence);
-    renderState(d);
+    renderState(d.status, d.max_questions);
   }
 
-  // ---------- answering ----------
+  // ---------- answering: pure local tree walk, no server call ----------
   function submitAnswer(answer) {
-    if (!diagnosisId || busy) return;
-    const asked = $("question").textContent;
-    const id = diagnosisId;
-    run("Updating the likely causes…", async () => {
-      const d = await api(`/diagnoses/${id}/answers`, { method: "POST", body: { answer } });
-      if (id !== diagnosisId) return; // the user started a new diagnosis while this answer was in flight
-      history.push({ question: asked, answer, showed: d.explanation || "" });
-      renderState(d);
-      await refreshCost();
-    }, undefined, true);
+    if (!currentTree || busy) return;
+    const node = findNode(currentNodeId);
+    history.push({ question: node.question, answer, showed: "" });
+    const nextId = { yes: node.yes, no: node.no, not_sure: node.not_sure }[answer] || node.yes || node.no;
+    currentNodeId = nextId;
+    const next = findNode(nextId);
+    renderState(next && next.conclusion ? "concluded" : "asking", 5);
   }
   $("answers").addEventListener("click", (ev) => {
     const btn = ev.target.closest("button[data-answer]");
@@ -279,32 +279,35 @@
     if (answer) { ev.preventDefault(); submitAnswer(answer); }
   });
 
-  // ---------- rendering ----------
-  function renderState(d) {
-    asking = d.status === "asking";
-    const concluded = d.status === "concluded";
+  // ---------- rendering (reads currentTree/currentNodeId, no server response needed) ----------
+  function renderState(status, maxQuestions) {
+    const node = currentTree ? findNode(currentNodeId) : null;
+    asking = status === "asking";
+    const concluded = status === "concluded";
+    const conclusion = node && node.conclusion ? node.conclusion : null;
+    const questionsAsked = history.length;
     setStep(concluded ? 3 : 2);
-    renderCandidates(d.candidates || []);
+    renderCandidates((node && node.candidates) || []);
     renderHistory();
-    $("question").textContent = asking ? d.question
+    $("question").textContent = asking ? (node && node.question)
       : concluded ? "Diagnosis complete. The result is below."
       : "There are no past repairs or manual text for this code and model, so there is nothing to base a diagnosis on.";
-    $("q-count").textContent = asking ? `${d.questions_asked + 1} of up to ${d.max_questions}` : "";
-    $("q-meter").style.width = `${Math.min(100, Math.round(((asking ? d.questions_asked : d.max_questions) / d.max_questions) * 100))}%`;
-    show($("answers"), asking && !inlineBusy); // while the small loader is up, the buttons stay hidden until it clears
+    $("q-count").textContent = asking ? `${questionsAsked + 1} of up to ${maxQuestions}` : "";
+    $("q-meter").style.width = `${Math.min(100, Math.round(((asking ? questionsAsked : maxQuestions) / maxQuestions) * 100))}%`;
+    show($("answers"), asking && !inlineBusy);
     show($("question-card"), !concluded);
-    show($("conclusion-card"), Boolean(d.conclusion));
+    show($("conclusion-card"), Boolean(conclusion));
     const note = $("action-note");
-    note.textContent = asking ? `Question ${d.questions_asked + 1} of up to ${d.max_questions}. Answer Yes, No or Not sure.`
+    note.textContent = asking ? `Question ${questionsAsked + 1} of up to ${maxQuestions}. Answer Yes, No or Not sure.`
       : concluded ? "Diagnosis ready. Review the repair steps, then give feedback after the repair."
       : "No diagnosis is possible for this code and model.";
     note.classList.toggle("strong", concluded);
     show($("copy-btn"), concluded);
     show($("print-btn"), concluded);
     show($("outcome-card"), concluded);
-    if (d.conclusion) renderConclusion(d.conclusion);
-    $("diag-id").textContent = `Diagnosis id: ${d.diagnosis_id}`;
-    $((d.conclusion ? "c-title" : "q-title")).focus({ preventScroll: false });
+    if (conclusion) renderConclusion(conclusion);
+    $("diag-id").textContent = `Diagnosis id: ${diagnosisId}`;
+    $((conclusion ? "c-title" : "q-title")).focus({ preventScroll: false });
   }
 
   function renderCandidates(cands) {

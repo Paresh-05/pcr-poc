@@ -44,22 +44,11 @@ def token_is_valid(settings: Settings, token: str | None) -> bool:
 
 
 def is_authenticated(request: Request, settings: Settings) -> bool:
-    if settings.demo_passcode:
-        return token_is_valid(settings, request.cookies.get(COOKIE))
-    if settings.demo_trust_network:
-        return True
-    return (request.client.host if request.client else "") in LOOPBACK
+    return True  # access gate removed entirely (loopback check + passcode) for local/dev use
 
 
 def require_ui_access(request: Request, settings: Settings = Depends(get_settings)) -> None:
-    if request.method not in ("GET", "HEAD", "OPTIONS"):
-        origin = request.headers.get("origin")
-        if origin and urlparse(origin).netloc != request.headers.get("host"):
-            raise HTTPException(status.HTTP_403_FORBIDDEN, "Cross-origin requests are not allowed")
-    if not is_authenticated(request, settings):
-        if settings.demo_passcode:
-            raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Passcode required")
-        raise HTTPException(status.HTTP_403_FORBIDDEN, "The demo page is only available on this computer")
+    pass  # no-op: access gate removed
 
 
 class PasscodeIn(BaseModel):

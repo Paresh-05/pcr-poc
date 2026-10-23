@@ -11,28 +11,22 @@ class Settings(BaseSettings):
     api_key: SecretStr
     rate_limit_per_minute: int = 30
 
-    # Demo page (dev only). Its API runs on the server with the server's own key, so the browser never sees a key.
-    # Empty = the page only answers requests from this computer. Set a passcode to let others use it (login screen).
     demo_passcode: SecretStr | None = None
-    # True only when the server is reachable from this computer alone (the Docker setup publishes its port on
-    # 127.0.0.1). Then the page is served without a code even though requests arrive from Docker's network.
     demo_trust_network: bool = False
 
-    # Chat model (OpenAI). LLM_BASE_URL is only for a custom OpenAI-compatible endpoint; empty = OpenAI.
+    # Chat + embedding model (OpenAI-compatible). LLM_BASE_URL empty = OpenAI itself.
     llm_api_key: SecretStr | None = None
     llm_base_url: str | None = None
     llm_model: str | None = None
-    llm_pack_model: str | None = None  # stronger model for the once-per-code knowledge pack; defaults to llm_model
-    # How much the model "thinks" before answering (none | low | medium | high ...). Lower = faster and cheaper.
-    # STEP applies to the yes/no question turns (speed matters); REASONING applies to the case digest and the final
-    # conclusion (quality matters). Unset = the model's own default.
-    llm_step_effort: str | None = None
     llm_reasoning_effort: str | None = None
+    embedding_model: str = "text-embedding-3-small"
+    embedding_dims: int = 1536
 
-    # DTC manual service. Empty base URL = manual step skipped. Include the route prefix, e.g. http://host:3001/api
-    manual_api_base_url: str | None = None
-    manual_api_user: str | None = None
-    manual_api_password: SecretStr | None = None
+    # Retrieval tuning.
+    retrieval_top_k: int = 30
+    retrieval_keep: int = 15
+    similarity_threshold: float = 0.60  # cosine similarity, matches dropped below this
+    tree_max_depth: int = 5
 
     postgres_user: str
     postgres_password: SecretStr
@@ -44,11 +38,6 @@ class Settings(BaseSettings):
     def _validate(self) -> "Settings":
         if self.llm_api_key is not None and not self.llm_model:
             raise ValueError("LLM_MODEL must be set in .env when LLM_API_KEY is set")
-        if self.manual_api_base_url:
-            if not self.is_dev and not self.manual_api_base_url.startswith("https://"):
-                raise ValueError("MANUAL_API_BASE_URL must use https outside dev")
-            if bool(self.manual_api_user) != bool(self.manual_api_password):
-                raise ValueError("MANUAL_API_USER and MANUAL_API_PASSWORD must be set together")
         return self
 
     @property

@@ -2,3 +2,40 @@
 .venv/
 __pycache__/
 *.csv
+/MG_COMET_DTC_Diagnosis_Manual.pdf
+/MG_COMET_DTC_Diagnosis_Manual.zip
+scripts/diagnosis_manuals/*
+/scripts/sample_data/
+/1_manual/
+/2_past complain/
+/dtc.csv
+/mg_comets_dtc_diagnosis_manual.pdf
+/mg_comets_ev.csv
+
+# Python caches and test artifacts
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.coverage
+.coverage.*
+htmlcov/
+
+# Virtual environments and local configuration
+venv/
+ENV/
+.env.*
+!.env.example
+
+# Build and packaging output
+build/
+dist/
+*.egg-info/
+
+# Editor and operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/

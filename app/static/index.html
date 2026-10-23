@@ -83,18 +83,13 @@
                 <label for="model">Car model</label>
                 <select id="model" required></select>
                 <label for="dtc">Fault code (DTC)</label>
-                <select id="dtc" required>
+                <select id="dtc">
                   <option value="">Select a fault code</option>
                 </select>
+                <label for="query-text">Or describe the problem (optional)</label>
+                <textarea id="query-text" rows="2" maxlength="500" placeholder="e.g. car shakes at idle, or mentions a code like P0420"></textarea>
               </div>
               <p id="dtc-meta" class="hint" aria-live="polite"></p>
-              <details class="resume">
-                <summary>Resume an earlier diagnosis</summary>
-                <div class="row">
-                  <input id="resume-id" placeholder="Diagnosis id" aria-label="Diagnosis id to resume" spellcheck="false">
-                  <button type="button" class="btn btn-quiet" id="resume-btn">Resume</button>
-                </div>
-              </details>
             </form>
 
             <aside class="side">

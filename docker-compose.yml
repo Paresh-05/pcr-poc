@@ -1,7 +1,6 @@
 services:
   db:
     image: pgvector/pgvector:pg17
-    container_name: dtcbot-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -13,34 +12,24 @@ services:
       - dtcbot_pgdata:/var/lib/postgresql/data
       - ./schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 10
 
   app:
     build: .
-    image: dtcbot-app:local
-    container_name: dtcbot-app
     restart: unless-stopped
+    env_file: .env
+    environment:
+      APP_HOST: 0.0.0.0
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+    ports:
+      - "8100:8100"
     depends_on:
       db:
         condition: service_healthy
-    env_file: .env # secrets are passed at run time; they are never copied into the image
-    environment:
-      # Inside the compose network the database is "db" on its normal port.
-      POSTGRES_HOST: db
-      POSTGRES_PORT: "5432"
-      APP_ENV: dev
-      # The port below is published on 127.0.0.1 only, so just this computer can reach the page: no access code needed.
-      DEMO_TRUST_NETWORK: "true"
-      # Optional: set DOCKER_DEMO_PASSCODE in .env to ask for an access code anyway (for example on a shared machine).
-      DEMO_PASSCODE: ${DOCKER_DEMO_PASSCODE:-}
-    ports:
-      - "127.0.0.1:8100:8100"
-    read_only: true
-    cap_drop: [ALL]
-    security_opt: ["no-new-privileges:true"]
 
 volumes:
   dtcbot_pgdata:

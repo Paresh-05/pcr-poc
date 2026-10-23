@@ -62,9 +62,10 @@ def usage_from_response(resp) -> Usage | None:
         return None
     cached = getattr(getattr(u, "prompt_tokens_details", None), "cached_tokens", 0) or 0
     reasoning = getattr(getattr(u, "completion_tokens_details", None), "reasoning_tokens", 0) or 0
+    # Embeddings responses have no completion_tokens (no output text); treat as 0.
     return Usage(
-        input_tokens=u.prompt_tokens or 0,
-        output_tokens=u.completion_tokens or 0,
+        input_tokens=getattr(u, "prompt_tokens", 0) or 0,
+        output_tokens=getattr(u, "completion_tokens", 0) or 0,
         cached_input_tokens=cached,
         reasoning_tokens=reasoning,
     )

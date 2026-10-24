@@ -76,13 +76,28 @@ evidence. Never repeat a question on a path.
 never leave one null and assume it won't be needed. If a yes/no answer already fully resolves the hypothesis \
 set, "not_sure" can point straight to a leaf that honestly reflects the remaining uncertainty instead of \
 continuing to branch, but it must still point somewhere valid.
-- Candidate narrowing on YES and NO paths: the candidates list at every such node must be freshly recomputed, \
-reflecting only the hypotheses still consistent with the answers given on the path to reach it. NEVER repeat \
-the same candidates list unchanged from a parent or sibling node - if an answer genuinely provided no new \
-discriminating information, say so in that node's reasoning instead of pasting the prior list. As the tree \
-gets deeper on these paths, the live candidate set should visibly narrow, with the leading candidate's \
-likelihood generally rising, until each leaf names a single most-likely diagnosis (or, if the evidence \
-genuinely can't separate two causes, says so explicitly rather than guessing).
+- What an answer actually proves: before moving any candidate after a YES or NO, ask what that specific \
+answer logically establishes - not what it hints at. Every answer does exactly one of three things to each \
+candidate, and you must keep them distinct:
+  * ELIMINATES it - only when the evidence shows that cause cannot produce this result (e.g. the manual or \
+the cases establish that fault always sets this code, and the code is absent).
+  * WEAKENS it - the answer makes it less likely but doesn't rule it out. Lower it; keep it in the list.
+  * LEAVES IT UNCHANGED - the answer says nothing about it. Its weight stays where it was.
+Absence of a supporting sign is usually WEAKENS, not ELIMINATES: a missing companion code, a normal visual \
+inspection, or an intermittent fault not reproducing does not prove a cause absent unless the evidence says \
+that cause would always show that sign.
+- Never infer the other option by elimination unless the options are proven exhaustive. If a question asks \
+"is it X?" and the answer is NO, that rules out X (or weakens it) - it does NOT confirm Y, unless the evidence \
+establishes X and Y are the only possibilities. If other causes remain live, the NO branch must keep them and \
+ask a further question that actually confirms Y, rather than jumping straight to a confident Y leaf.
+- Update candidates on YES and NO paths only as far as the answer justifies, using the three rules above. \
+Don't copy the parent's list out of habit, but don't invent movement either - if an answer genuinely changes \
+nothing for a candidate, its weight should stay the same and the reasoning should say why.
+- A leaf may only name a specific failed part when the path has actually separated it from the other live \
+causes. When the evidence cannot separate two or more causes, the correct leaf is an honest one: "the \
+evidence doesn't identify a single failed part - these causes remain: ... perform these checks to tell them \
+apart", with low confidence and no part replacement listed. This is a valid, good outcome, not a failure - \
+it is far better than naming a part the evidence doesn't support.
 - "Not sure" is different: a mechanic who can't determine an answer has learned nothing, so do not force an \
 artificial change in the candidate list there. If a genuinely useful alternative check exists, route not_sure \
 to a node asking it. If none does, route it to a leaf whose candidates stay close to the pre-question set and \
@@ -102,7 +117,9 @@ yes/no/not_sure (each pointing to another node's id) and leaves conclusion null.
 problem (plain statement), confidence (high only with case-specific supporting evidence; medium for \
 converging but incomplete evidence; low if thin/conflicting), confidence_note, evidence (cited bullets), \
 fix_steps (ordered, concrete, following the manual's sequence when available), parts, verify_fix, \
-alternatives, safety_note, how_we_got_here.
+alternatives, safety_note, how_we_got_here. For a leaf that could not separate the remaining causes, "parts" \
+must be empty, "problem" must say which causes are still possible, and "fix_steps" must be the checks that \
+would tell them apart - never a replacement.
 
 Rules that apply throughout:
 - Base every candidate cause, every question, and the conclusion strictly on the evidence given below. Never \

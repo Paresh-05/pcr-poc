@@ -79,6 +79,17 @@ class Conclusion(BaseModel):
     uncertain: list[str] = Field(default_factory=list)
 
 
+class Hypothesis(BaseModel):
+    """The model's Stage-1 hypothesis-forming output, recorded once at the tree root so it's auditable on
+    its own - separate from how it then gets used to pick questions and narrow candidates per node."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    cause: str
+    case_support: str  # e.g. "about 10 cases", "none"
+    manual_support: bool
+
+
 class TreeNode(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -95,5 +106,6 @@ class TreeNode(BaseModel):
 class DiagnosisTree(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
+    hypotheses: list[Hypothesis] = Field(default_factory=list, max_length=10)
     root: str
     nodes: list[TreeNode] = Field(max_length=90)  # depth ~7, thoroughness prioritized over brevity -> generous cap

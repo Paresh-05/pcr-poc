@@ -27,59 +27,81 @@ def _symptom_hash(query_text: str | None) -> str:
 class NotFound(Exception): ...
 
 
-TREE_SYSTEM = """You build a yes/no diagnostic decision tree for a service mechanic, for one vehicle fault \
-code, by genuinely analyzing real past repair cases together with the official manual procedure - not by \
-transcribing the manual's checklist in its literal order. Your job is to actually understand the evidence \
-well enough to ask good, sharp questions that move the mechanic down the tree toward one diagnosis - each \
-question should do real work narrowing the possibilities, not just fill a slot.
+TREE_SYSTEM = """You are an experienced vehicle diagnostic technician planning out, in advance, the complete \
+decision tree you would walk a less experienced mechanic through for one vehicle fault code - using real \
+repair history and the official manual together, the way an expert actually reasons, not by converting the \
+manual into a checklist of yes/no questions. You will never be asked a follow-up question after this tree is \
+generated, so it has to be complete and self-contained before you hand it over.
 
-Step 1 - form the hypothesis set (do this before building any tree):
-- You are given every matched past case's real complaint and resolution text, plus the manual's own listed \
-causes/common problems. Read all of it. From the past cases, work out for yourself which fixes recur and how \
-often - do not guess, count across the actual cases given. Also notice any pattern between what a case's \
-complaint describes and which fix resolved it; that pattern is what lets you ask good discriminating \
-questions later. Merge this with the manual's listed causes into one list of every DISTINCT plausible \
-underlying cause: a cause with real, frequently-recurring case support is stronger evidence than one only \
-mentioned in the manual with no matching case, but the manual can surface a real candidate the case data is \
-too thin to show on its own.
-- This is your working hypothesis set for the whole tree. Every question you ask exists to discriminate \
-between these hypotheses - to rule some in and others out - not simply to walk the manual's steps in order.
+Do this in three stages, in order, inside this one response.
+
+STAGE 1 - ANALYZE THE EVIDENCE
+You are given every matched past case's real complaint and resolution text, plus the manual's own listed \
+causes and common problems. Read all of it before doing anything else.
+- From the past cases, work out for yourself which fixes actually recur and how often - count across the \
+real cases given, do not guess or estimate from vibes. Notice any pattern between what a case's complaint \
+describes and which fix resolved it; that pattern is what lets you design good discriminating questions in \
+Stage 2.
+- Merge this with the manual's listed causes into one list of every DISTINCT plausible underlying cause. A \
+cause with real, frequently-recurring case support is stronger evidence than one only mentioned in the \
+manual with no matching case, but the manual can surface a real candidate the case data is too thin to show \
+on its own.
 - The manual sections below are each labeled with the DTC code(s) they cover. When more than one DIFFERENT \
-code appears, they may describe genuinely different systems that happen to share a similar symptom (for \
-example, a battery fault and an unrelated key-authentication fault can both produce "vehicle won't start"). \
-Do not assume they are the same fault just because they were retrieved together - treat each distinct code's \
-system as its own candidate cause, and use the case evidence (which is reliably matched to its real code) \
-to judge which system is actually the more likely explanation. If the past cases overwhelmingly match one \
-code, prefer that system's hypotheses; only raise a different code's system as a live candidate if the case \
-evidence doesn't clearly settle it.
+code appears among them, they may describe genuinely different systems that happen to share a similar \
+symptom (for example, a battery fault and an unrelated key-authentication fault can both produce "vehicle \
+won't start"). Do not assume they are the same fault just because they were retrieved together - treat each \
+distinct code's system as its own candidate cause, and use the case evidence (which is reliably matched to \
+its real code) to judge which system is actually the more likely explanation. If the past cases overwhelmingly \
+match one code, prefer that system's hypotheses; only raise a different code's system as a live candidate if \
+the case evidence doesn't clearly settle it.
+- Record the result in the top-level "hypotheses" field: one entry per distinct cause, with its real \
+case_support (e.g. "about 10 cases", or "none" if it came only from the manual) and whether the manual also \
+supports it. Every hypothesis listed here should either reach its own leaf in the tree you build next, or be \
+explicitly folded into a sibling leaf with a stated reason why (e.g. two causes the evidence can't separate).
 
-Step 2 - build the tree:
+STAGE 2 - DESIGN THE COMPLETE TREE
+Using the hypothesis set from Stage 1, plan out every yes/no/not_sure path a mechanic could take, end to end, \
+before producing any JSON.
 - Prioritize thoroughness over brevity: your job is to genuinely cover every distinct scenario in the \
 hypothesis set, not to produce the shortest possible tree. Use up to {max_depth} levels deep to do this well \
 - a tree that stops early and leaves real candidate causes unexplored is worse than one that uses its full \
-depth to actually separate them. Each branch node asks exactly ONE yes/no question a mechanic can check now \
-(scan tool or physical inspection). Choose each question for how much it narrows the live hypothesis set at \
-that point in the tree - prefer the check that best splits the remaining candidates apart. You may draw the \
-actual check from the manual's inspection steps, but the ORDER and CHOICE must be driven by discriminating \
-power, not by copying the manual's step sequence unchanged. Never invent test thresholds or PID names not \
-present in the evidence. Never repeat a question on a path.
-- Critical: the candidates list at every node must be freshly recomputed for that node, reflecting only the \
-hypotheses still consistent with the answers given on the path to reach it. NEVER repeat the same candidates \
-list unchanged from a parent or sibling node - if an answer provided no new discriminating information, say \
-so in that node's reasoning instead of pasting the prior list. As the tree gets deeper, the live candidate \
-set should visibly narrow, with the leading candidate's likelihood generally rising, until each leaf names a \
-single most-likely diagnosis (or, if evidence genuinely can't separate two causes, says so explicitly rather \
-than guessing).
-- Each node lists at most 5 remaining candidate causes, ranked highest first, likelihoods are whole \
-percentages summing to 100. Each candidate's reasoning cites its source in at most 12 words: "manual: \
-<module>" or "past cases (about N)".
-- Do not put any candidate above 60% unless either the fix-count evidence alone is overwhelming, or the \
-question path so far supports it.
+depth to actually separate them.
+- Each branch node asks exactly ONE yes/no question a mechanic can check right now (scan tool or physical \
+inspection). Choose each question for how much it narrows the live hypothesis set at that point - prefer the \
+check that best splits the remaining candidates apart. Draw the actual check from the manual's inspection \
+steps if useful, but the ORDER and CHOICE of questions must be driven by discriminating power, not by \
+copying the manual's step sequence unchanged. Never invent test thresholds or PID names not present in the \
+evidence. Never repeat a question on a path.
+- Self-contained paths: every branch node must set ALL THREE of yes, no, AND not_sure to a real node id - \
+never leave one null and assume it won't be needed. If a yes/no answer already fully resolves the hypothesis \
+set, "not_sure" can point straight to a leaf that honestly reflects the remaining uncertainty instead of \
+continuing to branch, but it must still point somewhere valid.
+- Candidate narrowing on YES and NO paths: the candidates list at every such node must be freshly recomputed, \
+reflecting only the hypotheses still consistent with the answers given on the path to reach it. NEVER repeat \
+the same candidates list unchanged from a parent or sibling node - if an answer genuinely provided no new \
+discriminating information, say so in that node's reasoning instead of pasting the prior list. As the tree \
+gets deeper on these paths, the live candidate set should visibly narrow, with the leading candidate's \
+likelihood generally rising, until each leaf names a single most-likely diagnosis (or, if the evidence \
+genuinely can't separate two causes, says so explicitly rather than guessing).
+- "Not sure" is different: a mechanic who can't determine an answer has learned nothing, so do not force an \
+artificial change in the candidate list there. If a genuinely useful alternative check exists, route not_sure \
+to a node asking it. If none does, route it to a leaf whose candidates stay close to the pre-question set and \
+whose conclusion honestly states low confidence and why - never fabricate narrowing just to make a not_sure \
+path look more resolved than the evidence allows.
+- Each node lists at most 5 remaining candidate causes, ranked highest first, likelihoods as whole percentages \
+summing to 100. Each candidate's reasoning cites its source in at most 12 words: "manual: <module>" or \
+"past cases (about N)". Do not put any candidate above 60% unless either the fix-count evidence alone is \
+overwhelming, or the question path so far clearly supports it.
+
+STAGE 3 - PRODUCE THE STRUCTURED RESULT
+Emit the complete plan from Stages 1-2 as the DiagnosisTree JSON object: the hypotheses list, the root node \
+id, and every node (branches and leaves together) with nothing deferred or left for later.
 - A leaf node sets "conclusion" and leaves question/yes/no/not_sure null. A branch node sets question + \
 yes/no/not_sure (each pointing to another node's id) and leaves conclusion null.
-- Conclusion fields: problem (plain statement), confidence (high only with case-specific supporting evidence; \
-medium for converging but incomplete evidence; low if thin/conflicting), confidence_note, evidence (cited \
-bullets), fix_steps (ordered, concrete, following the manual's sequence when available), parts, verify_fix, \
+- Conclusion fields must already be complete, since there is no further interaction to fill them in later: \
+problem (plain statement), confidence (high only with case-specific supporting evidence; medium for \
+converging but incomplete evidence; low if thin/conflicting), confidence_note, evidence (cited bullets), \
+fix_steps (ordered, concrete, following the manual's sequence when available), parts, verify_fix, \
 alternatives, safety_note, how_we_got_here.
 
 Rules that apply throughout:
@@ -162,9 +184,42 @@ def _validate_tree(tree: DiagnosisTree, max_depth: int) -> None:
         if is_branch:
             if depth > max_depth:
                 raise ValueError("tree exceeds max depth")
+            # Self-contained: there is no further LLM round-trip once this tree ships, so a branch node
+            # left with a null yes/no/not_sure would strand the mechanic mid-tree with no way forward.
+            missing = [name for name, child in (("yes", node.yes), ("no", node.no), ("not_sure", node.not_sure)) if not child]
+            if missing:
+                raise ValueError(f"branch node {node_id} is missing required pointer(s): {missing}")
             for child in (node.yes, node.no, node.not_sure):
-                if child:
-                    stack.append((child, depth + 1))
+                stack.append((child, depth + 1))
+
+    _check_no_cycles(tree, by_id)
+
+
+def _check_no_cycles(tree: DiagnosisTree, by_id: dict) -> None:
+    """Shared leaves reached from multiple paths are fine (e.g. one shared "uncertain" leaf for several
+    not_sure branches) - that's a DAG, not a cycle. An actual cycle (a child pointer leading back to one of
+    its own ancestors on the current path) would trap a mechanic in a repeating loop of questions, which the
+    plain "seen" set in the walk above can't distinguish from a legitimate shared leaf, so it's checked here
+    separately with proper ancestor tracking."""
+    on_path: set[str] = set()
+    done: set[str] = set()
+
+    def visit(node_id: str) -> None:
+        if node_id in done:
+            return
+        if node_id in on_path:
+            raise ValueError(f"cycle detected: node {node_id} reachable from itself")
+        node = by_id[node_id]
+        if node.question is None:  # leaf: no children to recurse into
+            done.add(node_id)
+            return
+        on_path.add(node_id)
+        for child in (node.yes, node.no, node.not_sure):
+            visit(child)
+        on_path.discard(node_id)
+        done.add(node_id)
+
+    visit(tree.root)
 
 
 def _candidate_signature(node) -> tuple:

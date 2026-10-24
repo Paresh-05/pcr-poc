@@ -96,4 +96,4 @@ class DiagnosisTree(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     root: str
-    nodes: list[TreeNode] = Field(max_length=31)  # depth ~5, binary-ish branching -> generous cap
+    nodes: list[TreeNode] = Field(max_length=90)  # depth ~7, thoroughness prioritized over brevity -> generous cap

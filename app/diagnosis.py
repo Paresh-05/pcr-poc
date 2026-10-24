@@ -24,9 +24,6 @@ def _symptom_hash(query_text: str | None) -> str:
         return ""
     return hashlib.sha256(query_text.strip().lower().encode()).hexdigest()[:32]
 
-MAX_QUESTIONS_SHOWN = 5  # matches tree_max_depth by construction; shown to the UI as "up to N"
-
-
 class NotFound(Exception): ...
 
 
@@ -55,12 +52,15 @@ code, prefer that system's hypotheses; only raise a different code's system as a
 evidence doesn't clearly settle it.
 
 Step 2 - build the tree:
-- Keep it small: at most {max_depth} levels deep. Each branch node asks exactly ONE yes/no question a \
-mechanic can check now (scan tool or physical inspection). Choose each question for how much it narrows the \
-live hypothesis set at that point in the tree - prefer the check that best splits the remaining candidates \
-apart. You may draw the actual check from the manual's inspection steps, but the ORDER and CHOICE must be \
-driven by discriminating power, not by copying the manual's step sequence unchanged. Never invent test \
-thresholds or PID names not present in the evidence. Never repeat a question on a path.
+- Prioritize thoroughness over brevity: your job is to genuinely cover every distinct scenario in the \
+hypothesis set, not to produce the shortest possible tree. Use up to {max_depth} levels deep to do this well \
+- a tree that stops early and leaves real candidate causes unexplored is worse than one that uses its full \
+depth to actually separate them. Each branch node asks exactly ONE yes/no question a mechanic can check now \
+(scan tool or physical inspection). Choose each question for how much it narrows the live hypothesis set at \
+that point in the tree - prefer the check that best splits the remaining candidates apart. You may draw the \
+actual check from the manual's inspection steps, but the ORDER and CHOICE must be driven by discriminating \
+power, not by copying the manual's step sequence unchanged. Never invent test thresholds or PID names not \
+present in the evidence. Never repeat a question on a path.
 - Critical: the candidates list at every node must be freshly recomputed for that node, reflecting only the \
 hypotheses still consistent with the answers given on the path to reach it. NEVER repeat the same candidates \
 list unchanged from a parent or sibling node - if an answer provided no new discriminating information, say \
@@ -302,7 +302,7 @@ async def start_diagnosis(
         "model_line": model_line,
         "status": status,
         "tree": tree.model_dump() if tree else None,
-        "max_questions": MAX_QUESTIONS_SHOWN,
+        "max_questions": settings.tree_max_depth,
         "evidence": {
             "total_cases": evidence.get("total_cases", 0),
             "scope": evidence.get("scope"),

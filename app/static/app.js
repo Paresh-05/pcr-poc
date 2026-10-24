@@ -431,6 +431,8 @@
     if (ev.resumed) row("Note", "Resumed diagnosis.");
   }
 
+  // Issue -> why -> fix, nothing hidden behind a click: a mechanic reading this once should have everything
+  // needed, not a page of collapsed accordions and decorative counters.
   function renderConclusion(k) {
     lastConclusion = k;
     const box = $("conclusion");
@@ -440,40 +442,25 @@
     badge.textContent = open ? "inconclusive" : `${k.confidence} confidence`;
     badge.className = `badge ${k.confidence}`;
 
-    const list = (items, cls = "") => el(cls ? "ol" : "ul", cls ? { cls } : {}, items.map((t) => el("li", { text: t })));
-    const stat = (n, label) => el("div", {}, [el("p", { cls: "tally-n", text: String(n) }), el("p", { cls: "tally-l", text: label })]);
-    const meta = (text) => (text ? [el("span", { cls: "acc-meta", text })] : []);
-    const card = (title, metaText, body) => el("section", { cls: "mini-card" }, [
-      el("div", { cls: "mini-head" }, [el("h3", { text: title }), ...meta(metaText)]), body,
-    ]);
-    const fold = (title, body) => el("details", { cls: "acc" }, [
-      el("summary", {}, [el("span", { cls: "acc-title", text: title })]),
-      el("div", { cls: "acc-body" }, [body]),
-    ]);
+    const list = (items) => el("ul", {}, items.map((t) => el("li", { text: t })));
+    const card = (title, body) => el("section", { cls: "mini-card" }, [el("div", { cls: "mini-head" }, [el("h3", { text: title })]), body]);
+
+    const why = [...k.evidence, ...(k.ruled_out || []).map((r) => `Ruled out: ${r}`), ...(k.uncertain || []).map((u) => `Still uncertain: ${u}`)];
 
     box.append(
       el("div", { cls: "problem-card" }, [
         el("p", { cls: "problem-kicker", text: open ? "Not yet identified" : "Most likely problem" }),
         el("p", { cls: "problem", text: k.problem }),
-        el("div", { cls: "problem-stats" }, open
-          ? [stat(k.fix_steps.length, "Checks to do"), stat(history.length, "Questions answered")]
-          : [stat(k.fix_steps.length, "Repair steps"), stat(k.parts.length, "Parts"), stat(history.length, "Questions answered")]),
       ]),
       ...(k.confidence_note ? [el("p", { cls: "hint", text: `Confidence: ${k.confidence_note}` })] : []),
       el("div", { cls: "safety-banner", attrs: { role: "note" } }, [el("strong", { text: "Safety first. " }), document.createTextNode(k.safety_note)]),
-      card(open ? "Checks to do" : "Repair steps", `${k.fix_steps.length} step${k.fix_steps.length === 1 ? "" : "s"}`, list(k.fix_steps, "steps")),
-      el("div", { cls: "two-up" }, [
-        card("Parts", k.parts.length ? String(k.parts.length) : "none",
-          k.parts.length ? el("div", { cls: "parts" }, k.parts.map((p) => el("span", { cls: "part", text: p }))) : el("p", { cls: "muted", text: open ? "Don't replace a part yet: the evidence doesn't single one out." : "No part replacement is supported by the evidence." })),
-        card(open ? "How to confirm" : "Confirm the repair", "", list(k.verify_fix)),
-      ]),
-      ...((k.how_we_got_here || []).length ? [card("How we reached this finding", `${history.length} answer${history.length === 1 ? "" : "s"}`, list(k.how_we_got_here, "steps"))] : []),
-      el("div", { cls: "acc-list" }, [
-        fold("Why we think so", list(k.evidence)),
-        ...((k.ruled_out || []).length ? [fold("What was ruled out", list(k.ruled_out))] : []),
-        ...((k.uncertain || []).length ? [fold("What is still uncertain", list(k.uncertain))] : []),
-        fold("If it does not fix it", k.alternatives.length ? list(k.alternatives.map((a) => `${a.cause}: ${a.when_to_consider}`)) : el("p", { cls: "muted", text: "No alternatives listed." })),
-      ]),
+      card("Why", list(why)),
+      card(open ? "Checks to do" : "What to do", el("ol", { cls: "steps" }, k.fix_steps.map((t) => el("li", { text: t })))),
+      ...(!open ? [card("Parts", k.parts.length
+        ? el("div", { cls: "parts" }, k.parts.map((p) => el("span", { cls: "part", text: p })))
+        : el("p", { cls: "muted", text: "No part replacement is supported by the evidence." }))] : []),
+      card(open ? "How to confirm" : "Confirm the repair", list(k.verify_fix)),
+      ...(k.alternatives.length ? [card("If it doesn't fix it", list(k.alternatives.map((a) => `${a.cause}: ${a.when_to_consider}`)))] : []),
     );
   }
 
@@ -482,10 +469,12 @@
     const k = lastConclusion;
     if (!k) return "";
     const open = isInconclusive(k);
-    const lines = [`${vehicleTitle()} on ${friendly(vehicle.model)}${vehicle.dtc ? "" : `: "${vehicle.query}"`}`, "", `${open ? "Not yet identified" : "Most likely problem"}: ${k.problem}`, `Confidence: ${k.confidence}${k.confidence_note ? ` (${k.confidence_note})` : ""}`, "", "Why:", ...k.evidence.map((e) => `- ${e}`),
-      "", "How we reached this finding:", ...(k.how_we_got_here || []).map((h) => `- ${h}`),
-      "", `${open ? "Checks to do" : "Repair steps"}:`, ...k.fix_steps.map((s, i) => `${i + 1}. ${s}`), "", `Parts: ${k.parts.length ? k.parts.join("; ") : "none supported"}`,
+    const why = [...k.evidence, ...(k.ruled_out || []).map((r) => `Ruled out: ${r}`), ...(k.uncertain || []).map((u) => `Still uncertain: ${u}`)];
+    const lines = [`${vehicleTitle()} on ${friendly(vehicle.model)}${vehicle.dtc ? "" : `: "${vehicle.query}"`}`, "", `${open ? "Not yet identified" : "Most likely problem"}: ${k.problem}`, `Confidence: ${k.confidence}${k.confidence_note ? ` (${k.confidence_note})` : ""}`,
+      "", "Why:", ...why.map((w) => `- ${w}`),
+      "", `${open ? "Checks to do" : "What to do"}:`, ...k.fix_steps.map((s, i) => `${i + 1}. ${s}`), "", `Parts: ${k.parts.length ? k.parts.join("; ") : "none supported"}`,
       "", `${open ? "How to confirm" : "Confirm the repair"}:`, ...k.verify_fix.map((v) => `- ${v}`), "", `Safety: ${k.safety_note}`];
+    if (k.alternatives.length) lines.push("", "If it doesn't fix it:", ...k.alternatives.map((a) => `- ${a.cause}: ${a.when_to_consider}`));
     return lines.join("\n");
   }
   $("copy-btn").addEventListener("click", async () => {

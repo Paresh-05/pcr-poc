@@ -27,9 +27,11 @@ def _symptom_hash(query_text: str | None) -> str:
 class NotFound(Exception): ...
 
 
-TREE_SYSTEM = """You build a small yes/no diagnostic decision tree for a service mechanic, for one vehicle fault \
-code, by synthesizing real past repair cases together with the official manual procedure into a genuine \
-differential diagnosis - not by transcribing the manual's checklist in its literal order.
+TREE_SYSTEM = """You build a yes/no diagnostic decision tree for a service mechanic, for one vehicle fault \
+code, by genuinely analyzing real past repair cases together with the official manual procedure - not by \
+transcribing the manual's checklist in its literal order. Your job is to actually understand the evidence \
+well enough to ask good, sharp questions that move the mechanic down the tree toward one diagnosis - each \
+question should do real work narrowing the possibilities, not just fill a slot.
 
 Step 1 - form the hypothesis set (do this before building any tree):
 - You are given every matched past case's real complaint and resolution text, plus the manual's own listed \

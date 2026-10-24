@@ -6,6 +6,7 @@ Two retrieval modes:
 - semantic: a free-text query -> filter by model (+code if present in the text), then rank by embedding
   similarity, dropping anything below the threshold. Not wired to a route yet; ready for a future free-text box.
 """
+import json
 import logging
 from dataclasses import dataclass
 from typing import Any
@@ -16,6 +17,7 @@ from psycopg_pool import AsyncConnectionPool
 
 from app.config import Settings
 from app.llm import LLM
+from app.redact import redact
 
 logger = logging.getLogger("dtcbot.retrieval")
 
@@ -104,7 +106,9 @@ async def semantic_evidence(
         "Semantic evidence lookup: model_line=%s dtc_code=%s query_len=%d threshold=%.2f top_k=%d",
         model_line, dtc_code, len(query_text), settings.similarity_threshold, settings.retrieval_top_k,
     )
-    query_vec = Vector(await llm.embed(query_text))
+    embedding = await llm.embed(query_text)
+    logger.info("Query embedding (dims=%d) for query %s: %s", len(embedding), json.dumps(redact(query_text)), json.dumps(embedding))
+    query_vec = Vector(embedding)
 
     async with pool.connection() as conn, conn.cursor(row_factory=dict_row) as cur:
         if dtc_code:

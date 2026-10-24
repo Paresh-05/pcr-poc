@@ -1,4 +1,5 @@
 """The diagnosis API. Built twice from one definition: with API-key auth (/) and with demo-page auth (/ui-api)."""
+import json
 import logging
 import re
 import uuid
@@ -9,6 +10,7 @@ from fastapi.responses import JSONResponse
 from app import diagnosis
 from app.manual import complete_manual_dtcs, has_complete_manual
 from app.ratelimit import rate_limit
+from app.redact import redact
 from app.schemas import OutcomeIn, StartDiagnosis
 
 logger = logging.getLogger("dtcbot.routes")
@@ -50,7 +52,8 @@ def make_router(auth) -> APIRouter:
     @router.post("/diagnoses", status_code=201, dependencies=[Depends(rate_limit), Depends(require_llm)])
     async def start_diagnosis(body: StartDiagnosis, request: Request) -> dict:
         s = request.app.state
-        logger.info("POST /diagnoses: model_line=%s dtc_code=%s query_text_present=%s", body.model_line, body.dtc_code, bool(body.query_text))
+        logger.info("POST /diagnoses: model_line=%s dtc_code=%s query=%s", body.model_line, body.dtc_code,
+                    json.dumps(redact(body.query_text)) if body.query_text else None)
         # The catalog (dropdown) flow gives an exact code up front, so it's worth a clear 404/422 before
         # spending an LLM call. Free-text queries may resolve to no code, or a code not yet in our catalog
         # check - those fall through to diagnosis.start_diagnosis, which returns status="no_evidence" instead.

@@ -35,6 +35,7 @@ class Evidence:
     manual_chunks: list[dict[str, Any]]
     top_parts: list[PartCount]
     scope: str  # "exact" | "semantic" | "manual_only" | "none"
+    embedding: list[float] | None = None  # set only by semantic_evidence; kept for the iteration trace
 
 
 MIN_CODE_CASES = 2  # a code needs at least this many matched cases...
@@ -84,7 +85,7 @@ async def exact_evidence(pool: AsyncConnectionPool, dtc_code: str, model_line: s
         cases = await cur.fetchall()
 
         await cur.execute(
-            "SELECT id, submodule, full_markdown FROM manual_chunks "
+            "SELECT id, dtc_codes, submodule, full_markdown FROM manual_chunks "
             "WHERE %s = ANY(dtc_codes) AND model_line = %s",
             (dtc_code, model_line),
         )
@@ -144,7 +145,7 @@ async def semantic_evidence(
             # the query's meaning so only the relevant submodule(s) go to the tree-builder. No threshold
             # drop here: the exact code match is already strong relevance signal on its own.
             await cur.execute(
-                "SELECT c.id, c.submodule, c.full_markdown FROM manual_chunk_summaries s "
+                "SELECT c.id, c.dtc_codes, c.submodule, c.full_markdown FROM manual_chunk_summaries s "
                 "JOIN manual_chunks c ON c.id = s.manual_chunk_id "
                 "WHERE %s = ANY(c.dtc_codes) AND c.model_line = %s "
                 "ORDER BY s.embedding <=> %s LIMIT %s",
@@ -183,4 +184,4 @@ async def semantic_evidence(
         "Semantic evidence result: model_line=%s dtc_code=%s cases=%d manual_chunks=%d scope=%s",
         model_line, dtc_code, len(cases), len(manual_chunks), scope,
     )
-    return Evidence(cases=cases, manual_chunks=manual_chunks, top_parts=await _fix_counts(cases), scope=scope)
+    return Evidence(cases=cases, manual_chunks=manual_chunks, top_parts=await _fix_counts(cases), scope=scope, embedding=embedding)

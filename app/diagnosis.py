@@ -14,6 +14,7 @@ from app.llm import LLM
 from app.query_analyzer import extract_dtc_code
 from app.redact import redact
 from app.schemas import DiagnosisTree
+from app.trace import write_iteration_trace
 from app.usage import RunInfo, current_run
 
 logger = logging.getLogger("dtcbot.diagnosis")
@@ -298,7 +299,8 @@ def _warn_if_candidates_static(tree: DiagnosisTree, dtc_code: str, model_line: s
 
 
 async def _get_or_build_tree(
-    pool: AsyncConnectionPool, llm: LLM, settings: Settings, dtc_code: str, model_line: str, query_text: str | None
+    pool: AsyncConnectionPool, llm: LLM, settings: Settings, dtc_code: str, model_line: str, query_text: str | None,
+    diagnosis_id: str,
 ):
     symptom_hash = _symptom_hash(query_text)
     async with pool.connection() as conn, conn.cursor(row_factory=dict_row) as cur:
@@ -309,7 +311,12 @@ async def _get_or_build_tree(
         cached = await cur.fetchone()
     if cached:
         logger.info("Tree cache HIT: dtc_code=%s model_line=%s symptom_hash=%s tree_id=%s", dtc_code, model_line, symptom_hash, cached["id"])
-        return cached["id"], DiagnosisTree.model_validate(cached["tree"]), cached["evidence"], False
+        cached_tree = DiagnosisTree.model_validate(cached["tree"])
+        write_iteration_trace(
+            diagnosis_id=diagnosis_id, dtc_code=dtc_code, model_line=model_line, query_text=query_text,
+            cache_hit=True, tree=cached_tree,
+        )
+        return cached["id"], cached_tree, cached["evidence"], False
 
     logger.info("Tree cache MISS: dtc_code=%s model_line=%s symptom_hash=%s -> retrieving evidence", dtc_code, model_line, symptom_hash)
     if query_text:
@@ -318,6 +325,10 @@ async def _get_or_build_tree(
         ev = await retrieval.exact_evidence(pool, dtc_code, model_line)
     if ev.scope == "none":
         logger.warning("No evidence found: dtc_code=%s model_line=%s -> returning no_evidence", dtc_code, model_line)
+        write_iteration_trace(
+            diagnosis_id=diagnosis_id, dtc_code=dtc_code, model_line=model_line, query_text=query_text,
+            cache_hit=False, embedding=ev.embedding, cases=ev.cases, manual_chunks=ev.manual_chunks,
+        )
         return None, None, {"scope": "none"}, False
 
     system = TREE_SYSTEM
@@ -340,6 +351,11 @@ async def _get_or_build_tree(
             logger.warning("Tree validation FAILED on attempt %d: %s", attempt, exc)
     if tree is None:
         logger.error("Tree build failed after retries: dtc_code=%s model_line=%s error=%s", dtc_code, model_line, last_error)
+        write_iteration_trace(
+            diagnosis_id=diagnosis_id, dtc_code=dtc_code, model_line=model_line, query_text=query_text,
+            cache_hit=False, embedding=ev.embedding, cases=ev.cases, manual_chunks=ev.manual_chunks,
+            system_prompt=system, user_prompt=user,
+        )
         raise RuntimeError(f"model could not produce a valid diagnosis tree: {last_error}")
 
     evidence_summary = {
@@ -357,6 +373,11 @@ async def _get_or_build_tree(
         )
         (tree_id,) = await cur.fetchone()
     logger.info("Tree cached: dtc_code=%s model_line=%s symptom_hash=%s tree_id=%s", dtc_code, model_line, symptom_hash, tree_id)
+    write_iteration_trace(
+        diagnosis_id=diagnosis_id, dtc_code=dtc_code, model_line=model_line, query_text=query_text,
+        cache_hit=False, embedding=ev.embedding, cases=ev.cases, manual_chunks=ev.manual_chunks,
+        system_prompt=system, user_prompt=user, tree=tree,
+    )
     return tree_id, tree, evidence_summary, True
 
 
@@ -376,7 +397,9 @@ async def start_diagnosis(
     diagnosis_id = uuid.uuid4()
     token = current_run.set(RunInfo(run_id=diagnosis_id, run_type="diagnosis", dtc_code=resolved_code or None, model_line=model_line))
     try:
-        tree_id, tree, evidence, built_now = await _get_or_build_tree(pool, llm, settings, resolved_code, model_line, query_text)
+        tree_id, tree, evidence, built_now = await _get_or_build_tree(
+            pool, llm, settings, resolved_code, model_line, query_text, str(diagnosis_id)
+        )
     finally:
         current_run.reset(token)
 

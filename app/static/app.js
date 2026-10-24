@@ -400,32 +400,23 @@
         ...(h.showed ? [el("p", { cls: "h-note", text: `What it showed: ${h.showed}` })] : []),
       ]));
     });
-    const count = (a) => history.filter((h) => h.answer === a).length;
-    $("t-yes").textContent = String(count("yes"));
-    $("t-no").textContent = String(count("no"));
-    $("t-unsure").textContent = String(count("not_sure"));
   }
 
   function renderEvidence(ev) {
-    const chips = $("v-evidence");
     const dl = $("evidence");
-    clear(chips);
     clear(dl);
     if (!ev) return;
     const row = (k, v) => dl.append(el("dt", { text: k }), el("dd", { text: v }));
     const m = ev.manual || {};
     const manualLoaded = m.status === "used";
     if (ev.total_cases !== undefined) {
-      chips.append(el("span", { cls: "chip", text: `${ev.total_cases} past repairs` }));
       row("Past repairs", ev.distinct_cases ? `${ev.total_cases} (${ev.distinct_cases} distinct)` : `${ev.total_cases}`);
     }
     if (ev.scope === "dtc_all_models") {
-      chips.append(el("span", { cls: "chip warn", text: "From other models" }));
       row("Note", "No repairs for this code on this model, so repairs on other models are used.");
     } else if (ev.scope === "none") {
       row("Past repairs", "none found");
     }
-    chips.append(el("span", { cls: `chip ${manualLoaded ? "good" : "warn"}`, text: manualLoaded ? "Service manual loaded" : "No manual text" }));
     row("Service manual", manualLoaded ? `loaded${m.modules && m.modules.length ? `, ${m.modules.length} section(s)${m.truncated ? ", trimmed to fit" : ""}` : ""}` : "not available for this code");
     (ev.top_parts || []).slice(0, 3).forEach((p) => row("Often replaced", `${p.part} (${p.pct}%)`));
     if (ev.resumed) row("Note", "Resumed diagnosis.");

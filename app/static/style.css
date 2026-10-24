@@ -205,18 +205,6 @@ input:hover, select:hover { border-color: var(--line-strong); }
 @media (min-width: 1024px) { .rail-title { font-size: 2.25rem; } }
 .rail-sub { margin: 6px 0 12px; font-size: 0.9375rem; color: var(--ink-2); }
 
-.tally { display: flex; align-items: flex-end; gap: 20px; padding: 16px; margin-bottom: 12px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg); }
-.tally-n { font-size: 26px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
-@media (min-width: 640px) { .tally-n { font-size: 34px; } }
-.tally-n.pass { color: var(--pass); }
-.tally-n.fail { color: var(--fail); }
-.tally-l { margin-top: 4px; font-size: 12px; color: var(--muted); white-space: nowrap; }
-
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
-.chip { display: inline-block; padding: 3px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); font-size: 12px; font-weight: 600; color: var(--ink-2); }
-.chip.good { background: var(--pass-soft); border-color: transparent; color: var(--pass); }
-.chip.warn { background: var(--signal-soft); border-color: transparent; color: var(--signal-deep); }
-
 .main-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 8px; }
 .main-head h2 { margin: 0; font-size: 1.25rem; font-weight: 600; }
 .main-head h2:focus { outline: none; }
@@ -340,17 +328,9 @@ input:hover, select:hover { border-color: var(--line-strong); }
 .card { border-color: var(--brand-100); }
 .rail .card { border-top: 3px solid var(--brand-300); }
 input:focus, select:focus { border-color: var(--brand-600); box-shadow: 0 0 0 3px var(--brand-100); }
-.chip { background: var(--brand-50); border-color: var(--brand-200); color: var(--brand-800); }
-.chip.good { background: var(--pass-soft); border-color: rgba(5, 150, 105, 0.25); color: var(--pass); }
-.chip.warn { background: var(--signal-soft); border-color: rgba(245, 158, 11, 0.4); color: var(--signal-deep); }
 
 /* left rail */
 .rail-title { color: var(--brand-800); }
-.tally { border-color: var(--brand-200); background: linear-gradient(135deg, #ffffff 0%, var(--brand-50) 100%); }
-.tally-n { color: var(--brand-800); }
-.tally-n.pass { color: var(--pass); }
-.tally-n.fail { color: var(--fail); }
-.tally-n.gold { color: var(--signal-deep); }
 
 /* current question: gold highlight like DVR's unanswered rows, with a warm tint */
 .question-card .rows { border-color: var(--brand-200); }
@@ -422,5 +402,3 @@ input:focus, select:focus { border-color: var(--brand-600); box-shadow: 0 0 0 3p
 .mini-card li { margin: 4px 0; font-size: 0.9375rem; }
 .mini-card .steps { padding-left: 0; }
 
-.rail-caption { margin: 0 0 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-.tally { margin-bottom: 12px; }

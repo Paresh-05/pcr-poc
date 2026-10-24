@@ -108,4 +108,4 @@ class DiagnosisTree(BaseModel):
 
     hypotheses: list[Hypothesis] = Field(default_factory=list, max_length=10)
     root: str
-    nodes: list[TreeNode] = Field(max_length=90)  # depth ~7, thoroughness prioritized over brevity -> generous cap
+    nodes: list[TreeNode]

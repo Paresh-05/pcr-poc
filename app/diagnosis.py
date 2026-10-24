@@ -62,10 +62,11 @@ explicitly folded into a sibling leaf with a stated reason why (e.g. two causes 
 STAGE 2 - DESIGN THE COMPLETE TREE
 Using the hypothesis set from Stage 1, plan out every yes/no/not_sure path a mechanic could take, end to end, \
 before producing any JSON.
-- Prioritize thoroughness over brevity: your job is to genuinely cover every distinct scenario in the \
-hypothesis set, not to produce the shortest possible tree. Use up to {max_depth} levels deep to do this well \
-- a tree that stops early and leaves real candidate causes unexplored is worse than one that uses its full \
-depth to actually separate them.
+- There is no limit on how many questions a path may ask. Ask as many as the evidence needs to genuinely \
+separate the causes in the hypothesis set - a tree that stops early and leaves real candidate causes \
+unexplored is worse than a longer one that actually separates them. But every question must earn its place: \
+stop a path as soon as its remaining causes are separated, or as soon as no supported check can separate them \
+further. Never pad a path with questions that don't change anything.
 - Each branch node asks exactly ONE yes/no question a mechanic can check right now (scan tool or physical \
 inspection). Choose each question for how much it narrows the live hypothesis set at that point - prefer the \
 check that best splits the remaining candidates apart. Draw the actual check from the manual's inspection \
@@ -180,14 +181,14 @@ def _build_prompt(dtc_code: str, model_line: str, ev: retrieval.Evidence, query_
     )
 
 
-def _validate_tree(tree: DiagnosisTree, max_depth: int) -> None:
+def _validate_tree(tree: DiagnosisTree) -> None:
     by_id = {n.id: n for n in tree.nodes}
     if tree.root not in by_id:
         raise ValueError("tree root id not found among nodes")
     seen: set[str] = set()
-    stack = [(tree.root, 1)]
+    stack = [tree.root]
     while stack:
-        node_id, depth = stack.pop()
+        node_id = stack.pop()
         if node_id in seen:
             continue
         seen.add(node_id)
@@ -199,17 +200,29 @@ def _validate_tree(tree: DiagnosisTree, max_depth: int) -> None:
         if is_leaf == is_branch:
             raise ValueError(f"node {node_id} must be exactly one of leaf/branch")
         if is_branch:
-            if depth > max_depth:
-                raise ValueError("tree exceeds max depth")
             # Self-contained: there is no further LLM round-trip once this tree ships, so a branch node
             # left with a null yes/no/not_sure would strand the mechanic mid-tree with no way forward.
             missing = [name for name, child in (("yes", node.yes), ("no", node.no), ("not_sure", node.not_sure)) if not child]
             if missing:
                 raise ValueError(f"branch node {node_id} is missing required pointer(s): {missing}")
-            for child in (node.yes, node.no, node.not_sure):
-                stack.append((child, depth + 1))
+            stack.extend((node.yes, node.no, node.not_sure))
 
     _check_no_cycles(tree, by_id)
+
+
+def _tree_depth(tree: DiagnosisTree) -> int:
+    """Questions on the longest path through this tree - shown to the mechanic as "question X of up to N".
+    It describes the tree that was built, not a limit on it. Assumes a validated (acyclic) tree."""
+    by_id = {n.id: n for n in tree.nodes}
+    memo: dict[str, int] = {}
+
+    def depth(node_id: str) -> int:
+        if node_id not in memo:
+            node = by_id[node_id]
+            memo[node_id] = 0 if node.question is None else 1 + max(depth(c) for c in (node.yes, node.no, node.not_sure))
+        return memo[node_id]
+
+    return depth(tree.root)
 
 
 def _check_no_cycles(tree: DiagnosisTree, by_id: dict) -> None:
@@ -300,7 +313,7 @@ async def _get_or_build_tree(
         logger.warning("No evidence found: dtc_code=%s model_line=%s -> returning no_evidence", dtc_code, model_line)
         return None, None, {"scope": "none"}, False
 
-    system = TREE_SYSTEM.format(max_depth=settings.tree_max_depth)
+    system = TREE_SYSTEM
     user = _build_prompt(dtc_code or "(not given; matched by symptom text)", model_line, ev, query_text)
     logger.info("Prompt being sent to LLM for tree_build (dtc_code=%s model_line=%s):\n%s", dtc_code, model_line, user)
     tree = None
@@ -310,7 +323,7 @@ async def _get_or_build_tree(
                     attempt, dtc_code, model_line, ev.scope, len(ev.cases), len(ev.manual_chunks))
         candidate = await llm.structured(system, user, DiagnosisTree, purpose="tree_build", effort="high")
         try:
-            _validate_tree(candidate, settings.tree_max_depth)
+            _validate_tree(candidate)
             tree = candidate
             logger.info("Tree build succeeded on attempt %d: %d node(s), root=%s", attempt, len(candidate.nodes), candidate.root)
             _warn_if_candidates_static(tree, dtc_code, model_line)
@@ -376,7 +389,7 @@ async def start_diagnosis(
         "model_line": model_line,
         "status": status,
         "tree": tree.model_dump() if tree else None,
-        "max_questions": settings.tree_max_depth,
+        "max_questions": _tree_depth(tree) if tree else 0,
         "evidence": {
             "total_cases": evidence.get("total_cases", 0),
             "scope": evidence.get("scope"),

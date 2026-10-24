@@ -29,7 +29,6 @@ class Settings(BaseSettings):
     retrieval_top_k: int = 30
     retrieval_keep: int = 15
     similarity_threshold: float = 0.60  # cosine similarity, matches dropped below this
-    tree_max_depth: int = 7
 
     postgres_user: str
     postgres_password: SecretStr

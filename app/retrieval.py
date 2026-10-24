@@ -35,6 +35,28 @@ class Evidence:
     scope: str  # "exact" | "semantic" | "manual_only" | "none"
 
 
+MIN_CODE_CASES = 2  # a code needs at least this many matched cases...
+MIN_CODE_SHARE = 0.2  # ...or this share of them, to have its manual pulled in
+MANUAL_PAGES_PER_CODE = 3
+
+
+def _supported_codes(cases: list[dict[str, Any]]) -> list[str]:
+    """Codes among the matched cases with enough support to be a real candidate, most-supported first. The
+    single most frequent code always qualifies, so a lone match still gets its manual."""
+    counts: dict[str, int] = {}
+    for c in cases:
+        if c.get("dtc_code"):
+            counts[c["dtc_code"]] = counts.get(c["dtc_code"], 0) + 1
+    ranked = sorted(counts, key=counts.get, reverse=True)
+    total = len(cases) or 1
+    kept = [code for i, code in enumerate(ranked)
+            if i == 0 or counts[code] >= MIN_CODE_CASES or counts[code] / total >= MIN_CODE_SHARE]
+    dropped = {code: counts[code] for code in ranked if code not in kept}
+    if dropped:
+        logger.info("Manual lookup skips weakly supported codes (case counts): %s", dropped)
+    return kept
+
+
 async def _fix_counts(cases: list[dict[str, Any]]) -> list[PartCount]:
     counts: dict[str, int] = {}
     for case in cases:
@@ -126,44 +148,30 @@ async def semantic_evidence(
             )
             manual_chunks = await cur.fetchall()
         else:
-            # No code was given or extracted, so we can't filter the manual by code directly. Manual-text
-            # embeddings are written in formal technical language and don't reliably match casual symptom
-            # wording (verified: a correct manual's "reduced discharge performance" scores lower against a
-            # symptom query than a WRONG manual's incidental "vehicle may not start" - see session notes).
-            # So: trust the case-side match instead (proven highly accurate - same symptom query scored
-            # 0.62-0.67 against the right code's cases, matching 10/10 in the top results) - pull manual
-            # sections for every distinct code actually found among the matched cases, by exact lookup, no
-            # embedding guessing. Still keep a handful of embedding-matched chunks as a safety net for codes
-            # that are real candidates but have little or no case history to anchor them.
-            case_codes = sorted({c["dtc_code"] for c in cases if c.get("dtc_code")})
-            case_driven_chunks: list[dict[str, Any]] = []
-            if case_codes:
+            # No code given: manual-summary embeddings don't reliably match casual symptom wording (a wrong
+            # system's "vehicle may not start" outscored the right battery-fault section), so the manual is
+            # chosen through the codes on the matched cases instead, which match accurately. Two guards:
+            # only codes with real support among those cases count - one stray case shouldn't pull in a
+            # whole system - and each code contributes only its few pages closest to the symptom, since a
+            # code can span many (B100016 has 13 sections, ~76k chars) and would otherwise swamp the rest.
+            manual_chunks = []
+            supported = _supported_codes(cases)
+            seen_ids: set[int] = set()
+            for code in supported:
                 await cur.execute(
-                    "SELECT id, dtc_codes, submodule, full_markdown FROM manual_chunks "
-                    "WHERE dtc_codes && %s AND model_line = %s",
-                    (case_codes, model_line),
+                    "SELECT c.id, c.dtc_codes, c.submodule, c.full_markdown FROM manual_chunk_summaries s "
+                    "JOIN manual_chunks c ON c.id = s.manual_chunk_id "
+                    "WHERE %s = ANY(c.dtc_codes) AND c.model_line = %s "
+                    "ORDER BY s.embedding <=> %s LIMIT %s",
+                    (code, model_line, query_vec, MANUAL_PAGES_PER_CODE),
                 )
-                case_driven_chunks = await cur.fetchall()
-                logger.info(
-                    "Case-driven manual lookup: distinct codes from matched cases=%s -> %d manual chunk(s)",
-                    case_codes, len(case_driven_chunks),
-                )
-
-            await cur.execute(
-                "SELECT c.id, c.dtc_codes, c.submodule, c.full_markdown, "
-                "1 - (s.embedding <=> %s) AS similarity FROM manual_chunk_summaries s "
-                "JOIN manual_chunks c ON c.id = s.manual_chunk_id "
-                "WHERE c.model_line = %s ORDER BY s.embedding <=> %s LIMIT %s",
-                (query_vec, model_line, query_vec, settings.retrieval_top_k),
-            )
-            manual_rows = await cur.fetchall()
-            embedding_matched = [m for m in manual_rows if m["similarity"] >= settings.similarity_threshold][:3]
-
-            seen_ids = {m["id"] for m in case_driven_chunks}
-            manual_chunks = case_driven_chunks + [m for m in embedding_matched if m["id"] not in seen_ids]
+                for row in await cur.fetchall():
+                    if row["id"] not in seen_ids:
+                        seen_ids.add(row["id"])
+                        manual_chunks.append(row)
             logger.info(
-                "Manual evidence (no code given): %d case-driven + %d embedding-matched (deduped) = %d total",
-                len(case_driven_chunks), len([m for m in embedding_matched if m["id"] not in seen_ids]), len(manual_chunks),
+                "Manual evidence (no code given): supported codes=%s -> %d manual chunk(s)",
+                supported, len(manual_chunks),
             )
 
     scope = "semantic" if cases else ("manual_only" if manual_chunks else "none")

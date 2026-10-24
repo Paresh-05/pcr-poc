@@ -83,6 +83,16 @@
               </div>
             </form>
           </div>
+
+          <form id="resume-form" class="panel pad" autocomplete="off" aria-labelledby="resume-title">
+            <h2 id="resume-title">Resume a diagnosis</h2>
+            <p class="hint">Already started one? Enter its diagnosis id (shown at the end of a diagnosis) to pick up where you left off.</p>
+            <div class="start-fields">
+              <label for="resume-id">Diagnosis id</label>
+              <input id="resume-id" maxlength="36" placeholder="e.g. 6b61eb1f-c755-406d-8168-f0510f6a1bc6">
+            </div>
+            <div class="row"><button type="submit" class="btn btn-quiet">Resume</button></div>
+          </form>
         </section>
 
         <!-- Steps 2 to 4: questions, diagnosis, feedback (DVR "Review" and "Summary" layout) -->

@@ -9,10 +9,14 @@
   const UPPER_WORDS = new Set(["MG", "EV", "BS4", "BS6", "SUV"]);
   const DEFAULT_MODEL = "MG_COMET_EV"; // only model supported for now; no picker shown
 
+  const PROGRESS_PREFIX = "dtcbot:progress:"; // one saved diagnosis per id, so Resume can restore the exact spot
+  const LAST_ID_KEY = "dtcbot:lastId";
+
   let diagnosisId = null;
   let history = []; // [{fromId, question, answer}] - also the back/forward stack
   let future = []; // [{fromId, question, answer}] popped off history by "Back", replayed by "Forward"
   let lastConclusion = null;
+  let lastEvidence = null;
   let vehicle = { dtc: "", model: "" };
   let timer = null;
   let busy = false;
@@ -188,6 +192,10 @@
     $("f-cases").textContent = String(entry ? entry.cases : 0);
     screen("start");
     setStep(1);
+    try {
+      const lastId = localStorage.getItem(LAST_ID_KEY);
+      if (lastId) $("resume-id").value = lastId;
+    } catch { /* storage unavailable (private mode, etc.) - Resume still works by pasting an id */ }
   }
 
   $("query-text").addEventListener("input", updateStartNote);
@@ -199,12 +207,41 @@
     if (!queryText) { showError("Describe the problem or enter a fault code."); return; }
     begin(queryText, DEFAULT_MODEL);
   });
+  $("resume-form").addEventListener("submit", (ev) => {
+    ev.preventDefault();
+    const id = $("resume-id").value.trim();
+    if (!id) { showError("Enter a diagnosis id to resume."); return; }
+    resumeDiagnosis(id);
+  });
 
   let currentTree = null; // {root, nodes[]} - the whole tree, walked locally
   let currentNodeId = null;
   let maxQuestions = 7;
 
   function findNode(id) { return (currentTree.nodes || []).find((n) => n.id === id); }
+  function statusFor(tree, nodeId) {
+    if (!tree) return "no_evidence";
+    const node = findNode(nodeId);
+    return node && node.conclusion ? "concluded" : "asking";
+  }
+
+  // Saved under the diagnosis id so "Resume" can restore the exact question reached, not just the tree -
+  // the server only tracks the tree itself (see get_diagnosis), not which answers were given.
+  function saveProgress() {
+    if (!diagnosisId || !currentTree) return;
+    try {
+      localStorage.setItem(PROGRESS_PREFIX + diagnosisId, JSON.stringify({
+        tree: currentTree, currentNodeId, history, future, vehicle, maxQuestions, evidence: lastEvidence,
+      }));
+      localStorage.setItem(LAST_ID_KEY, diagnosisId);
+    } catch { /* storage unavailable (private mode, quota) - Resume falls back to the server copy */ }
+  }
+  function loadProgress(id) {
+    try {
+      const raw = localStorage.getItem(PROGRESS_PREFIX + id);
+      return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
+  }
 
   function begin(queryText, model) {
     run(`Checking your description for ${friendly(model)} and preparing the first question.`, async () => {
@@ -218,21 +255,56 @@
       currentTree = d.tree;
       currentNodeId = d.tree ? d.tree.root : null;
       maxQuestions = d.max_questions;
-      enterWork(d, d.evidence);
+      enterWork(maxQuestions, d.evidence);
     }, "Preparing your diagnosis");
+  }
+
+  // Resume: same-browser diagnoses restore the exact question from local storage, with no server call at
+  // all. A diagnosis id from another browser/device (or after local storage was cleared) falls back to the
+  // server's cached tree and restarts at its root, since only the browser ever knew which answers were given.
+  function resumeDiagnosis(idRaw) {
+    const id = idRaw.trim().toLowerCase();
+    if (!UUID_RE.test(id)) { showError("That doesn't look like a diagnosis id."); return; }
+    hideError();
+    const saved = loadProgress(id);
+    if (saved && saved.tree) {
+      history = saved.history || [];
+      future = saved.future || [];
+      lastConclusion = null;
+      diagnosisId = id;
+      vehicle = saved.vehicle || { dtc: "", model: DEFAULT_MODEL, query: "" };
+      currentTree = saved.tree;
+      currentNodeId = saved.currentNodeId;
+      maxQuestions = saved.maxQuestions || 1;
+      enterWork(maxQuestions, { ...(saved.evidence || {}), resumed: true });
+      return;
+    }
+    run("Looking up that diagnosis…", async () => {
+      const d = await api(`/diagnoses/${id}`);
+      history = [];
+      future = [];
+      lastConclusion = null;
+      diagnosisId = d.diagnosis_id;
+      vehicle = { dtc: d.dtc_code || "", model: d.model_line, query: "" };
+      currentTree = d.tree;
+      currentNodeId = d.tree ? d.tree.root : null;
+      maxQuestions = d.max_questions;
+      enterWork(maxQuestions, { ...d.evidence, resumed: true });
+    }, "Looking up that diagnosis");
   }
 
   const vehicleTitle = () => vehicle.dtc || "Symptom";
   // The prompt requires an ending that couldn't separate the causes to be low confidence with no part listed.
   const isInconclusive = (k) => k.confidence === "low" && k.parts.length === 0;
 
-  function enterWork(d, evidence) {
+  function enterWork(maxQ, evidence) {
     screen("work");
+    lastEvidence = evidence;
     $("v-code").textContent = vehicleTitle();
-    const short = vehicle.query.length > 90 ? `${vehicle.query.slice(0, 90)}…` : vehicle.query;
-    $("v-model").textContent = vehicle.dtc ? friendly(vehicle.model) : `${friendly(vehicle.model)} · “${short}”`;
+    const short = vehicle.query && vehicle.query.length > 90 ? `${vehicle.query.slice(0, 90)}…` : vehicle.query;
+    $("v-model").textContent = (vehicle.dtc || !short) ? friendly(vehicle.model) : `${friendly(vehicle.model)} · “${short}”`;
     renderEvidence(evidence);
-    renderState(d.status, d.max_questions);
+    renderState(statusFor(currentTree, currentNodeId), maxQ);
   }
 
   // ---------- answering: pure local tree walk, no server call ----------
@@ -310,6 +382,7 @@
     show($("outcome-card"), concluded);
     if (conclusion) renderConclusion(conclusion);
     updateNavButtons();
+    saveProgress();
     $((conclusion ? "c-title" : "q-title")).focus({ preventScroll: false });
   }
 

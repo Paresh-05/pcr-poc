@@ -77,8 +77,15 @@ def make_router(auth) -> APIRouter:
                 )
         return await diagnosis.start_diagnosis(s.pool, s.llm, s.settings, body.model_line, body.dtc_code, body.query_text)
 
-    # No /answers or GET /diagnoses/{id} endpoint: the whole tree is returned by /diagnoses (above) and
-    # walked client-side - no per-answer round-trip, no resume.
+    # No /answers endpoint: the whole tree is returned by /diagnoses (above) and walked client-side - no
+    # per-answer round-trip.
+
+    @router.get("/diagnoses/{diagnosis_id}")
+    async def get_diagnosis(diagnosis_id: uuid.UUID, request: Request):
+        try:
+            return await diagnosis.get_diagnosis(request.app.state.pool, diagnosis_id)
+        except diagnosis.NotFound:
+            return JSONResponse({"error": "Diagnosis not found"}, status_code=404)
 
     @router.get("/diagnoses/{diagnosis_id}/cost")
     async def get_cost(diagnosis_id: uuid.UUID, request: Request) -> dict:

@@ -382,7 +382,8 @@ async def start_diagnosis(
     logger.info("start_diagnosis DONE: diagnosis_id=%s dtc_code=%s model_line=%s status=%s built_now=%s",
                 diagnosis_id, resolved_code, model_line, status, built_now)
 
-    # The whole tree is sent once; the client walks it locally (no per-answer server round-trip, no resume).
+    # The whole tree is sent once; the client walks it locally (no per-answer server round-trip). A later
+    # GET /diagnoses/{id} (get_diagnosis, below) re-sends this same cached tree for Resume.
     return {
         "diagnosis_id": str(diagnosis_id),
         "dtc_code": resolved_code,
@@ -397,6 +398,41 @@ async def start_diagnosis(
             "top_parts": evidence.get("top_parts", []),
         },
         "tree_built_this_run": built_now,
+    }
+
+
+async def get_diagnosis(pool: AsyncConnectionPool, diagnosis_id: uuid.UUID) -> dict:
+    """Re-fetches an existing diagnosis's cached tree so the client can resume it - no LLM call, since the
+    tree was already built and cached by start_diagnosis. The client restarts at the tree's root: the
+    answers already given are only tracked client-side, so a resume that can't read them back from the
+    browser's own storage has no way to know how far the mechanic had got."""
+    async with pool.connection() as conn, conn.cursor(row_factory=dict_row) as cur:
+        await cur.execute(
+            "SELECT d.dtc_code, d.model_line, d.status, t.tree, t.evidence "
+            "FROM diagnoses d LEFT JOIN diagnosis_trees t ON t.id = d.tree_id WHERE d.id = %s",
+            (diagnosis_id,),
+        )
+        row = await cur.fetchone()
+    if row is None:
+        logger.warning("get_diagnosis: diagnosis_id=%s not found", diagnosis_id)
+        raise NotFound
+    tree = DiagnosisTree.model_validate(row["tree"]) if row["tree"] else None
+    evidence = row["evidence"] or {"scope": "none"}
+    logger.info("get_diagnosis: diagnosis_id=%s dtc_code=%s model_line=%s status=%s tree_found=%s",
+                diagnosis_id, row["dtc_code"], row["model_line"], row["status"], tree is not None)
+    return {
+        "diagnosis_id": str(diagnosis_id),
+        "dtc_code": row["dtc_code"],
+        "model_line": row["model_line"],
+        "status": row["status"],
+        "tree": tree.model_dump() if tree else None,
+        "max_questions": _tree_depth(tree) if tree else 0,
+        "evidence": {
+            "total_cases": evidence.get("total_cases", 0),
+            "scope": evidence.get("scope"),
+            "manual": evidence.get("manual", {"status": "missing", "modules": []}),
+            "top_parts": evidence.get("top_parts", []),
+        },
     }
 
 

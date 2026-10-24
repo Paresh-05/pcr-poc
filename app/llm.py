@@ -35,22 +35,37 @@ class OpenAILLM:
         self.model = settings.llm_model
         self.embedding_model = settings.embedding_model
         self.effort = settings.llm_reasoning_effort
+        self.service_tier = settings.llm_service_tier
         self.recorder = recorder
         self.client = AsyncOpenAI(
             api_key=settings.llm_api_key.get_secret_value(), base_url=settings.llm_base_url, timeout=300, max_retries=2
         )
 
     def _extra(self, purpose: str, effort_override: str | None) -> dict:
+        if purpose == "embed":
+            return {}
         effort = effort_override if effort_override is not None else self.effort
-        return {"reasoning_effort": effort} if effort and purpose != "embed" else {}
+        extra = {"reasoning_effort": effort} if effort else {}
+        if self.service_tier:
+            extra["service_tier"] = self.service_tier
+        return extra
 
     async def _call(self, fn, purpose: str, effort_override: str | None, **kwargs):
         try:
             return await fn(**kwargs, **self._extra(purpose, effort_override))
         except BadRequestError as exc:
-            if "reasoning_effort" in str(exc) and (effort_override or self.effort):
+            msg = str(exc)
+            # Drop whichever extra the gateway rejected and retry once with what's left, rather than
+            # failing the whole call over an unsupported knob (e.g. "ultrafast" not valid for every model).
+            dropped = False
+            if "reasoning_effort" in msg and (effort_override or self.effort):
                 self.effort = None
-                return await fn(**kwargs)
+                dropped = True
+            if "service_tier" in msg and self.service_tier:
+                self.service_tier = None
+                dropped = True
+            if dropped:
+                return await fn(**kwargs, **self._extra(purpose, effort_override))
             raise
 
     async def _record(self, resp, purpose: str, model: str, started: float) -> None:
@@ -69,7 +84,10 @@ class OpenAILLM:
         """`effort` overrides the configured default reasoning effort for this one call (e.g. "high" for a
         call that benefits from deeper reasoning, like turning a messy manual into structured analysis)."""
         messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
-        logger.info("structured call: purpose=%s model=%s schema=%s", purpose, self.model, schema.__name__)
+        logger.info(
+            "structured call: purpose=%s model=%s schema=%s reasoning_effort=%s service_tier=%s",
+            purpose, self.model, schema.__name__, effort if effort is not None else self.effort, self.service_tier,
+        )
         started = time.monotonic()
         try:
             completion = await self._call(

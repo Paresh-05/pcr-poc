@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     llm_base_url: str | None = None
     llm_model: str | None = None
     llm_reasoning_effort: str | None = None
+    llm_service_tier: str | None = None  # e.g. "ultrafast" - passed through as-is, gateway-specific
     embedding_model: str = "text-embedding-3-small"
     embedding_dims: int = 1536
 

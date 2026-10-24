@@ -205,7 +205,7 @@
       history = [];
       lastConclusion = null;
       diagnosisId = d.diagnosis_id;
-      vehicle = { dtc: d.dtc_code || "(from description)", model };
+      vehicle = { dtc: d.dtc_code || "", model, query: queryText };
       currentTree = d.tree;
       currentNodeId = d.tree ? d.tree.root : null;
       maxQuestions = d.max_questions;
@@ -213,10 +213,15 @@
     }, "Preparing your diagnosis");
   }
 
+  const vehicleTitle = () => vehicle.dtc || "Symptom";
+  // The prompt requires an ending that couldn't separate the causes to be low confidence with no part listed.
+  const isInconclusive = (k) => k.confidence === "low" && k.parts.length === 0;
+
   function enterWork(d, evidence) {
     screen("work");
-    $("v-code").textContent = vehicle.dtc;
-    $("v-model").textContent = friendly(vehicle.model);
+    $("v-code").textContent = vehicleTitle();
+    const short = vehicle.query.length > 90 ? `${vehicle.query.slice(0, 90)}…` : vehicle.query;
+    $("v-model").textContent = vehicle.dtc ? friendly(vehicle.model) : `${friendly(vehicle.model)} · “${short}”`;
     renderEvidence(evidence);
     renderState(d.status, d.max_questions);
   }
@@ -251,7 +256,6 @@
     const conclusion = node && node.conclusion ? node.conclusion : null;
     const questionsAsked = history.length;
     setStep(concluded ? 3 : 2);
-    renderCandidates((node && node.candidates) || []);
     renderHistory();
     $("question").textContent = asking ? (node && node.question)
       : concluded ? "Diagnosis complete. The result is below."
@@ -263,7 +267,9 @@
     show($("conclusion-card"), Boolean(conclusion));
     const note = $("action-note");
     note.textContent = asking ? `Question ${questionsAsked + 1} of up to ${maxQuestions}. Answer Yes, No or Not sure.`
-      : concluded ? "Diagnosis ready. Review the repair steps, then give feedback after the repair."
+      : concluded ? (conclusion && isInconclusive(conclusion)
+        ? "Not yet identified. Run the checks below, then give feedback on what you found."
+        : "Diagnosis ready. Review the repair steps, then give feedback after the repair.")
       : "No diagnosis is possible for this code and model.";
     note.classList.toggle("strong", concluded);
     show($("copy-btn"), concluded);
@@ -271,22 +277,6 @@
     show($("outcome-card"), concluded);
     if (conclusion) renderConclusion(conclusion);
     $((conclusion ? "c-title" : "q-title")).focus({ preventScroll: false });
-  }
-
-  function renderCandidates(cands) {
-    const ul = $("candidates");
-    clear(ul);
-    const fills = [];
-    for (const c of cands) {
-      const fill = el("span");
-      fills.push([fill, Math.max(0, Math.min(100, c.likelihood))]);
-      ul.append(el("li", { cls: `rank-${Math.min(cands.indexOf(c) + 1, 3)}` }, [
-        el("div", { cls: "cand-head" }, [el("span", { text: c.cause }), el("strong", { text: `${c.likelihood}%` })]),
-        el("div", { cls: "bar", attrs: { role: "img", "aria-label": `${c.likelihood} percent` } }, [fill]),
-        el("div", { cls: "cand-why", text: c.reasoning }),
-      ]));
-    }
-    requestAnimationFrame(() => requestAnimationFrame(() => fills.forEach(([f, w]) => { f.style.width = `${w}%`; })));
   }
 
   function renderHistory() {
@@ -338,8 +328,9 @@
     lastConclusion = k;
     const box = $("conclusion");
     clear(box);
+    const open = isInconclusive(k);
     const badge = $("confidence");
-    badge.textContent = `${k.confidence} confidence`;
+    badge.textContent = open ? "inconclusive" : `${k.confidence} confidence`;
     badge.className = `badge ${k.confidence}`;
 
     const list = (items, cls = "") => el(cls ? "ol" : "ul", cls ? { cls } : {}, items.map((t) => el("li", { text: t })));
@@ -355,17 +346,19 @@
 
     box.append(
       el("div", { cls: "problem-card" }, [
-        el("p", { cls: "problem-kicker", text: "Most likely problem" }),
+        el("p", { cls: "problem-kicker", text: open ? "Not yet identified" : "Most likely problem" }),
         el("p", { cls: "problem", text: k.problem }),
-        el("div", { cls: "problem-stats" }, [stat(k.fix_steps.length, "Repair steps"), stat(k.parts.length, "Parts"), stat(history.length, "Questions answered")]),
+        el("div", { cls: "problem-stats" }, open
+          ? [stat(k.fix_steps.length, "Checks to do"), stat(history.length, "Questions answered")]
+          : [stat(k.fix_steps.length, "Repair steps"), stat(k.parts.length, "Parts"), stat(history.length, "Questions answered")]),
       ]),
       ...(k.confidence_note ? [el("p", { cls: "hint", text: `Confidence: ${k.confidence_note}` })] : []),
       el("div", { cls: "safety-banner", attrs: { role: "note" } }, [el("strong", { text: "Safety first. " }), document.createTextNode(k.safety_note)]),
-      card("Repair steps", `${k.fix_steps.length} step${k.fix_steps.length === 1 ? "" : "s"}`, list(k.fix_steps, "steps")),
+      card(open ? "Checks to do" : "Repair steps", `${k.fix_steps.length} step${k.fix_steps.length === 1 ? "" : "s"}`, list(k.fix_steps, "steps")),
       el("div", { cls: "two-up" }, [
         card("Parts", k.parts.length ? String(k.parts.length) : "none",
-          k.parts.length ? el("div", { cls: "parts" }, k.parts.map((p) => el("span", { cls: "part", text: p }))) : el("p", { cls: "muted", text: "No part replacement is supported by the evidence." })),
-        card("Confirm the repair", "", list(k.verify_fix)),
+          k.parts.length ? el("div", { cls: "parts" }, k.parts.map((p) => el("span", { cls: "part", text: p }))) : el("p", { cls: "muted", text: open ? "Don't replace a part yet: the evidence doesn't single one out." : "No part replacement is supported by the evidence." })),
+        card(open ? "How to confirm" : "Confirm the repair", "", list(k.verify_fix)),
       ]),
       ...((k.how_we_got_here || []).length ? [card("How we reached this finding", `${history.length} answer${history.length === 1 ? "" : "s"}`, list(k.how_we_got_here, "steps"))] : []),
       el("div", { cls: "acc-list" }, [
@@ -381,10 +374,11 @@
   function summaryText() {
     const k = lastConclusion;
     if (!k) return "";
-    const lines = [`${vehicle.dtc} on ${friendly(vehicle.model)}`, "", `Most likely problem: ${k.problem}`, `Confidence: ${k.confidence}${k.confidence_note ? ` (${k.confidence_note})` : ""}`, "", "Why:", ...k.evidence.map((e) => `- ${e}`),
+    const open = isInconclusive(k);
+    const lines = [`${vehicleTitle()} on ${friendly(vehicle.model)}${vehicle.dtc ? "" : `: "${vehicle.query}"`}`, "", `${open ? "Not yet identified" : "Most likely problem"}: ${k.problem}`, `Confidence: ${k.confidence}${k.confidence_note ? ` (${k.confidence_note})` : ""}`, "", "Why:", ...k.evidence.map((e) => `- ${e}`),
       "", "How we reached this finding:", ...(k.how_we_got_here || []).map((h) => `- ${h}`),
-      "", "Repair steps:", ...k.fix_steps.map((s, i) => `${i + 1}. ${s}`), "", `Parts: ${k.parts.length ? k.parts.join("; ") : "none supported"}`,
-      "", "Confirm the repair:", ...k.verify_fix.map((v) => `- ${v}`), "", `Safety: ${k.safety_note}`];
+      "", `${open ? "Checks to do" : "Repair steps"}:`, ...k.fix_steps.map((s, i) => `${i + 1}. ${s}`), "", `Parts: ${k.parts.length ? k.parts.join("; ") : "none supported"}`,
+      "", `${open ? "How to confirm" : "Confirm the repair"}:`, ...k.verify_fix.map((v) => `- ${v}`), "", `Safety: ${k.safety_note}`];
     return lines.join("\n");
   }
   $("copy-btn").addEventListener("click", async () => {
@@ -401,7 +395,7 @@
   // ---------- outcome feedback ----------
   // Final, read-only page shown once the feedback is saved.
   function showDone(o) {
-    $("d-code").textContent = vehicle.dtc;
+    $("d-code").textContent = vehicle.dtc || "Not given (symptom only)";
     $("d-model").textContent = friendly(vehicle.model);
     $("d-result").textContent = { worked: "Fixed it", partly: "Partly fixed", not_worked: "Did not fix it" }[o.result] || o.result;
     $("d-id").textContent = diagnosisId;

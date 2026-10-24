@@ -266,13 +266,6 @@ input:hover, select:hover { border-color: var(--line-strong); }
 .tag.not_sure { background: var(--signal-soft); color: var(--signal-deep); }
 .history-empty { padding: 14px 16px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg); font-size: 0.875rem; }
 
-.candidates { list-style: none; margin: 0; padding: 0; }
-.candidates li { margin-bottom: 14px; }
-.cand-head { display: flex; justify-content: space-between; gap: 10px; font-size: 0.875rem; font-weight: 600; }
-.cand-head strong { font-variant-numeric: tabular-nums; }
-.bar { height: 8px; margin: 6px 0 4px; border-radius: 4px; background: var(--track); overflow: hidden; }
-.bar > span { display: block; height: 100%; width: 0; border-radius: 4px; background: var(--grad-blue); transition: width 0.7s cubic-bezier(0.2, 0.7, 0.2, 1); }
-.cand-why { color: var(--muted); font-size: 0.75rem; line-height: 1.4; }
 
 .facts { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 0.875rem; }
 .facts dt { color: var(--muted); }
@@ -385,13 +378,6 @@ input:focus, select:focus { border-color: var(--brand-600); box-shadow: 0 0 0 3p
 .pill.yes:hover:not(:disabled), .pill.no:hover:not(:disabled) { box-shadow: 0 2px 8px rgba(30, 64, 175, 0.18); }
 .meter { background: var(--brand-100); }
 
-/* likely causes: the leader is the strongest blue, the rest fade */
-.bar { background: var(--brand-100); }
-.rank-1 .cand-head { color: var(--brand-800); }
-.rank-1 .cand-head strong { color: var(--brand-700); }
-.rank-2 .bar > span { background: linear-gradient(to right, #93C5FD, #60A5FA); }
-.rank-3 .bar > span { background: linear-gradient(to right, #DBEAFE, #BFDBFE); }
-.rank-2 .cand-head, .rank-3 .cand-head { color: var(--ink-2); }
 
 /* answered rows: filled yes and no pills already use the green and red gradients; tint the list */
 .history { border-color: var(--brand-200); }

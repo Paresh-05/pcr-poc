@@ -45,6 +45,14 @@ mentioned in the manual with no matching case, but the manual can surface a real
 too thin to show on its own.
 - This is your working hypothesis set for the whole tree. Every question you ask exists to discriminate \
 between these hypotheses - to rule some in and others out - not simply to walk the manual's steps in order.
+- The manual sections below are each labeled with the DTC code(s) they cover. When more than one DIFFERENT \
+code appears, they may describe genuinely different systems that happen to share a similar symptom (for \
+example, a battery fault and an unrelated key-authentication fault can both produce "vehicle won't start"). \
+Do not assume they are the same fault just because they were retrieved together - treat each distinct code's \
+system as its own candidate cause, and use the case evidence (which is reliably matched to its real code) \
+to judge which system is actually the more likely explanation. If the past cases overwhelmingly match one \
+code, prefer that system's hypotheses; only raise a different code's system as a live candidate if the case \
+evidence doesn't clearly settle it.
 
 Step 2 - build the tree:
 - Keep it small: at most {max_depth} levels deep. Each branch node asks exactly ONE yes/no question a \
@@ -104,11 +112,16 @@ def _case_lines(cases: list[dict[str, Any]]) -> str:
 
 
 def _manual_lines(chunks: list[dict[str, Any]]) -> str:
+    """Labels each section with its own DTC code(s) - when a query has no known code, evidence can include
+    manual sections for more than one genuinely different system, and the tree-builder needs to know which
+    code each section actually belongs to rather than assuming they're all the same fault."""
     if not chunks:
         return "(no manual procedure on file for this fault code and model)"
     out = []
     for m in chunks:
-        out.append(f"[{m.get('submodule') or 'manual'}]\n{m['full_markdown']}")
+        codes = m.get("dtc_codes")
+        code_label = f" (codes: {', '.join(codes)})" if codes else ""
+        out.append(f"[{m.get('submodule') or 'manual'}{code_label}]\n{m['full_markdown']}")
     return "\n\n".join(out)
 
 

@@ -96,9 +96,9 @@ async def semantic_evidence(
             )
         else:
             await cur.execute(
-                "SELECT c.ticket_no, c.customer_verbatim, c.conclusion_text, c.failed_parts, c.model_variant, "
-                "c.fuel, c.updated_date, 1 - (s.embedding <=> %s) AS similarity FROM pcr_case_summaries s "
-                "JOIN pcr_cases c ON c.id = s.pcr_case_id "
+                "SELECT c.ticket_no, c.dtc_code, c.customer_verbatim, c.conclusion_text, c.failed_parts, "
+                "c.model_variant, c.fuel, c.updated_date, 1 - (s.embedding <=> %s) AS similarity "
+                "FROM pcr_case_summaries s JOIN pcr_cases c ON c.id = s.pcr_case_id "
                 "WHERE c.model_line = %s AND c.resolution_status = 'resolved' "
                 "ORDER BY s.embedding <=> %s LIMIT %s",
                 (query_vec, model_line, query_vec, settings.retrieval_top_k),
@@ -120,15 +120,45 @@ async def semantic_evidence(
             )
             manual_chunks = await cur.fetchall()
         else:
+            # No code was given or extracted, so we can't filter the manual by code directly. Manual-text
+            # embeddings are written in formal technical language and don't reliably match casual symptom
+            # wording (verified: a correct manual's "reduced discharge performance" scores lower against a
+            # symptom query than a WRONG manual's incidental "vehicle may not start" - see session notes).
+            # So: trust the case-side match instead (proven highly accurate - same symptom query scored
+            # 0.62-0.67 against the right code's cases, matching 10/10 in the top results) - pull manual
+            # sections for every distinct code actually found among the matched cases, by exact lookup, no
+            # embedding guessing. Still keep a handful of embedding-matched chunks as a safety net for codes
+            # that are real candidates but have little or no case history to anchor them.
+            case_codes = sorted({c["dtc_code"] for c in cases if c.get("dtc_code")})
+            case_driven_chunks: list[dict[str, Any]] = []
+            if case_codes:
+                await cur.execute(
+                    "SELECT id, dtc_codes, submodule, full_markdown FROM manual_chunks "
+                    "WHERE dtc_codes && %s AND model_line = %s",
+                    (case_codes, model_line),
+                )
+                case_driven_chunks = await cur.fetchall()
+                logger.info(
+                    "Case-driven manual lookup: distinct codes from matched cases=%s -> %d manual chunk(s)",
+                    case_codes, len(case_driven_chunks),
+                )
+
             await cur.execute(
-                "SELECT c.id, c.submodule, c.full_markdown, "
+                "SELECT c.id, c.dtc_codes, c.submodule, c.full_markdown, "
                 "1 - (s.embedding <=> %s) AS similarity FROM manual_chunk_summaries s "
                 "JOIN manual_chunks c ON c.id = s.manual_chunk_id "
                 "WHERE c.model_line = %s ORDER BY s.embedding <=> %s LIMIT %s",
                 (query_vec, model_line, query_vec, settings.retrieval_top_k),
             )
             manual_rows = await cur.fetchall()
-            manual_chunks = [m for m in manual_rows if m["similarity"] >= settings.similarity_threshold][: settings.retrieval_keep]
+            embedding_matched = [m for m in manual_rows if m["similarity"] >= settings.similarity_threshold][:3]
+
+            seen_ids = {m["id"] for m in case_driven_chunks}
+            manual_chunks = case_driven_chunks + [m for m in embedding_matched if m["id"] not in seen_ids]
+            logger.info(
+                "Manual evidence (no code given): %d case-driven + %d embedding-matched (deduped) = %d total",
+                len(case_driven_chunks), len([m for m in embedding_matched if m["id"] not in seen_ids]), len(manual_chunks),
+            )
 
     scope = "semantic" if cases else ("manual_only" if manual_chunks else "none")
     logger.info(

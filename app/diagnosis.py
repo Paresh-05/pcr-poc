@@ -121,6 +121,13 @@ fix_steps (ordered, concrete, following the manual's sequence when available), p
 alternatives, safety_note, how_we_got_here. For a leaf that could not separate the remaining causes, "parts" \
 must be empty, "problem" must say which causes are still possible, and "fix_steps" must be the checks that \
 would tell them apart - never a replacement.
+- Pull forward the concrete specifics already sitting in the evidence instead of paraphrasing them away: an \
+exact wait time, test-drive distance, voltage/resistance reading, or pass/fail number mentioned in a case's \
+text belongs in fix_steps or verify_fix verbatim, not as "monitor" or "confirm normal operation." When a \
+part is named in "parts", use the real part name/code from a matching case's parts-replaced list if one \
+exists, not only a generic description. When the manual lists separate "Maintenance / Follow-Up Actions" \
+for a component (e.g. both a Replacement step and a Programming and Setup step), include each as its own \
+fix_steps entry - do not fold a required follow-up step into the replacement step and drop it.
 
 Rules that apply throughout:
 - Base every candidate cause, every question, and the conclusion strictly on the evidence given below. Never \

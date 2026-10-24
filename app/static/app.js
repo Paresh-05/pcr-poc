@@ -445,13 +445,13 @@
       ]),
       ...(k.confidence_note ? [el("p", { cls: "hint", text: `Confidence: ${k.confidence_note}` })] : []),
       el("div", { cls: "safety-banner", attrs: { role: "note" } }, [el("strong", { text: "Safety first. " }), document.createTextNode(k.safety_note)]),
-      card("Why", list(why)),
       card(open ? "Checks to do" : "What to do", el("ol", { cls: "steps" }, k.fix_steps.map((t) => el("li", { text: t })))),
       ...(!open ? [card("Parts", k.parts.length
         ? el("div", { cls: "parts" }, k.parts.map((p) => el("span", { cls: "part", text: p })))
         : el("p", { cls: "muted", text: "No part replacement is supported by the evidence." }))] : []),
       card(open ? "How to confirm" : "Confirm the repair", list(k.verify_fix)),
       ...(k.alternatives.length ? [card("If it doesn't fix it", list(k.alternatives.map((a) => `${a.cause}: ${a.when_to_consider}`)))] : []),
+      card("Why", list(why)),
     );
   }
 
@@ -461,11 +461,15 @@
     if (!k) return "";
     const open = isInconclusive(k);
     const why = [...k.evidence, ...(k.ruled_out || []).map((r) => `Ruled out: ${r}`), ...(k.uncertain || []).map((u) => `Still uncertain: ${u}`)];
-    const lines = [`${vehicleTitle()} on ${friendly(vehicle.model)}${vehicle.dtc ? "" : `: "${vehicle.query}"`}`, "", `${open ? "Not yet identified" : "Most likely problem"}: ${k.problem}`, `Confidence: ${k.confidence}${k.confidence_note ? ` (${k.confidence_note})` : ""}`,
-      "", "Why:", ...why.map((w) => `- ${w}`),
-      "", `${open ? "Checks to do" : "What to do"}:`, ...k.fix_steps.map((s, i) => `${i + 1}. ${s}`), "", `Parts: ${k.parts.length ? k.parts.join("; ") : "none supported"}`,
-      "", `${open ? "How to confirm" : "Confirm the repair"}:`, ...k.verify_fix.map((v) => `- ${v}`), "", `Safety: ${k.safety_note}`];
+    const lines = [`${vehicleTitle()} on ${friendly(vehicle.model)}${vehicle.dtc ? "" : `: "${vehicle.query}"`}`, "",
+      `${open ? "Not yet identified" : "Most likely problem"}: ${k.problem}`,
+      `Confidence: ${k.confidence}${k.confidence_note ? ` (${k.confidence_note})` : ""}`,
+      `Safety: ${k.safety_note}`,
+      "", `${open ? "Checks to do" : "What to do"}:`, ...k.fix_steps.map((s, i) => `${i + 1}. ${s}`),
+      "", `Parts: ${k.parts.length ? k.parts.join("; ") : "none supported"}`,
+      "", `${open ? "How to confirm" : "Confirm the repair"}:`, ...k.verify_fix.map((v) => `- ${v}`)];
     if (k.alternatives.length) lines.push("", "If it doesn't fix it:", ...k.alternatives.map((a) => `- ${a.cause}: ${a.when_to_consider}`));
+    lines.push("", "Why:", ...why.map((w) => `- ${w}`));
     return lines.join("\n");
   }
   $("copy-btn").addEventListener("click", async () => {

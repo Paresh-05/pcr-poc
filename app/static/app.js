@@ -10,7 +10,8 @@
   const DEFAULT_MODEL = "MG_COMET_EV"; // only model supported for now; no picker shown
 
   let diagnosisId = null;
-  let history = []; // [{question, answer}]
+  let history = []; // [{fromId, question, answer}] - also the back/forward stack
+  let future = []; // [{fromId, question, answer}] popped off history by "Back", replayed by "Forward"
   let lastConclusion = null;
   let vehicle = { dtc: "", model: "" };
   let timer = null;
@@ -54,6 +55,11 @@
     clearInterval(timer);
     show($("status"), false);
     document.querySelectorAll("button").forEach((b) => { b.disabled = false; });
+    updateNavButtons();
+  }
+  function updateNavButtons() {
+    $("back-btn").disabled = history.length === 0;
+    $("forward-btn").disabled = future.length === 0;
   }
   // Small loader for follow-up questions: only the question card changes, the rest of the page stays as it is.
   function setInlineBusy(on, text = "Working out the next question…") {
@@ -81,6 +87,8 @@
     show($("action-bar"), name === "start" || name === "work");
     show($("start-btn"), name === "start");
     show($("reset"), name === "work");
+    show($("back-btn"), name === "work");
+    show($("forward-btn"), name === "work");
     if (name === "start") { show($("copy-btn"), false); show($("print-btn"), false); updateStartNote(); }
   }
   function updateStartNote() {
@@ -203,6 +211,7 @@
       const body = { model_line: model, query_text: queryText };
       const d = await api("/diagnoses", { method: "POST", body, timeoutMs: 600000 });
       history = [];
+      future = [];
       lastConclusion = null;
       diagnosisId = d.diagnosis_id;
       vehicle = { dtc: d.dtc_code || "", model, query: queryText };
@@ -230,8 +239,27 @@
   function submitAnswer(answer) {
     if (!currentTree || busy) return;
     const node = findNode(currentNodeId);
-    history.push({ question: node.question, answer, showed: "" });
+    history.push({ fromId: currentNodeId, question: node.question, answer, showed: "" });
+    future = []; // a fresh answer replaces whatever branch "Forward" used to lead to
     const nextId = { yes: node.yes, no: node.no, not_sure: node.not_sure }[answer] || node.yes || node.no;
+    currentNodeId = nextId;
+    const next = findNode(nextId);
+    renderState(next && next.conclusion ? "concluded" : "asking", maxQuestions);
+  }
+  // Back/Forward walk the same question/answer stack used for "Answered so far" - no server call, no re-ask.
+  function goBack() {
+    if (!currentTree || busy || history.length === 0) return;
+    const entry = history.pop();
+    future.push(entry);
+    currentNodeId = entry.fromId;
+    renderState("asking", maxQuestions);
+  }
+  function goForward() {
+    if (!currentTree || busy || future.length === 0) return;
+    const entry = future.pop();
+    history.push(entry);
+    const node = findNode(entry.fromId);
+    const nextId = { yes: node.yes, no: node.no, not_sure: node.not_sure }[entry.answer] || node.yes || node.no;
     currentNodeId = nextId;
     const next = findNode(nextId);
     renderState(next && next.conclusion ? "concluded" : "asking", maxQuestions);
@@ -240,9 +268,14 @@
     const btn = ev.target.closest("button[data-answer]");
     if (btn) submitAnswer(btn.dataset.answer);
   });
+  $("back-btn").addEventListener("click", goBack);
+  $("forward-btn").addEventListener("click", goForward);
   document.addEventListener("keydown", (ev) => {
-    if (ev.ctrlKey || ev.metaKey || ev.altKey || busy || $("answers").hidden) return;
+    if (ev.ctrlKey || ev.metaKey || ev.altKey || busy) return;
     if (["INPUT", "SELECT", "TEXTAREA", "SUMMARY"].includes(document.activeElement && document.activeElement.tagName)) return;
+    if (ev.key === "ArrowLeft" && !$("back-btn").hidden) { ev.preventDefault(); goBack(); return; }
+    if (ev.key === "ArrowRight" && !$("forward-btn").hidden) { ev.preventDefault(); goForward(); return; }
+    if ($("answers").hidden) return;
     const map = { y: "yes", n: "no", s: "not_sure" };
     const answer = map[ev.key.toLowerCase()];
     if (answer) { ev.preventDefault(); submitAnswer(answer); }
@@ -276,6 +309,7 @@
     show($("print-btn"), concluded);
     show($("outcome-card"), concluded);
     if (conclusion) renderConclusion(conclusion);
+    updateNavButtons();
     $((conclusion ? "c-title" : "q-title")).focus({ preventScroll: false });
   }
 
@@ -429,6 +463,7 @@
   function newDiagnosis() {
     diagnosisId = null;
     history = [];
+    future = [];
     lastConclusion = null;
     hideError();
     show($("outcome-saved"), false);

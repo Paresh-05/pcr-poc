@@ -194,6 +194,7 @@
 
   let currentTree = null; // {root, nodes[]} - the whole tree, walked locally
   let currentNodeId = null;
+  let maxQuestions = 7;
 
   function findNode(id) { return (currentTree.nodes || []).find((n) => n.id === id); }
 
@@ -207,8 +208,8 @@
       vehicle = { dtc: d.dtc_code || "(from description)", model };
       currentTree = d.tree;
       currentNodeId = d.tree ? d.tree.root : null;
+      maxQuestions = d.max_questions;
       enterWork(d, d.evidence);
-      await refreshCost();
     }, "Preparing your diagnosis");
   }
 
@@ -228,7 +229,7 @@
     const nextId = { yes: node.yes, no: node.no, not_sure: node.not_sure }[answer] || node.yes || node.no;
     currentNodeId = nextId;
     const next = findNode(nextId);
-    renderState(next && next.conclusion ? "concluded" : "asking", 5);
+    renderState(next && next.conclusion ? "concluded" : "asking", maxQuestions);
   }
   $("answers").addEventListener("click", (ev) => {
     const btn = ev.target.closest("button[data-answer]");
@@ -269,7 +270,6 @@
     show($("print-btn"), concluded);
     show($("outcome-card"), concluded);
     if (conclusion) renderConclusion(conclusion);
-    $("diag-id").textContent = `Diagnosis id: ${diagnosisId}`;
     $((conclusion ? "c-title" : "q-title")).focus({ preventScroll: false });
   }
 
@@ -375,38 +375,6 @@
         fold("If it does not fix it", k.alternatives.length ? list(k.alternatives.map((a) => `${a.cause}: ${a.when_to_consider}`)) : el("p", { cls: "muted", text: "No alternatives listed." })),
       ]),
     );
-  }
-
-  async function refreshCost() {
-    const data = await api(`/diagnoses/${diagnosisId}/cost`);
-    const t = data.run_total;
-    const dl = $("cost");
-    const list = $("calls");
-    clear(dl);
-    clear(list);
-    if (!t) { dl.append(el("dd", { text: "No model calls yet." })); show(list, false); return; }
-    const n = (v) => Number(v).toLocaleString("en-US");
-    const row = (k, v) => dl.append(el("dt", { text: k }), el("dd", { text: v }));
-    const pk = data.pack || {};
-    row("Questions and result", `$${(pk.built_in_this_run && pk.cost_usd !== null ? t.cost_usd - pk.cost_usd : t.cost_usd).toFixed(5)}`);
-    if (pk.cost_usd !== null && pk.cost_usd !== undefined) {
-      row("Knowledge pack", `$${pk.cost_usd.toFixed(5)} (built once for this code${pk.built_in_this_run ? ", built during this run" : ", shared by every diagnosis"})`);
-    }
-    row("Total for this run", `$${t.cost_usd.toFixed(5)}${pk.built_in_this_run || pk.cost_usd === null || pk.cost_usd === undefined ? "" : ` (+ $${pk.cost_usd.toFixed(5)} pack, built earlier = $${(t.cost_usd + pk.cost_usd).toFixed(5)} all-in)`}`);
-    row("Model calls", String(t.calls));
-    row("Input tokens", `${n(t.input_tokens)} (${n(t.cached_input_tokens)} cached)`);
-    row("Output tokens", `${n(t.output_tokens)} (${n(t.reasoning_tokens)} thinking)`);
-    for (const c of data.calls) {
-      list.append(el("li", {}, [
-        el("div", { cls: "call-top" }, [
-          el("strong", { text: c.purpose }),
-          el("span", { cls: "muted", text: `${(c.latency_ms / 1000).toFixed(1)} s` }),
-          el("span", { cls: "call-cost", text: c.cost_usd === null ? "n/a" : `$${c.cost_usd.toFixed(5)}` }),
-        ]),
-        el("div", { cls: "call-tokens", text: `in ${n(c.input_tokens)} (${n(c.cached_input_tokens)} cached) · out ${n(c.output_tokens)} (${n(c.reasoning_tokens)} thinking)` }),
-      ]));
-    }
-    show(list);
   }
 
   // ---------- copy / print ----------

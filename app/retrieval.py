@@ -86,14 +86,20 @@ async def semantic_evidence(
 
     async with pool.connection() as conn, conn.cursor(row_factory=dict_row) as cur:
         if dtc_code:
+            # The exact code match already makes every one of these cases relevant, so keep them all (same
+            # 200 ceiling as exact_evidence) - the symptom only orders them, most similar first. Applying the
+            # similarity cutoff here used to drop a 106-case code to 15 or even 0 just because the symptom
+            # was worded casually, leaving a manual-only tree.
             await cur.execute(
                 "SELECT c.ticket_no, c.customer_verbatim, c.conclusion_text, c.failed_parts, c.model_variant, "
                 "c.fuel, c.updated_date, 1 - (s.embedding <=> %s) AS similarity FROM pcr_case_summaries s "
                 "JOIN pcr_cases c ON c.id = s.pcr_case_id "
                 "WHERE c.dtc_code = %s AND c.model_line = %s AND c.resolution_status = 'resolved' "
-                "ORDER BY s.embedding <=> %s LIMIT %s",
-                (query_vec, dtc_code, model_line, query_vec, settings.retrieval_top_k),
+                "ORDER BY s.embedding <=> %s LIMIT 200",
+                (query_vec, dtc_code, model_line, query_vec),
             )
+            cases = await cur.fetchall()
+            logger.info("Case lookup by code, ranked by symptom: kept all %d (no similarity cutoff)", len(cases))
         else:
             await cur.execute(
                 "SELECT c.ticket_no, c.dtc_code, c.customer_verbatim, c.conclusion_text, c.failed_parts, "
@@ -103,9 +109,9 @@ async def semantic_evidence(
                 "ORDER BY s.embedding <=> %s LIMIT %s",
                 (query_vec, model_line, query_vec, settings.retrieval_top_k),
             )
-        ranked = await cur.fetchall()
-        cases = [c for c in ranked if c["similarity"] >= settings.similarity_threshold][: settings.retrieval_keep]
-        logger.info("Case similarity search: ranked=%d kept_after_threshold=%d", len(ranked), len(cases))
+            ranked = await cur.fetchall()
+            cases = [c for c in ranked if c["similarity"] >= settings.similarity_threshold][: settings.retrieval_keep]
+            logger.info("Case similarity search: ranked=%d kept_after_threshold=%d", len(ranked), len(cases))
 
         if dtc_code:
             # Filter by code first (a code can span many submodules - e.g. B100016 in 13), THEN rank by

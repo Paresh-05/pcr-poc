@@ -16,6 +16,10 @@ scripts/diagnosis_manuals/*
 /logs/
 *.log
 
+# Eval artifacts (contain real customer complaint text)
+/scripts/golden_set.json
+/scripts/eval_results.json
+
 # Python caches and test artifacts
 *.py[cod]
 *$py.class

@@ -1,4 +1,7 @@
-"""Builds a small grounded diagnosis tree once per (dtc_code, model_line [, symptom]), caches it, and walks it."""
+"""Builds a small grounded diagnosis tree for a (dtc_code, model_line [, symptom]) request and walks it.
+
+MVP: no caching/reuse across requests - every call to start_diagnosis retrieves fresh evidence and runs
+one LLM call to build a new tree, which is then stored (not cached-and-reused) for that diagnosis run."""
 import hashlib
 import logging
 import uuid
@@ -264,17 +267,19 @@ def _candidate_signature(node) -> tuple:
     return tuple((c.cause, c.likelihood) for c in node.candidates)
 
 
-def _warn_if_candidates_static(tree: DiagnosisTree, dtc_code: str, model_line: str) -> None:
-    """Non-fatal check: flags branch nodes whose candidate list is identical to their parent's, which would
-    mean the model pasted the root's flat evidence instead of narrowing it per the TREE_SYSTEM instructions.
-    Only logs a warning (never raises) since the build already succeeded and retrying risks exhausting the
-    2-attempt budget over a quality signal rather than a structural defect."""
+def _check_candidates_narrow(tree: DiagnosisTree) -> None:
+    """Every node (branch OR leaf) must narrow its candidate list from its parent's - an answer that leads
+    to the exact same weighted candidate list as before did nothing. This catches both a branch that pasted
+    the root's flat evidence unchanged, and a leaf reached after a specifically-designed confirming answer
+    that still hedges across the same candidates as if the answer had never been given. Raises instead of
+    only logging, so it consumes the same 2-attempt retry budget as a structural defect - a tree that asks
+    a question and then ignores the answer is as broken as a malformed one, just less visibly."""
     by_id = {n.id: n for n in tree.nodes}
     static_nodes = []
-    stack = [(tree.root, None)]
+    stack = [(tree.root, None, False)]  # (node_id, parent_sig, reached_via_not_sure)
     seen: set[str] = set()
     while stack:
-        node_id, parent_sig = stack.pop()
+        node_id, parent_sig, via_not_sure = stack.pop()
         if node_id in seen:
             continue
         seen.add(node_id)
@@ -282,43 +287,32 @@ def _warn_if_candidates_static(tree: DiagnosisTree, dtc_code: str, model_line: s
         if node is None:
             continue
         sig = _candidate_signature(node) if node.candidates else None
-        if node.question is not None:  # branch node
-            if parent_sig is not None and sig == parent_sig:
-                static_nodes.append(node_id)
-            for child in (node.yes, node.no, node.not_sure):
-                if child:
-                    stack.append((child, sig))
+        # not_sure is allowed to stay close to the parent's candidates by design (an honest "learned
+        # nothing" outcome) - only a yes/no answer that changed nothing is the real defect.
+        if parent_sig is not None and sig == parent_sig and not via_not_sure:
+            static_nodes.append(node_id)
+        if node.question is not None:  # branch node: keep walking
+            if node.yes:
+                stack.append((node.yes, sig, False))
+            if node.no:
+                stack.append((node.no, sig, False))
+            if node.not_sure:
+                stack.append((node.not_sure, sig, True))
     if static_nodes:
-        logger.warning(
-            "Tree quality check: dtc_code=%s model_line=%s - %d branch node(s) repeated their parent's "
-            "candidate list unchanged (not narrowed): %s",
-            dtc_code, model_line, len(static_nodes), static_nodes,
+        raise ValueError(
+            f"{len(static_nodes)} node(s) did not narrow their candidate list from their parent's, "
+            f"meaning the preceding question's answer changed nothing: {static_nodes}"
         )
-    else:
-        logger.info("Tree quality check: dtc_code=%s model_line=%s - candidates narrow across all branch nodes, no static copies found", dtc_code, model_line)
 
 
-async def _get_or_build_tree(
+async def _build_tree(
     pool: AsyncConnectionPool, llm: LLM, settings: Settings, dtc_code: str, model_line: str, query_text: str | None,
     diagnosis_id: str,
 ):
+    """MVP: always builds a fresh tree and stores it for this run - no cache lookup/reuse. A later
+    diagnosis for the same code/model/symptom runs its own LLM call rather than replaying an old tree."""
     symptom_hash = _symptom_hash(query_text)
-    async with pool.connection() as conn, conn.cursor(row_factory=dict_row) as cur:
-        await cur.execute(
-            "SELECT id, tree, evidence FROM diagnosis_trees WHERE dtc_code = %s AND model_line = %s AND symptom_hash = %s",
-            (dtc_code, model_line, symptom_hash),
-        )
-        cached = await cur.fetchone()
-    if cached:
-        logger.info("Tree cache HIT: dtc_code=%s model_line=%s symptom_hash=%s tree_id=%s", dtc_code, model_line, symptom_hash, cached["id"])
-        cached_tree = DiagnosisTree.model_validate(cached["tree"])
-        write_iteration_trace(
-            diagnosis_id=diagnosis_id, dtc_code=dtc_code, model_line=model_line, query_text=query_text,
-            cache_hit=True, tree=cached_tree,
-        )
-        return cached["id"], cached_tree, cached["evidence"], False
-
-    logger.info("Tree cache MISS: dtc_code=%s model_line=%s symptom_hash=%s -> retrieving evidence", dtc_code, model_line, symptom_hash)
+    logger.info("Building tree: dtc_code=%s model_line=%s symptom_hash=%s -> retrieving evidence", dtc_code, model_line, symptom_hash)
     if query_text:
         ev = await retrieval.semantic_evidence(pool, llm, settings, query_text, model_line, dtc_code or None)
     else:
@@ -329,34 +323,29 @@ async def _get_or_build_tree(
             diagnosis_id=diagnosis_id, dtc_code=dtc_code, model_line=model_line, query_text=query_text,
             cache_hit=False, embedding=ev.embedding, cases=ev.cases, manual_chunks=ev.manual_chunks,
         )
-        return None, None, {"scope": "none"}, False
+        return None, None, {"scope": "none"}
 
     system = TREE_SYSTEM
     user = _build_prompt(dtc_code or "(not given; matched by symptom text)", model_line, ev, query_text)
     logger.info("Prompt being sent to LLM for tree_build (dtc_code=%s model_line=%s):\n%s", dtc_code, model_line, user)
-    tree = None
-    last_error: Exception | None = None
-    for attempt in range(1, 3):  # try once, retry once on a malformed tree
-        logger.info("Tree build attempt %d/2: dtc_code=%s model_line=%s evidence_scope=%s cases=%d manual_chunks=%d",
-                    attempt, dtc_code, model_line, ev.scope, len(ev.cases), len(ev.manual_chunks))
-        candidate = await llm.structured(system, user, DiagnosisTree, purpose="tree_build", effort="medium")
-        try:
-            _validate_tree(candidate)
-            tree = candidate
-            logger.info("Tree build succeeded on attempt %d: %d node(s), root=%s", attempt, len(candidate.nodes), candidate.root)
-            _warn_if_candidates_static(tree, dtc_code, model_line)
-            break
-        except ValueError as exc:
-            last_error = exc
-            logger.warning("Tree validation FAILED on attempt %d: %s", attempt, exc)
-    if tree is None:
-        logger.error("Tree build failed after retries: dtc_code=%s model_line=%s error=%s", dtc_code, model_line, last_error)
+    logger.info("Tree build: dtc_code=%s model_line=%s evidence_scope=%s cases=%d manual_chunks=%d",
+                dtc_code, model_line, ev.scope, len(ev.cases), len(ev.manual_chunks))
+    candidate = await llm.structured(
+        system, user, DiagnosisTree, purpose="tree_build", effort="high", service_tier="ultrafast"
+    )
+    try:
+        _validate_tree(candidate)
+        _check_candidates_narrow(candidate)
+    except ValueError as exc:
+        logger.error("Tree validation FAILED: dtc_code=%s model_line=%s error=%s", dtc_code, model_line, exc)
         write_iteration_trace(
             diagnosis_id=diagnosis_id, dtc_code=dtc_code, model_line=model_line, query_text=query_text,
             cache_hit=False, embedding=ev.embedding, cases=ev.cases, manual_chunks=ev.manual_chunks,
             system_prompt=system, user_prompt=user,
         )
-        raise RuntimeError(f"model could not produce a valid diagnosis tree: {last_error}")
+        raise RuntimeError(f"model could not produce a valid diagnosis tree: {exc}") from exc
+    tree = candidate
+    logger.info("Tree build succeeded: %d node(s), root=%s", len(tree.nodes), tree.root)
 
     evidence_summary = {
         "scope": ev.scope,
@@ -372,13 +361,13 @@ async def _get_or_build_tree(
             (dtc_code, model_line, symptom_hash, tree.model_dump_json(), Json(evidence_summary)),
         )
         (tree_id,) = await cur.fetchone()
-    logger.info("Tree cached: dtc_code=%s model_line=%s symptom_hash=%s tree_id=%s", dtc_code, model_line, symptom_hash, tree_id)
+    logger.info("Tree stored: dtc_code=%s model_line=%s symptom_hash=%s tree_id=%s", dtc_code, model_line, symptom_hash, tree_id)
     write_iteration_trace(
         diagnosis_id=diagnosis_id, dtc_code=dtc_code, model_line=model_line, query_text=query_text,
         cache_hit=False, embedding=ev.embedding, cases=ev.cases, manual_chunks=ev.manual_chunks,
         system_prompt=system, user_prompt=user, tree=tree,
     )
-    return tree_id, tree, evidence_summary, True
+    return tree_id, tree, evidence_summary
 
 
 async def start_diagnosis(
@@ -397,7 +386,7 @@ async def start_diagnosis(
     diagnosis_id = uuid.uuid4()
     token = current_run.set(RunInfo(run_id=diagnosis_id, run_type="diagnosis", dtc_code=resolved_code or None, model_line=model_line))
     try:
-        tree_id, tree, evidence, built_now = await _get_or_build_tree(
+        tree_id, tree, evidence = await _build_tree(
             pool, llm, settings, resolved_code, model_line, query_text, str(diagnosis_id)
         )
     finally:
@@ -409,11 +398,11 @@ async def start_diagnosis(
             "INSERT INTO diagnoses (id, dtc_code, model_line, tree_id, status) VALUES (%s,%s,%s,%s,%s)",
             (diagnosis_id, resolved_code, model_line, tree_id, status),
         )
-    logger.info("start_diagnosis DONE: diagnosis_id=%s dtc_code=%s model_line=%s status=%s built_now=%s",
-                diagnosis_id, resolved_code, model_line, status, built_now)
+    logger.info("start_diagnosis DONE: diagnosis_id=%s dtc_code=%s model_line=%s status=%s",
+                diagnosis_id, resolved_code, model_line, status)
 
     # The whole tree is sent once; the client walks it locally (no per-answer server round-trip). A later
-    # GET /diagnoses/{id} (get_diagnosis, below) re-sends this same cached tree for Resume.
+    # GET /diagnoses/{id} (get_diagnosis, below) re-sends this same tree for Resume.
     return {
         "diagnosis_id": str(diagnosis_id),
         "dtc_code": resolved_code,
@@ -427,7 +416,6 @@ async def start_diagnosis(
             "manual": evidence.get("manual", {"status": "missing", "modules": []}),
             "top_parts": evidence.get("top_parts", []),
         },
-        "tree_built_this_run": built_now,
     }
 
 

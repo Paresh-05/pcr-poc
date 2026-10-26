@@ -19,7 +19,10 @@ T = TypeVar("T", bound=BaseModel)
 class LLM(Protocol):
     async def embed(self, text: str) -> list[float]: ...
 
-    async def structured(self, system: str, user: str, schema: type[T], purpose: str) -> T: ...
+    async def structured(
+        self, system: str, user: str, schema: type[T], purpose: str, effort: str | None = None,
+        service_tier: str | None = None,
+    ) -> T: ...
 
 
 def _extract_json(text: str, schema: type[T]) -> T:
@@ -41,18 +44,19 @@ class OpenAILLM:
             api_key=settings.llm_api_key.get_secret_value(), base_url=settings.llm_base_url, timeout=300, max_retries=2
         )
 
-    def _extra(self, purpose: str, effort_override: str | None) -> dict:
+    def _extra(self, purpose: str, effort_override: str | None, service_tier_override: str | None) -> dict:
         if purpose == "embed":
             return {}
         effort = effort_override if effort_override is not None else self.effort
         extra = {"reasoning": {"effort": effort}} if effort else {}
-        if self.service_tier:
-            extra["service_tier"] = self.service_tier
+        service_tier = service_tier_override if service_tier_override is not None else self.service_tier
+        if service_tier:
+            extra["service_tier"] = service_tier
         return extra
 
-    async def _call(self, fn, purpose: str, effort_override: str | None, **kwargs):
+    async def _call(self, fn, purpose: str, effort_override: str | None, service_tier_override: str | None, **kwargs):
         try:
-            return await fn(**kwargs, **self._extra(purpose, effort_override))
+            return await fn(**kwargs, **self._extra(purpose, effort_override, service_tier_override))
         except BadRequestError as exc:
             msg = str(exc)
             # Drop whichever extra the gateway rejected and retry once with what's left, rather than
@@ -60,12 +64,14 @@ class OpenAILLM:
             dropped = False
             if "reasoning" in msg and (effort_override or self.effort):
                 self.effort = None
+                effort_override = None
                 dropped = True
-            if "service_tier" in msg and self.service_tier:
+            if "service_tier" in msg and (service_tier_override or self.service_tier):
                 self.service_tier = None
+                service_tier_override = None
                 dropped = True
             if dropped:
-                return await fn(**kwargs, **self._extra(purpose, effort_override))
+                return await fn(**kwargs, **self._extra(purpose, effort_override, service_tier_override))
             raise
 
     async def _record(self, resp, purpose: str, model: str, started: float) -> None:
@@ -80,18 +86,24 @@ class OpenAILLM:
         await self._record(resp, "embed", self.embedding_model, started)
         return resp.data[0].embedding
 
-    async def structured(self, system: str, user: str, schema: type[T], purpose: str, effort: str | None = None) -> T:
+    async def structured(
+        self, system: str, user: str, schema: type[T], purpose: str, effort: str | None = None,
+        service_tier: str | None = None,
+    ) -> T:
         """`effort` overrides the configured default reasoning effort for this one call (e.g. "high" for a
-        call that benefits from deeper reasoning, like turning a messy manual into structured analysis)."""
+        call that benefits from deeper reasoning, like turning a messy manual into structured analysis).
+        `service_tier` likewise overrides the configured default tier for this one call (e.g. "ultrafast")."""
         messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
         logger.info(
             "structured call: purpose=%s model=%s schema=%s reasoning_effort=%s service_tier=%s",
-            purpose, self.model, schema.__name__, effort if effort is not None else self.effort, self.service_tier,
+            purpose, self.model, schema.__name__, effort if effort is not None else self.effort,
+            service_tier if service_tier is not None else self.service_tier,
         )
         started = time.monotonic()
         try:
             response = await self._call(
-                self.client.responses.parse, purpose, effort, model=self.model, input=messages, text_format=schema
+                self.client.responses.parse, purpose, effort, service_tier,
+                model=self.model, input=messages, text_format=schema,
             )
             elapsed_ms = int((time.monotonic() - started) * 1000)
             usage = usage_from_response(response)
@@ -112,7 +124,9 @@ class OpenAILLM:
             + json.dumps(schema.model_json_schema()),
         }
         started = time.monotonic()
-        response = await self._call(self.client.responses.create, purpose, effort, model=self.model, input=messages)
+        response = await self._call(
+            self.client.responses.create, purpose, effort, service_tier, model=self.model, input=messages
+        )
         elapsed_ms = int((time.monotonic() - started) * 1000)
         usage = usage_from_response(response)
         logger.info(

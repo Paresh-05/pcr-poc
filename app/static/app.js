@@ -302,7 +302,10 @@
     lastEvidence = evidence;
     $("v-code").textContent = vehicleTitle();
     const short = vehicle.query && vehicle.query.length > 90 ? `${vehicle.query.slice(0, 90)}…` : vehicle.query;
-    $("v-model").textContent = (vehicle.dtc || !short) ? friendly(vehicle.model) : `${friendly(vehicle.model)} · “${short}”`;
+    const vModel = $("v-model");
+    clear(vModel);
+    vModel.append(document.createTextNode(friendly(vehicle.model)));
+    if (!vehicle.dtc && short) vModel.append(el("span", { cls: "rail-sub-query", text: `“${short}”` }));
     renderEvidence(evidence);
     renderState(statusFor(currentTree, currentNodeId), maxQ);
   }
@@ -418,12 +421,14 @@
       row("Past repairs", "none found");
     }
     row("Service manual", manualLoaded ? `loaded${m.modules && m.modules.length ? `, ${m.modules.length} section(s)${m.truncated ? ", trimmed to fit" : ""}` : ""}` : "not available for this code");
-    (ev.top_parts || []).slice(0, 3).forEach((p) => row("Often replaced", `${p.part} (${p.pct}%)`));
+    const topParts = (ev.top_parts || []).slice(0, 3);
+    if (topParts.length) row("Often replaced", topParts.map((p) => `${p.part} (${p.pct}%)`).join(", "));
     if (ev.resumed) row("Note", "Resumed diagnosis.");
   }
 
-  // Issue -> why -> fix, nothing hidden behind a click: a mechanic reading this once should have everything
-  // needed, not a page of collapsed accordions and decorative counters.
+  // Everything the model actually produced, laid out so the top is still "issue -> what to do -> parts" at
+  // a glance, with the supporting detail (verify, alternatives, evidence, reasoning trail) below it instead
+  // of discarded - most of it collapsed by default so it doesn't compete for attention.
   function renderConclusion(k) {
     lastConclusion = k;
     const box = $("conclusion");
@@ -433,25 +438,36 @@
     badge.textContent = open ? "inconclusive" : `${k.confidence} confidence`;
     badge.className = `badge ${k.confidence}`;
 
-    const list = (items) => el("ul", {}, items.map((t) => el("li", { text: t })));
     const card = (title, body) => el("section", { cls: "mini-card" }, [el("div", { cls: "mini-head" }, [el("h3", { text: title })]), body]);
-
-    const why = [...k.evidence, ...(k.ruled_out || []).map((r) => `Ruled out: ${r}`), ...(k.uncertain || []).map((u) => `Still uncertain: ${u}`)];
+    const list = (items) => el("ul", {}, items.map((t) => el("li", { text: t })));
 
     box.append(
       el("div", { cls: "problem-card" }, [
         el("p", { cls: "problem-kicker", text: open ? "Not yet identified" : "Most likely problem" }),
         el("p", { cls: "problem", text: k.problem }),
+        ...(k.confidence_note ? [el("p", { cls: "confidence-note", text: k.confidence_note })] : []),
       ]),
-      ...(k.confidence_note ? [el("p", { cls: "hint", text: `Confidence: ${k.confidence_note}` })] : []),
       el("div", { cls: "safety-banner", attrs: { role: "note" } }, [el("strong", { text: "Safety first. " }), document.createTextNode(k.safety_note)]),
       card(open ? "Checks to do" : "What to do", el("ol", { cls: "steps" }, k.fix_steps.map((t) => el("li", { text: t })))),
       ...(!open ? [card("Parts", k.parts.length
         ? el("div", { cls: "parts" }, k.parts.map((p) => el("span", { cls: "part", text: p })))
         : el("p", { cls: "muted", text: "No part replacement is supported by the evidence." }))] : []),
-      card(open ? "How to confirm" : "Confirm the repair", list(k.verify_fix)),
-      ...(k.alternatives.length ? [card("If it doesn't fix it", list(k.alternatives.map((a) => `${a.cause}: ${a.when_to_consider}`)))] : []),
-      card("Why", list(why)),
+      ...(k.verify_fix.length ? [card("Verify the fix",
+        el("ul", { cls: "checklist" }, k.verify_fix.map((t) => el("li", { text: t }))))] : []),
+      ...(!open && k.alternatives.length ? [card("If this doesn't fix it",
+        el("ul", { cls: "alt-list" }, k.alternatives.map((a) => el("li", {}, [
+          el("span", { cls: "alt-cause", text: a.cause }),
+          el("span", { cls: "alt-when", text: a.when_to_consider }),
+        ]))))] : []),
+      ...((k.how_we_got_here.length || k.evidence.length || k.ruled_out.length || k.uncertain.length) ? [
+        el("details", { cls: "mini-card details-card" }, [
+          el("summary", { text: "Why this conclusion" }),
+          ...(k.how_we_got_here.length ? [el("h4", { text: "How we got here" }), list(k.how_we_got_here)] : []),
+          ...(k.evidence.length ? [el("h4", { text: "Evidence" }), list(k.evidence)] : []),
+          ...(k.ruled_out.length ? [el("h4", { text: "Ruled out" }), list(k.ruled_out)] : []),
+          ...(k.uncertain.length ? [el("h4", { text: "Still uncertain" }), list(k.uncertain)] : []),
+        ]),
+      ] : []),
     );
   }
 
@@ -460,16 +476,20 @@
     const k = lastConclusion;
     if (!k) return "";
     const open = isInconclusive(k);
-    const why = [...k.evidence, ...(k.ruled_out || []).map((r) => `Ruled out: ${r}`), ...(k.uncertain || []).map((u) => `Still uncertain: ${u}`)];
     const lines = [`${vehicleTitle()} on ${friendly(vehicle.model)}${vehicle.dtc ? "" : `: "${vehicle.query}"`}`, "",
       `${open ? "Not yet identified" : "Most likely problem"}: ${k.problem}`,
-      `Confidence: ${k.confidence}${k.confidence_note ? ` (${k.confidence_note})` : ""}`,
+      ...(k.confidence_note ? [`Confidence (${k.confidence}): ${k.confidence_note}`] : [`Confidence: ${k.confidence}`]),
       `Safety: ${k.safety_note}`,
       "", `${open ? "Checks to do" : "What to do"}:`, ...k.fix_steps.map((s, i) => `${i + 1}. ${s}`),
-      "", `Parts: ${k.parts.length ? k.parts.join("; ") : "none supported"}`,
-      "", `${open ? "How to confirm" : "Confirm the repair"}:`, ...k.verify_fix.map((v) => `- ${v}`)];
-    if (k.alternatives.length) lines.push("", "If it doesn't fix it:", ...k.alternatives.map((a) => `- ${a.cause}: ${a.when_to_consider}`));
-    lines.push("", "Why:", ...why.map((w) => `- ${w}`));
+      "", `Parts: ${k.parts.length ? k.parts.join("; ") : "none supported"}`];
+    if (k.verify_fix.length) lines.push("", "Verify the fix:", ...k.verify_fix.map((s, i) => `${i + 1}. ${s}`));
+    if (!open && k.alternatives.length) {
+      lines.push("", "If this doesn't fix it:", ...k.alternatives.map((a) => `- ${a.cause} — ${a.when_to_consider}`));
+    }
+    if (k.how_we_got_here.length) lines.push("", "How we got here:", ...k.how_we_got_here.map((s) => `- ${s}`));
+    if (k.evidence.length) lines.push("", "Evidence:", ...k.evidence.map((s) => `- ${s}`));
+    if (k.ruled_out.length) lines.push("", "Ruled out:", ...k.ruled_out.map((s) => `- ${s}`));
+    if (k.uncertain.length) lines.push("", "Still uncertain:", ...k.uncertain.map((s) => `- ${s}`));
     return lines.join("\n");
   }
   $("copy-btn").addEventListener("click", async () => {

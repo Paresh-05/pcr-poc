@@ -1,0 +1,126 @@
+[
+  {
+    "ticket_no": "10000000199091",
+    "dtc_code": "B104A00",
+    "model_line": "MG_COMET_EV",
+    "query_text": "Vehicle not getting in to ready mode and vehicle control system warning showing in cluster",
+    "expected_cause": "Observation\r\n*Checked and confirmed the customer concern  vehicle not starting and vehicle control system warning showing in cluster\r\n*While driving, the vehicle gets a control fault and shuts off. After keeping it stopped for some time, the complaint gets resolved temporarily, but later it replicates again.\r\n*When the 12V battery was checked, the voltage was low. So, the battery was replaced and checked again, at that time also, the control fault system warning complaint was replicated.\r\n*Later, when the vehicle was scanned, the below-mentioned DTC were found.\r\n              BMS P187873 Main switch: main positive switch stick -Current\r\n              BMS P186573 ALM_RELAY_FAIL    - History\r\n             VCU B108600 Battery Main Positive Relay Status (Bat Ma Pos Rly Sts)Adhesion -Current\r\n             VCU B104A00 Battery Fault Level (BatF ltLvl) Battary DisCharge Open Request- Current\r\n* Based on the   DTC we suspect the issue in HVB and informed TACO team to conduct the HVB inspection.\r\n* Also conducted the MCU diode test Drive motor inspection and found values are in limit as per check list . Attached the inspection check list for \r\n  the references.\r\n*A Taco service engineer inspected the HVB and observed an issue with the BDU inside the HVB.\r\n* Based on the inspection, Taco shared the repair quotation, and the dealer approved and paid for the HVB repair.\r\n*Attached the Taco service report (FSR). Also attached are the before-and-after logs and live data of the HVB repair for reference.\r\nAction Taken\r\n * HVB repaired by Taco SE and replaced BDU inside the HVB. \r\nConclusion\r\n*After repairing the HVB, the vehicle was turned to Ready mode. We conducted a test drive of more than 30 km, and the vehicle was delivered to the customer.",
+    "expected_parts": [
+      "HV BATTERY TESTING/REPAIR-EV"
+    ]
+  },
+  {
+    "ticket_no": "10000000148410",
+    "dtc_code": "B104A00",
+    "model_line": "MG_COMET_EV",
+    "query_text": "Vehicle does not start.",
+    "expected_cause": "1.\tVehicle received through RSA due to the concern that the vehicle does not start.\r\n2.\tWe checked and found the vehicle control system fault MIL glowing in the cluster meter.\r\n3.\tWe checked for VDS log reports and found multiple DTC P186573 ALM_RELAY_FAIL in history state, P187973 Main switch: main negative switch stick in confirm state, B104A00 Battery Fault Level (BatF ltLvl) Battery Discharge Open Request and B108700 Battery Main Negative Relay Status (BatMaNegRlySts)Adhesion in confirmed state.\r\n4.\tWe checked vehicle history and found 23.01.2026 at 17958kms reported on body shop, that time front side accidental work found.\r\n5.\tWe checked the underbody and HV connections further, and no abnormality was observed.\r\n6.\tTo check further we needed to open the HV battery.\r\n7.\tFurther checking TACO Team visited to workshop, AS per TACO team further checking need to replace Negative relay, so TACO team replaced Negative relay.\r\n8.\tKindly find the FSR report from TACO team.\r\n9.\tWe have checked MCU internal diodes, Drive motor insulation resistance between 3 phase lines.\r\n10.\tKindly find the attached sheet for your reference.\r\n11.\tFurther we have replaced MCU under warranty.",
+    "expected_parts": [
+      "MODULE ASM DRV MOT CONT",
+      "HV BATTERY TESTING/REPAIR-EV"
+    ]
+  },
+  {
+    "ticket_no": "10000000137672",
+    "dtc_code": "B104A00",
+    "model_line": "MG_COMET_EV",
+    "query_text": "Check Vehicle not moving",
+    "expected_cause": "VOC\tCheck Vehicle not moving.\r\nDiagnosis Comments:ehicle gear not shifting. If we disconnect 12 Battery and reconnect, then vehicle became normal. After driving the vehicle if parked for a while then same concern occurs. Checked DTC, BMS P186573 ALM_RELAY_FAIL History, VCU B104A00 Battery Fault Level (BatFltLvl)Battery Discharge\r\nOpen Request Current, VCU B108700 Battery Main Negative Relay Status (Bat MaNegRlySts)Adhesion\r\nCurrent \r\nand found P186573 ALM_RELAY_FAIL History, P187973 Main switch main negative switch stick Current.\r\n We checked as per check sheet and below are the observations, 1. Drive Motor Resolver Connector \r\nPin 1 & 7 24.7 Ohms. 2.Drive Motor Resolver Connector Pin 2 & 8 36.7 Ohms. 3.Drive Motor Resolver Connector Pin 3 & 9 38.9 Ohms. 4.4 and 10 (Thermistor) 123.4 8 K Ohms. Drive Motor Insulation test 1. U Line & Housing 550 M Ohms. 2. V Line & Housing 550 M Ohms. 3. W Line & Housing 550 M Ohms. 1. U Line V Line 0 Ohms 2. U Line W Line 0 Ohms 3. W Line V Line 0 Ohms All the readings are attached in ppt as a check sheet for reference.\r\nResolution Taken: Involved Taco service engineer and HV battery repair work done. Contactor and BDU replaced and concern resolved. Attached Invoice and JIR report.",
+    "expected_parts": [
+      "HV BATTERY TESTING/REPAIR-EV"
+    ]
+  },
+  {
+    "ticket_no": "10000000211798",
+    "dtc_code": "B104A00",
+    "model_line": "MG_COMET_EV",
+    "query_text": "concern that it was not entering Ready Mode.",
+    "expected_cause": "Dear Sir,\r\nWe recently received the following vehicle with the customer concern that it was not entering Ready Mode.\r\nThe vehicle was received with the customer's complaint that it intermittently failed to start and did not enter Ready Mode.\r\nDuring inspection, the concern was verified, and the vehicle failed to enter Ready Mode during diagnosis.\r\nObservations:\r\n•\tThe Malfunction Indicator Lamp (MIL) was illuminated in the instrument cluster.\r\n•\tVDS diagnostics were performed, and the following DTCs were recorded\r\n•\to    P187973 – Main Switch: Main Negative Switch Stuck Current\r\n•\to    VCU B104A00 – Battery Fault Level (Bat Flt Lvl): Battery Discharge Open Request Current\r\n•\t                        B108700 Battery Main Negative Relay Status (Bat Ma Neg Rly Sts Adhesion Current\r\n\r\nDiagnostic Checks Performed:\r\n•\tInspected all high-voltage (HV) connectors – No abnormalities found.\r\n•\tChecked the insulation resistance (IR) value – Within specification.\r\nAs per the Service E-Manual diagnostic procedure for the above DTCs, the recommended corrective action was replacement of the Hybrid/EV Battery Pack.\r\nHowever, as per the Tata company plant report, the required parts were initially not covered under warranty. After discussion with the MGI Technical Team, it was advised to replace the required parts under MGI warranty instead of replacing the complete battery pack.\r\nAccordingly, the following parts were replaced under MGI warranty:\r\n•\tBDU (Battery Disconnect Unit)\r\n•\tMain Negative Connector\r\nTata company replaced the failure parts.\r\nAfter replacement of the above components, the vehicle was tested, and the concern was completely resolved. The vehicle is now entering Ready Mode normally, and no further issues were observed.\r\nRegards,\r\nPrabhat Kumar",
+    "expected_parts": [
+      "HV BATTERY TESTING/REPAIR-EV"
+    ]
+  },
+  {
+    "ticket_no": "10000000171950",
+    "dtc_code": "B100016",
+    "model_line": "MG_COMET_EV",
+    "query_text": "Vehicle Not Start.",
+    "expected_cause": "1.We checked battery health found not ok.\r\n2.We checked gravity all battery cell dead found.\r\n4.We tried to recharge battery but battery not charge.\r\n4.We send battery to the Exide Dealer they provide Rejection report with reason of Long idle.\r\n5.After that approval of our fd we replaced 12 volt battery concern was resolved.",
+    "expected_parts": [
+      "Comet EV 35Ah - FML5-ML38B20L",
+      "Battery Replacement"
+    ]
+  },
+  {
+    "ticket_no": "10000000166117",
+    "dtc_code": "B100016",
+    "model_line": "MG_COMET_EV",
+    "query_text": "VEHICLE NOT STARTING",
+    "expected_cause": "Hi sir, we receive a COMET vehicle in RSA with a concern VOC:- Vehicle not starting. DIAGNOSIS:- As per concern we checked and found 12v battery low. so we replace the 12v battery and checked the out put observed out put not coming, then we conduct the Battery drain test found current leak after 50min (2.24)A. then we remove one by one fuses  when remove the BMS/MCU 10A fuse found current leak coming down. As discusses on phone call checked the underbody and LV AND HV lines observed connectors are muddy, then we remove the connectors and observed water marks on HVB sockets, and observed water coming from HV cable connected from VCU to HVB. (Vehicle fitted with out side GPS wiring and full floor mating).concern photos and videos shared please suggest us further diagnosis.\r\n\r\nWahed Syed, TeXpert\r\n\r\nAssigned\r\n27th Apr,2026 09:00 AM\r\n\r\nAssigned to TM\r\n\r\nGurumurthi ., TM\r\n\r\nInprocess\r\n27th Apr,2026 09:00 AM\r\n\r\nAssigned to TM\r\n\r\nGurumurthi ., TM\r\n\r\nClosed\r\n27th Apr,2026 09:00 AM\r\n\r\nResolution Proposed\r\n\r\nHii Yusuf, as per the shared images, and physical inspection water ingress is observed in the HVB connectors and the external HVB area. this issue appears to be due to external factors. Kindly take up this case with the insurance team for further action.\r\n\r\nWahed Syed, TeXpert\r\n\r\nInprocess\r\n27th Apr,2026 09:25 AM\r\n\r\nHold due to parts\r\n\r\nHi sir, As  per advice inform to Insurance team.\r\n\r\nWahed Syed, TeXpert\r\n\r\nInprocess\r\n5th Jun,2026 10:11 AM\r\n\r\nAssigned back to TM\r\n\r\nHi sir, in this case HVB has been inspected by TACO. they told there no part failure in HVB. As discuses on phone call we checked for vehicle getting in ready mode, but not charging, as advice we swap the CDU and checkd the concern found vehicle getting charging. on CDU couplers mud marks observed, water entery traces not found inside of couplers, photos and videos shared please suggest us further.\r\n\r\nGurumurthi ., TM\r\n\r\nClosed\r\n5th Jun,2026 11:09 AM\r\n\r\nResolution Proposed\r\n\r\nHi Yusuf,\r\nPlease replace the CDU under warranty\r\n\r\nWahed Syed, TeXpert\r\n\r\nHi sir, as per advice, water ingress is observed in the HVB connectors and the external HVB area. vehicle transfer to body shop.",
+    "expected_parts": [
+      "NOT APPLICABLE"
+    ]
+  },
+  {
+    "ticket_no": "10000000208339",
+    "dtc_code": "B100016",
+    "model_line": "MG_COMET_EV",
+    "query_text": "VEHICLE NOT MOVING",
+    "expected_cause": "VOC:  Vehicle stopped while running.\r\nWD: When reception time 12V battery was fully drained we fixed a good battery and diagnosed the vehicle, and found the DTCs B100016, P1A2212, and C100016. We cleared the DTCs and confirmed the vehicle entered ready mode. We diagnosed the vehicle and found the DTC P1A2212: DCDC Self-Test failure (current). \r\nRoot cause: As per the DTC reference, we checked and confirmed that the 12V battery is not charging when the vehicle is in ready mode. We removed the CDU, inspected then confirmed the CDU fuse was blown. Suspected CDU fault.\r\nConclusion: Replaced the CDU, then cleared DTCS and confirmed the 12V battery is charging when the vehicle is in idle",
+    "expected_parts": [
+      "Replacing CHARGER PKG/CDU - DRV MOT BAT",
+      "CHARGER PKG-DRV MOT BAT"
+    ]
+  },
+  {
+    "ticket_no": "10000000164423",
+    "dtc_code": "B100016",
+    "model_line": "MG_COMET_EV",
+    "query_text": "Vehicle not starting.",
+    "expected_cause": "Diagnosis Details :-1-Concern verified, Vehicle not coming into ready mode.2-Upon inspection, we identified that the 12V battery was completely discharged.3-After recharging and testing the battery, we confirmed it is faulty. Specifically, the specific gravity was measured at 1150–1180 across all cells, and the electrolyte showed signs of blackness.4-We sent the battery to the vendor for a warranty claim; however, it was rejected because the battery's manufacturing date is 17/10/2024.5-Then we checked the vehicle sale date is 31.07.2025.As per the policy the battery in under warranty.6-Then we discussed the case with our respected FD sir & approved to replaced the new battery.7-Then we replaced the battery & checked the vehicle concern resolved.\r\nRoot Cause :- 12 volt battery internal faulty.",
+    "expected_parts": [
+      "Comet EV 35Ah - FML5-ML38B20L"
+    ]
+  },
+  {
+    "ticket_no": "10000000192649",
+    "dtc_code": "B104600",
+    "model_line": "MG_COMET_EV",
+    "query_text": "*Air bag warning lamp displayed in instrument cluster while the vehicle get in ready mode condition",
+    "expected_cause": "Observation\r\n*Confirmed the customer concern air bag warning lamp displayed in instrument cluster while the vehicle get in ready mode condition\r\n*VDS connected and scan the vehicle ,observed history DTC SDM module (DTC B108800：ECU Internal Error,B104600：Frontal Airbag Driver High Resistance)\r\n*After try to clear the DTC ,but the DTC are not cleared and still it showing SDM module \r\n*Check the frontal air bag connector for any  loose connection or corrosion, but no more abnormalities were observed\r\n*After removing frontal air bag connector, added Foam tap Coil to  airbag connectors and re fix the connector\r\n*After attempting to clear the DTC, the DTC remained showing and could not be cleared.\r\n*As per the DTC B108800 checked the SDM module and also checked its connector , no abnormalities were observed\r\n*After check the F35D 10 A fuse in instrument panel and found its okay\r\n*Then check the SDM module Connector pins voltage and grounds resistance , get the values are okay\r\n         Pin no.5   getting 12.2 V(IGN)\r\n         pin no.34  getting 2.6 V (CAN H\r\n        pin no.33   getting 2.3 V\r\n        pin no.6  and G102 is getting 0.0 ohms\r\n*Based in our inspection we suspect the issues in SDM module\r\n*DTC log ,live data ,check sheet ,photos and videos are attached\r\nAction Taken\r\n*Replaced SDM module under warranty\r\nConclusion\r\n*After replacing SDM module the concern was resolved",
+    "expected_parts": [
+      "MODULE ASM-AIRBAG SEN & DIAGN"
+    ]
+  },
+  {
+    "ticket_no": "10000000150621",
+    "dtc_code": "B104600",
+    "model_line": "MG_COMET_EV",
+    "query_text": "vehicle visited for Airbag MIL on.",
+    "expected_cause": "Vehicle visited for checked Airbag MIL ON.\r\nWe took log & found Frontal Airbag Driver High Resistance (B104600).\r\nAs per DTC we checked live data frontal airbag found abnormal. (7.17Ω)\r\nWe check concern related system connectors for loose contact, open mouth, etc. found none.\r\nWe checked the history and found ok.\r\nWe have checked any external impact found none \r\nWe perform field fix process & apply tape one airbag connector.\r\nAfter apply tape, checked live data – concern solved.\r\nWe released the vehicle under observation-\r\nDetails are attached.",
+    "expected_parts": [
+      "NOT APPLICABLE"
+    ]
+  },
+  {
+    "ticket_no": "10000000188351",
+    "dtc_code": "B104600",
+    "model_line": "MG_COMET_EV",
+    "query_text": "HORN NOT WORKING",
+    "expected_cause": "VOC:  New Vehicle doing PDI  a concern of Horn not working and  steering switch ,air bag light .\r\nObservation :  New Vehicle delivery and while doing PDI  a concern of  horn not working and steering switch bank and also driver air bag light . we inspected that the concern was true and found DTC SDM - B104600 Frontal Airbag Driver High Resistance( Current) we inspected the switches connectors to clock spring was found ok and checked the volume switches functionality found ok no damage of swatches  but horn was some times not working and checked by swapping  horn pad and steering wheel assembly from good vehicle but the issue remains same , then after replacing clock spring ( coil assembly steering wheel) assembly , then the issue got resolved , and all steering controls are working fine , please find the video evidence for this concern ,Resolution : Need to replace coil spring steering wheel to resolve the issue . \r\n Action Taken : Replaced coil assembly steering wheel under warranty.",
+    "expected_parts": [
+      "COIL ASM-STRG WHL AIRBAG",
+      "Driver Airbag Clock Spring Replacement"
+    ]
+  },
+  {
+    "ticket_no": "10000000197058",
+    "dtc_code": "B104600",
+    "model_line": "MG_COMET_EV",
+    "query_text": "Airbag light on",
+    "expected_cause": "Diagnosis Details -\r\nThe vehicle visited our workshop with the airbag warning light ON in the cluster meter.\r\nDTC found: B104600 - Frontal Airbag Driver High Resistance – Current.\r\nAs per the MGI circular (STR00095), the prescribed activity was carried out at our workshop. After completing the activity, a trial was taken on a rough road to verify the concern.\r\nConcern not replicated, so vehicle released under observation.\r\nDetails are attached.",
+    "expected_parts": [
+      "NOT APPLICABLE"
+    ]
+  }
+]

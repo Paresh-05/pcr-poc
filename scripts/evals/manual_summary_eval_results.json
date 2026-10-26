@@ -1,0 +1,4678 @@
+[
+  {
+    "question": "Could an open CAN-H or CAN-L wire cause U140982 or U141182?",
+    "target_chunk_id": 232,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 232,
+    "top_scored_submodule": "IESL DTC List",
+    "target_similarity": 0.5671085685762557,
+    "top_similarity": 0.5671085685762557,
+    "dtc_codes": [
+      "U140982",
+      "U140983",
+      "U140987",
+      "U141182",
+      "U141183",
+      "U141187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IESL DTC List"
+  },
+  {
+    "question": "What does U141182 mean?",
+    "target_chunk_id": 232,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 232,
+    "top_scored_submodule": "IESL DTC List",
+    "target_similarity": 0.3515295135768641,
+    "top_similarity": 0.3515295135768641,
+    "dtc_codes": [
+      "U140982",
+      "U140983",
+      "U140987",
+      "U141182",
+      "U141183",
+      "U141187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IESL DTC List"
+  },
+  {
+    "question": "What does P100016 mean on a Drive Motor Control Module?",
+    "target_chunk_id": 239,
+    "n_rivals": 4,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 239,
+    "top_scored_submodule": "MCU DTC List",
+    "target_similarity": 0.6605852238658338,
+    "top_similarity": 0.6605852238658338,
+    "dtc_codes": [
+      "P100016",
+      "P100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "MCU DTC List"
+  },
+  {
+    "question": "How do I clear P100016 or P100017?",
+    "target_chunk_id": 239,
+    "n_rivals": 4,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 239,
+    "top_scored_submodule": "MCU DTC List",
+    "target_similarity": 0.5930923306742087,
+    "top_similarity": 0.5930923306742087,
+    "dtc_codes": [
+      "P100016",
+      "P100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "MCU DTC List"
+  },
+  {
+    "question": "LAM module voltage fault",
+    "target_chunk_id": 235,
+    "n_rivals": 12,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 235,
+    "top_scored_submodule": "LAM DTC List",
+    "target_similarity": 0.4951106648685637,
+    "top_similarity": 0.4951106648685637,
+    "dtc_codes": [
+      "B100016",
+      "B100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "LAM DTC List"
+  },
+  {
+    "question": "pedestrian warning speaker fault",
+    "target_chunk_id": 235,
+    "n_rivals": 12,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 235,
+    "top_scored_submodule": "LAM DTC List",
+    "target_similarity": 0.6104777552873741,
+    "top_similarity": 0.6104777552873741,
+    "dtc_codes": [
+      "B100016",
+      "B100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "LAM DTC List"
+  },
+  {
+    "question": "Why is the stability control or VDC unavailable?",
+    "target_chunk_id": 20,
+    "n_rivals": 14,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 20,
+    "top_scored_submodule": "ABS DTC List",
+    "target_similarity": 0.5392604806888632,
+    "top_similarity": 0.5392604806888632,
+    "dtc_codes": [
+      "U190387"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "ABS DTC List"
+  },
+  {
+    "question": "Why did the EBCM lose the vehicle operation readiness message from the VCU?",
+    "target_chunk_id": 20,
+    "n_rivals": 14,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 20,
+    "top_scored_submodule": "ABS DTC List",
+    "target_similarity": 0.6136893376189817,
+    "top_similarity": 0.6136893376189817,
+    "dtc_codes": [
+      "U190387"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "ABS DTC List"
+  },
+  {
+    "question": "How do I clear historical codes C100016 and C100017?",
+    "target_chunk_id": 12,
+    "n_rivals": 2,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 12,
+    "top_scored_submodule": "ABS DTC List",
+    "target_similarity": 0.5163053970314546,
+    "top_similarity": 0.5163053970314546,
+    "dtc_codes": [
+      "C100016",
+      "C100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "ABS DTC List"
+  },
+  {
+    "question": "Why is my ABS or brake system showing a fault with code C100016?",
+    "target_chunk_id": 12,
+    "n_rivals": 2,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 12,
+    "top_scored_submodule": "ABS DTC List",
+    "target_similarity": 0.7161993028491765,
+    "top_similarity": 0.7161993028491765,
+    "dtc_codes": [
+      "C100016",
+      "C100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "ABS DTC List"
+  },
+  {
+    "question": "What voltage should CAN-H and CAN-L read during the U007300 test?",
+    "target_chunk_id": 17,
+    "n_rivals": 16,
+    "rank": 9,
+    "correct": false,
+    "top_scored_chunk_id": 354,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.6052477205969912,
+    "top_similarity": 0.6691875702652522,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "ABS DTC List"
+  },
+  {
+    "question": "Why did my TCS, VDC, or stability control stop working with U007300?",
+    "target_chunk_id": 17,
+    "n_rivals": 16,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 17,
+    "top_scored_submodule": "ABS DTC List",
+    "target_similarity": 0.6616466388745041,
+    "top_similarity": 0.6616466388745041,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "ABS DTC List"
+  },
+  {
+    "question": "Could a bad ground or power wire cause B100016 or B100017?",
+    "target_chunk_id": 19,
+    "n_rivals": 12,
+    "rank": 7,
+    "correct": false,
+    "top_scored_chunk_id": 295,
+    "top_scored_submodule": "TICE DTC List",
+    "target_similarity": 0.5567115381518808,
+    "top_similarity": 0.5832175843362933,
+    "dtc_codes": [
+      "B100016",
+      "B100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "AC DTC List"
+  },
+  {
+    "question": "How do I diagnose B100017 when battery voltage is above 16 volts?",
+    "target_chunk_id": 19,
+    "n_rivals": 12,
+    "rank": 3,
+    "correct": false,
+    "top_scored_chunk_id": 322,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.6407553331098623,
+    "top_similarity": 0.7146373361227761,
+    "dtc_codes": [
+      "B100016",
+      "B100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "AC DTC List"
+  },
+  {
+    "question": "What causes a U007300 CAN bus off error?",
+    "target_chunk_id": 29,
+    "n_rivals": 16,
+    "rank": 7,
+    "correct": false,
+    "top_scored_chunk_id": 197,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.7142830046570618,
+    "top_similarity": 0.7744592483152075,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "AC DTC List"
+  },
+  {
+    "question": "What does U007300 mean on a vehicle?",
+    "target_chunk_id": 29,
+    "n_rivals": 16,
+    "rank": 9,
+    "correct": false,
+    "top_scored_chunk_id": 264,
+    "top_scored_submodule": "MCU DTC List",
+    "target_similarity": 0.6038976983952559,
+    "top_similarity": 0.6612662697999893,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "AC DTC List"
+  },
+  {
+    "question": "What is the difference between B100016 and B100017?",
+    "target_chunk_id": 268,
+    "n_rivals": 12,
+    "rank": 11,
+    "correct": false,
+    "top_scored_chunk_id": 295,
+    "top_scored_submodule": "TICE DTC List",
+    "target_similarity": 0.48311008876604167,
+    "top_similarity": 0.5518529260973277,
+    "dtc_codes": [
+      "B100016",
+      "B100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "SDM DTC List"
+  },
+  {
+    "question": "Can high charging voltage trigger B100017 in the SIR system?",
+    "target_chunk_id": 268,
+    "n_rivals": 12,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 322,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.5684669164555483,
+    "top_similarity": 0.5701139372204744,
+    "dtc_codes": [
+      "B100016",
+      "B100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "SDM DTC List"
+  },
+  {
+    "question": "Which CAN bus does the inflatable restraint module use?",
+    "target_chunk_id": 284,
+    "n_rivals": 16,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 284,
+    "top_scored_submodule": "SDM DTC List",
+    "target_similarity": 0.5481507011587533,
+    "top_similarity": 0.5481507011587533,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "SDM DTC List"
+  },
+  {
+    "question": "What should CAN-H voltage be at the Vehicle Performance Data Recorder connector?",
+    "target_chunk_id": 284,
+    "n_rivals": 16,
+    "rank": 9,
+    "correct": false,
+    "top_scored_chunk_id": 54,
+    "top_scored_submodule": "BMS (KY) DTC List",
+    "target_similarity": 0.4640961623407831,
+    "top_similarity": 0.565308279559029,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "SDM DTC List"
+  },
+  {
+    "question": "Does B056F00 identify a specific failed part or cause?",
+    "target_chunk_id": 287,
+    "n_rivals": 6,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 159,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.586221176439222,
+    "top_similarity": 0.6016969258864002,
+    "dtc_codes": [
+      "B056F00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TBOX DTC List"
+  },
+  {
+    "question": "What does B056F00 mean?",
+    "target_chunk_id": 287,
+    "n_rivals": 6,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 159,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.6302041500129675,
+    "top_similarity": 0.6402639160804945,
+    "dtc_codes": [
+      "B056F00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TBOX DTC List"
+  },
+  {
+    "question": "Could an open CAN circuit cause U190487?",
+    "target_chunk_id": 285,
+    "n_rivals": 16,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 285,
+    "top_scored_submodule": "SDM DTC List",
+    "target_similarity": 0.6316203023179774,
+    "top_similarity": 0.6316203023179774,
+    "dtc_codes": [
+      "U190487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "SDM DTC List"
+  },
+  {
+    "question": "Can U190487 affect motor speed or overspeed information?",
+    "target_chunk_id": 285,
+    "n_rivals": 16,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 285,
+    "top_scored_submodule": "SDM DTC List",
+    "target_similarity": 0.6281938307245205,
+    "top_similarity": 0.6281938307245205,
+    "dtc_codes": [
+      "U190487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "SDM DTC List"
+  },
+  {
+    "question": "Is the vehicle performance data recorder checked for U260087 on LV2?",
+    "target_chunk_id": 286,
+    "n_rivals": 17,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 318,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.5549016201411121,
+    "top_similarity": 0.5776474928548879,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "SDM DTC List"
+  },
+  {
+    "question": "Could the instrument cluster cause U260087?",
+    "target_chunk_id": 286,
+    "n_rivals": 17,
+    "rank": 4,
+    "correct": false,
+    "top_scored_chunk_id": 121,
+    "top_scored_submodule": "EBS DTC List",
+    "target_similarity": 0.6980219759910435,
+    "top_similarity": 0.7291545449962962,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "SDM DTC List"
+  },
+  {
+    "question": "How do I check CAN-H and CAN-L for U140087 or U140287?",
+    "target_chunk_id": 310,
+    "n_rivals": 10,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 310,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.6411036238220137,
+    "top_similarity": 0.6411036238220137,
+    "dtc_codes": [
+      "U140087",
+      "U140287",
+      "U140387",
+      "U140487",
+      "U140587",
+      "U140787",
+      "U140987",
+      "U141187",
+      "U1D0087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "UCU DTC List"
+  },
+  {
+    "question": "What does U140287 EBD fault indication message lost mean?",
+    "target_chunk_id": 310,
+    "n_rivals": 10,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 117,
+    "top_scored_submodule": "EBS DTC List",
+    "target_similarity": 0.603636038049824,
+    "top_similarity": 0.6172613315577389,
+    "dtc_codes": [
+      "U140087",
+      "U140287",
+      "U140387",
+      "U140487",
+      "U140587",
+      "U140787",
+      "U140987",
+      "U141187",
+      "U1D0087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "UCU DTC List"
+  },
+  {
+    "question": "Can a weak battery cause radio or navigation problems?",
+    "target_chunk_id": 288,
+    "n_rivals": 12,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 295,
+    "top_scored_submodule": "TICE DTC List",
+    "target_similarity": 0.45887038629388355,
+    "top_similarity": 0.48274699327104886,
+    "dtc_codes": [
+      "B100016",
+      "B100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TBOX DTC List"
+  },
+  {
+    "question": "Could a bad ground or power wire cause B100016 or B100017?",
+    "target_chunk_id": 288,
+    "n_rivals": 12,
+    "rank": 9,
+    "correct": false,
+    "top_scored_chunk_id": 295,
+    "top_scored_submodule": "TICE DTC List",
+    "target_similarity": 0.5325016072367887,
+    "top_similarity": 0.5832175843362933,
+    "dtc_codes": [
+      "B100016",
+      "B100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TBOX DTC List"
+  },
+  {
+    "question": "Why is there a fault stored for the Vehicle Performance Data Recorder?",
+    "target_chunk_id": 303,
+    "n_rivals": 6,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 303,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.6118194592245823,
+    "top_similarity": 0.6118194592245823,
+    "dtc_codes": [
+      "B056F00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "UCU DTC List"
+  },
+  {
+    "question": "How do I clear B056F00?",
+    "target_chunk_id": 303,
+    "n_rivals": 6,
+    "rank": 3,
+    "correct": false,
+    "top_scored_chunk_id": 159,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.5869052320209827,
+    "top_similarity": 0.6128346282972047,
+    "dtc_codes": [
+      "B056F00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "UCU DTC List"
+  },
+  {
+    "question": "What does U007300 mean?",
+    "target_chunk_id": 54,
+    "n_rivals": 16,
+    "rank": 2,
+    "correct": false,
+    "top_scored_chunk_id": 264,
+    "top_scored_submodule": "MCU DTC List",
+    "target_similarity": 0.6078519408100559,
+    "top_similarity": 0.6313764787072651,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (KY) DTC List"
+  },
+  {
+    "question": "Is U007300 a communication fault with the performance data recorder?",
+    "target_chunk_id": 54,
+    "n_rivals": 16,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 54,
+    "top_scored_submodule": "BMS (KY) DTC List",
+    "target_similarity": 0.6887413264587297,
+    "top_similarity": 0.6887413264587297,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (KY) DTC List"
+  },
+  {
+    "question": "Why does U007305 return after clearing the code?",
+    "target_chunk_id": 309,
+    "n_rivals": 1,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 291,
+    "top_scored_submodule": "TBOX DTC List",
+    "target_similarity": 0.5577496665590541,
+    "top_similarity": 0.5681903713210446,
+    "dtc_codes": [
+      "U007305"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "UCU DTC List"
+  },
+  {
+    "question": "What resistance should I measure between CAN-H and CAN-L at the data link connector?",
+    "target_chunk_id": 309,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 309,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.45542284126674604,
+    "top_similarity": 0.45542284126674604,
+    "dtc_codes": [
+      "U007305"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "UCU DTC List"
+  },
+  {
+    "question": "How do I check the CAN-H and CAN-L circuits for U007303?",
+    "target_chunk_id": 308,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 308,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.6820557000224127,
+    "top_similarity": 0.6820557000224127,
+    "dtc_codes": [
+      "U007303"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "UCU DTC List"
+  },
+  {
+    "question": "Why is the vehicle performance data recorder losing C-CAN communication?",
+    "target_chunk_id": 308,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 308,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.632278491272634,
+    "top_similarity": 0.632278491272634,
+    "dtc_codes": [
+      "U007303"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "UCU DTC List"
+  },
+  {
+    "question": "How long does the MCU message have to be missing to set U198087?",
+    "target_chunk_id": 314,
+    "n_rivals": 6,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 314,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.5454879576260762,
+    "top_similarity": 0.5454879576260762,
+    "dtc_codes": [
+      "U198087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "UCU DTC List"
+  },
+  {
+    "question": "Should other module communication codes be diagnosed before U198087?",
+    "target_chunk_id": 314,
+    "n_rivals": 6,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 314,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.6006936312616682,
+    "top_similarity": 0.6006936312616682,
+    "dtc_codes": [
+      "U198087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "UCU DTC List"
+  },
+  {
+    "question": "Why is my hybrid or EV in discharge limp performance?",
+    "target_chunk_id": 331,
+    "n_rivals": 2,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 330,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.5324961439357587,
+    "top_similarity": 0.5814855402632957,
+    "dtc_codes": [
+      "B101A00",
+      "B102A00",
+      "B103A00",
+      "B104A00",
+      "B106A00",
+      "B107A00",
+      "B108A00",
+      "B109A00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "What does B104A00 battery discharge open request mean, and how is it different from B103A00?",
+    "target_chunk_id": 331,
+    "n_rivals": 2,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 330,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.6354860484032236,
+    "top_similarity": 0.6567840893850473,
+    "dtc_codes": [
+      "B101A00",
+      "B102A00",
+      "B103A00",
+      "B104A00",
+      "B106A00",
+      "B107A00",
+      "B108A00",
+      "B109A00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "vehicle not charging",
+    "target_chunk_id": 322,
+    "n_rivals": 12,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 322,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.5254898958244351,
+    "top_similarity": 0.5254898958244351,
+    "dtc_codes": [
+      "B100016",
+      "B100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "vehicle not starting hybrid",
+    "target_chunk_id": 322,
+    "n_rivals": 12,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 322,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.5309062780308831,
+    "top_similarity": 0.5309062780308831,
+    "dtc_codes": [
+      "B100016",
+      "B100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "What does B104A00 battery discharge open request mean?",
+    "target_chunk_id": 330,
+    "n_rivals": 2,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 330,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.6545688397540393,
+    "top_similarity": 0.6545688397540393,
+    "dtc_codes": [
+      "B101A00",
+      "B102A00",
+      "B103A00",
+      "B104A00",
+      "B106A00",
+      "B107A00",
+      "B108A00",
+      "B109A00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "Why is charging performance limited on my hybrid or EV?",
+    "target_chunk_id": 330,
+    "n_rivals": 2,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 330,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.510214578915868,
+    "top_similarity": 0.510214578915868,
+    "dtc_codes": [
+      "B101A00",
+      "B102A00",
+      "B103A00",
+      "B104A00",
+      "B106A00",
+      "B107A00",
+      "B108A00",
+      "B109A00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "Can a CAN bus short to ground set U180187?",
+    "target_chunk_id": 85,
+    "n_rivals": 7,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 357,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.5632655615454659,
+    "top_similarity": 0.5639289192516396,
+    "dtc_codes": [
+      "U180187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (LG) DTC List"
+  },
+  {
+    "question": "Can a faulty hybrid battery pack cause U180187?",
+    "target_chunk_id": 85,
+    "n_rivals": 7,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 85,
+    "top_scored_submodule": "BMS (LG) DTC List",
+    "target_similarity": 0.6920419495419513,
+    "top_similarity": 0.6920419495419513,
+    "dtc_codes": [
+      "U180187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (LG) DTC List"
+  },
+  {
+    "question": "Why does my car show a BMS CAN message lost code?",
+    "target_chunk_id": 359,
+    "n_rivals": 2,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 359,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.636471033781769,
+    "top_similarity": 0.636471033781769,
+    "dtc_codes": [
+      "U1A0187",
+      "U1A0281",
+      "U1A0287",
+      "U1A0381",
+      "U1A0387",
+      "U1A0481",
+      "U1A0487",
+      "U1A0581",
+      "U1A0587",
+      "U1A0681",
+      "U1A0687",
+      "U1A0787",
+      "U1A0887",
+      "U1A0981",
+      "U1A0987",
+      "U1A0A87"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "What does code U1A0287 mean on a hybrid or EV?",
+    "target_chunk_id": 359,
+    "n_rivals": 2,
+    "rank": 2,
+    "correct": false,
+    "top_scored_chunk_id": 105,
+    "top_scored_submodule": "CDU (YBR) DTC List",
+    "target_similarity": 0.6369328934181208,
+    "top_similarity": 0.6522344800780061,
+    "dtc_codes": [
+      "U1A0187",
+      "U1A0281",
+      "U1A0287",
+      "U1A0381",
+      "U1A0387",
+      "U1A0481",
+      "U1A0487",
+      "U1A0581",
+      "U1A0587",
+      "U1A0681",
+      "U1A0687",
+      "U1A0787",
+      "U1A0887",
+      "U1A0981",
+      "U1A0987",
+      "U1A0A87"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "Can the Vehicle Performance Data Recorder cause these codes on an LV2 vehicle?",
+    "target_chunk_id": 366,
+    "n_rivals": 7,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 366,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.5745424857650712,
+    "top_similarity": 0.5745424857650712,
+    "dtc_codes": [
+      "U200487",
+      "U220287"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "What CAN resistance should I measure for U200487 or U220287?",
+    "target_chunk_id": 366,
+    "n_rivals": 7,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 95,
+    "top_scored_submodule": "CDU (TC) DTC List",
+    "target_similarity": 0.4956981710604189,
+    "top_similarity": 0.5056947802859295,
+    "dtc_codes": [
+      "U200487",
+      "U220287"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "What should CAN-H voltage be at the drive motor control module connector?",
+    "target_chunk_id": 87,
+    "n_rivals": 6,
+    "rank": 2,
+    "correct": false,
+    "top_scored_chunk_id": 358,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.48025932370813784,
+    "top_similarity": 0.5320356779315967,
+    "dtc_codes": [
+      "U198087",
+      "U198187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (LG) DTC List"
+  },
+  {
+    "question": "Why is my motor CAN message lost code coming up?",
+    "target_chunk_id": 87,
+    "n_rivals": 6,
+    "rank": 2,
+    "correct": false,
+    "top_scored_chunk_id": 358,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.5931666198343284,
+    "top_similarity": 0.6327469855741067,
+    "dtc_codes": [
+      "U198087",
+      "U198187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (LG) DTC List"
+  },
+  {
+    "question": "Could U260087 make an instrument cluster warning light or message appear?",
+    "target_chunk_id": 21,
+    "n_rivals": 17,
+    "rank": 3,
+    "correct": false,
+    "top_scored_chunk_id": 121,
+    "top_scored_submodule": "EBS DTC List",
+    "target_similarity": 0.591072998142086,
+    "top_similarity": 0.6188967226315117,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "ABS DTC List"
+  },
+  {
+    "question": "What does U260087 mean for the instrument cluster?",
+    "target_chunk_id": 21,
+    "n_rivals": 17,
+    "rank": 6,
+    "correct": false,
+    "top_scored_chunk_id": 121,
+    "top_scored_submodule": "EBS DTC List",
+    "target_similarity": 0.6653691785978576,
+    "top_similarity": 0.7010124910612288,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "ABS DTC List"
+  },
+  {
+    "question": "What should CAN resistance measure at DLC terminals 6 and 14 for this charger fault?",
+    "target_chunk_id": 88,
+    "n_rivals": 4,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 88,
+    "top_scored_submodule": "BMS (LG) DTC List",
+    "target_similarity": 0.558378080629752,
+    "top_similarity": 0.558378080629752,
+    "dtc_codes": [
+      "U1A8087",
+      "U1A8487",
+      "U1A8687"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (LG) DTC List"
+  },
+  {
+    "question": "What causes the battery pack to lose the OBC current status message $4F6?",
+    "target_chunk_id": 88,
+    "n_rivals": 4,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 88,
+    "top_scored_submodule": "BMS (LG) DTC List",
+    "target_similarity": 0.6276701456474697,
+    "top_similarity": 0.6276701456474697,
+    "dtc_codes": [
+      "U1A8087",
+      "U1A8487",
+      "U1A8687"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (LG) DTC List"
+  },
+  {
+    "question": "U260087 Vehicle Mileage Information Message $120 Lost From IC",
+    "target_chunk_id": 31,
+    "n_rivals": 17,
+    "rank": 7,
+    "correct": false,
+    "top_scored_chunk_id": 107,
+    "top_scored_submodule": "CDU (YBR) DTC List",
+    "target_similarity": 0.5864027390235741,
+    "top_similarity": 0.6484106595494312,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "AC DTC List"
+  },
+  {
+    "question": "Could CAN-H or CAN-L wiring between the Instrument Cluster and HVAC module set U260087?",
+    "target_chunk_id": 31,
+    "n_rivals": 17,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 31,
+    "top_scored_submodule": "AC DTC List",
+    "target_similarity": 0.6226513757882554,
+    "top_similarity": 0.6226513757882554,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "AC DTC List"
+  },
+  {
+    "question": "How do I diagnose U260087 between the Hybrid/EV Battery Pack, data recorder, and instrument cluster?",
+    "target_chunk_id": 59,
+    "n_rivals": 17,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 89,
+    "top_scored_submodule": "BMS (LG) DTC List",
+    "target_similarity": 0.7200896888259815,
+    "top_similarity": 0.7232454350994791,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (KY) DTC List"
+  },
+  {
+    "question": "What does lost Vehicle Mileage Information Message $120 from the IC mean?",
+    "target_chunk_id": 59,
+    "n_rivals": 17,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 107,
+    "top_scored_submodule": "CDU (YBR) DTC List",
+    "target_similarity": 0.6080184444693922,
+    "top_similarity": 0.6160714782014725,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (KY) DTC List"
+  },
+  {
+    "question": "Could the instrument cluster or Hybrid/EV Battery Pack cause U260087?",
+    "target_chunk_id": 89,
+    "n_rivals": 17,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 89,
+    "top_scored_submodule": "BMS (LG) DTC List",
+    "target_similarity": 0.7636453020761718,
+    "top_similarity": 0.7636453020761718,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (LG) DTC List"
+  },
+  {
+    "question": "What does U260087 mean on the Hybrid/EV Battery Pack?",
+    "target_chunk_id": 89,
+    "n_rivals": 17,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 89,
+    "top_scored_submodule": "BMS (LG) DTC List",
+    "target_similarity": 0.6125975385286772,
+    "top_similarity": 0.6125975385286772,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (LG) DTC List"
+  },
+  {
+    "question": "Why is mileage information missing or not updating in the CDU on my EV?",
+    "target_chunk_id": 96,
+    "n_rivals": 17,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 96,
+    "top_scored_submodule": "CDU (TC) DTC List",
+    "target_similarity": 0.6148913642401954,
+    "top_similarity": 0.6148913642401954,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "CDU (TC) DTC List"
+  },
+  {
+    "question": "Why is my charging and distribution module not receiving vehicle mileage data from the instrument cluster?",
+    "target_chunk_id": 96,
+    "n_rivals": 17,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 96,
+    "top_scored_submodule": "CDU (TC) DTC List",
+    "target_similarity": 0.695371991338626,
+    "top_similarity": 0.695371991338626,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "CDU (TC) DTC List"
+  },
+  {
+    "question": "Do I need to program the Vehicle Performance Data Recorder after replacement?",
+    "target_chunk_id": 84,
+    "n_rivals": 16,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 84,
+    "top_scored_submodule": "BMS (LG) DTC List",
+    "target_similarity": 0.5418341408471773,
+    "top_similarity": 0.5418341408471773,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (LG) DTC List"
+  },
+  {
+    "question": "Can U007300 be caused by an intermittent CAN connection?",
+    "target_chunk_id": 84,
+    "n_rivals": 16,
+    "rank": 4,
+    "correct": false,
+    "top_scored_chunk_id": 197,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.6778799264110941,
+    "top_similarity": 0.7189640276130562,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (LG) DTC List"
+  },
+  {
+    "question": "P100016 diagnostic procedure",
+    "target_chunk_id": 90,
+    "n_rivals": 4,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 90,
+    "top_scored_submodule": "CDU (TC) DTC List",
+    "target_similarity": 0.5225615802461124,
+    "top_similarity": 0.5225615802461124,
+    "dtc_codes": [
+      "P100016",
+      "P100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "CDU (TC) DTC List"
+  },
+  {
+    "question": "Could excessive voltage in the low-voltage system trigger P100017?",
+    "target_chunk_id": 90,
+    "n_rivals": 4,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 90,
+    "top_scored_submodule": "CDU (TC) DTC List",
+    "target_similarity": 0.6093816244708989,
+    "top_similarity": 0.6093816244708989,
+    "dtc_codes": [
+      "P100016",
+      "P100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "CDU (TC) DTC List"
+  },
+  {
+    "question": "What is DTC U200487 for the charging and distribution module?",
+    "target_chunk_id": 95,
+    "n_rivals": 5,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 95,
+    "top_scored_submodule": "CDU (TC) DTC List",
+    "target_similarity": 0.6633278181720047,
+    "top_similarity": 0.6633278181720047,
+    "dtc_codes": [
+      "U200487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "CDU (TC) DTC List"
+  },
+  {
+    "question": "What does lost message $12A from IBC mean?",
+    "target_chunk_id": 95,
+    "n_rivals": 5,
+    "rank": 2,
+    "correct": false,
+    "top_scored_chunk_id": 301,
+    "top_scored_submodule": "TICE DTC List",
+    "target_similarity": 0.447033877457818,
+    "top_similarity": 0.5630029012726441,
+    "dtc_codes": [
+      "U200487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "CDU (TC) DTC List"
+  },
+  {
+    "question": "Could the Hybrid/EV Battery Section or Battery Charger cause these CAN message codes?",
+    "target_chunk_id": 93,
+    "n_rivals": 19,
+    "rank": 4,
+    "correct": false,
+    "top_scored_chunk_id": 86,
+    "top_scored_submodule": "BMS (LG) DTC List",
+    "target_similarity": 0.6685760986462147,
+    "top_similarity": 0.7075340690809302,
+    "dtc_codes": [
+      "U190287",
+      "U190387",
+      "U190487",
+      "U190687"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "CDU (TC) DTC List"
+  },
+  {
+    "question": "What does U190687 mean on my vehicle?",
+    "target_chunk_id": 93,
+    "n_rivals": 19,
+    "rank": 7,
+    "correct": false,
+    "top_scored_chunk_id": 32,
+    "top_scored_submodule": "AC DTC List",
+    "target_similarity": 0.5338759991683061,
+    "top_similarity": 0.5861243514926779,
+    "dtc_codes": [
+      "U190287",
+      "U190387",
+      "U190487",
+      "U190687"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "CDU (TC) DTC List"
+  },
+  {
+    "question": "What CAN bus resistance should I measure for U007300?",
+    "target_chunk_id": 92,
+    "n_rivals": 16,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 92,
+    "top_scored_submodule": "CDU (TC) DTC List",
+    "target_similarity": 0.6276377289440538,
+    "top_similarity": 0.6276377289440538,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "CDU (TC) DTC List"
+  },
+  {
+    "question": "What should I check when U007300 sets?",
+    "target_chunk_id": 92,
+    "n_rivals": 16,
+    "rank": 5,
+    "correct": false,
+    "top_scored_chunk_id": 264,
+    "top_scored_submodule": "MCU DTC List",
+    "target_similarity": 0.5840502366526735,
+    "top_similarity": 0.6123911639980986,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "CDU (TC) DTC List"
+  },
+  {
+    "question": "Is U260087 a lost odometer message or a vehicle-speed message?",
+    "target_chunk_id": 107,
+    "n_rivals": 17,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 107,
+    "top_scored_submodule": "CDU (YBR) DTC List",
+    "target_similarity": 0.6620757825736753,
+    "top_similarity": 0.6620757825736753,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "CDU (YBR) DTC List"
+  },
+  {
+    "question": "Could a communication fault between the IC and charging and distribution module set U260087?",
+    "target_chunk_id": 107,
+    "n_rivals": 17,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 107,
+    "top_scored_submodule": "CDU (YBR) DTC List",
+    "target_similarity": 0.6510112667458494,
+    "top_similarity": 0.6510112667458494,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "CDU (YBR) DTC List"
+  },
+  {
+    "question": "How do I check the CAN-H circuit for U007300?",
+    "target_chunk_id": 103,
+    "n_rivals": 16,
+    "rank": 2,
+    "correct": false,
+    "top_scored_chunk_id": 197,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.6973818718788714,
+    "top_similarity": 0.7040129530054411,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "CDU (YBR) DTC List"
+  },
+  {
+    "question": "Why are control modules losing communication with each other?",
+    "target_chunk_id": 103,
+    "n_rivals": 16,
+    "rank": 3,
+    "correct": false,
+    "top_scored_chunk_id": 197,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.4133897853766795,
+    "top_similarity": 0.4410289102999654,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "CDU (YBR) DTC List"
+  },
+  {
+    "question": "How do you diagnose U200487 on the CAN bus?",
+    "target_chunk_id": 106,
+    "n_rivals": 5,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 106,
+    "top_scored_submodule": "CDU (YBR) DTC List",
+    "target_similarity": 0.6905159641862098,
+    "top_similarity": 0.6905159641862098,
+    "dtc_codes": [
+      "U200487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "CDU (YBR) DTC List"
+  },
+  {
+    "question": "Why is door-touch status information unavailable or inconsistent?",
+    "target_chunk_id": 106,
+    "n_rivals": 5,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 106,
+    "top_scored_submodule": "CDU (YBR) DTC List",
+    "target_similarity": 0.4724210153725039,
+    "top_similarity": 0.4724210153725039,
+    "dtc_codes": [
+      "U200487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "CDU (YBR) DTC List"
+  },
+  {
+    "question": "What does an invalid BMS charge current request message mean?",
+    "target_chunk_id": 105,
+    "n_rivals": 2,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 105,
+    "top_scored_submodule": "CDU (YBR) DTC List",
+    "target_similarity": 0.5189249920903839,
+    "top_similarity": 0.5189249920903839,
+    "dtc_codes": [
+      "U1A0081",
+      "U1A0087",
+      "U1A0181",
+      "U1A0787"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "CDU (YBR) DTC List"
+  },
+  {
+    "question": "What does U1A0181 mean on a hybrid or electric vehicle?",
+    "target_chunk_id": 105,
+    "n_rivals": 2,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 105,
+    "top_scored_submodule": "CDU (YBR) DTC List",
+    "target_similarity": 0.6345475623291863,
+    "top_similarity": 0.6345475623291863,
+    "dtc_codes": [
+      "U1A0081",
+      "U1A0087",
+      "U1A0181",
+      "U1A0787"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "CDU (YBR) DTC List"
+  },
+  {
+    "question": "Why won’t my electronic parking brake auto release with U142D87?",
+    "target_chunk_id": 117,
+    "n_rivals": 7,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 117,
+    "top_scored_submodule": "EBS DTC List",
+    "target_similarity": 0.593784644810814,
+    "top_similarity": 0.593784644810814,
+    "dtc_codes": [
+      "U140087",
+      "U140287",
+      "U140387",
+      "U140487",
+      "U140687",
+      "U140787",
+      "U140A87",
+      "U140B87",
+      "U142D87",
+      "U142F87"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EBS DTC List"
+  },
+  {
+    "question": "What does lost ESC vehicle speed message $13E mean?",
+    "target_chunk_id": 117,
+    "n_rivals": 7,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 117,
+    "top_scored_submodule": "EBS DTC List",
+    "target_similarity": 0.5832399928675712,
+    "top_similarity": 0.5832399928675712,
+    "dtc_codes": [
+      "U140087",
+      "U140287",
+      "U140387",
+      "U140487",
+      "U140687",
+      "U140787",
+      "U140A87",
+      "U140B87",
+      "U142D87",
+      "U142F87"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EBS DTC List"
+  },
+  {
+    "question": "What is BCM CAN message $12A?",
+    "target_chunk_id": 120,
+    "n_rivals": 5,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 366,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.573914950037337,
+    "top_similarity": 0.5845424165992422,
+    "dtc_codes": [
+      "U200487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EBS DTC List"
+  },
+  {
+    "question": "Could a short to ground on CAN-H or CAN-L cause U200487?",
+    "target_chunk_id": 120,
+    "n_rivals": 5,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 95,
+    "top_scored_submodule": "CDU (TC) DTC List",
+    "target_similarity": 0.5960023357559592,
+    "top_similarity": 0.6145906122445345,
+    "dtc_codes": [
+      "U200487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EBS DTC List"
+  },
+  {
+    "question": "Could U280087 indicate a CAN communication problem between the EBS and compressor control module?",
+    "target_chunk_id": 122,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 122,
+    "top_scored_submodule": "EBS DTC List",
+    "target_similarity": 0.7011725752823802,
+    "top_similarity": 0.7011725752823802,
+    "dtc_codes": [
+      "U280087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EBS DTC List"
+  },
+  {
+    "question": "Why is U280087 set after turning the ignition on?",
+    "target_chunk_id": 122,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 122,
+    "top_scored_submodule": "EBS DTC List",
+    "target_similarity": 0.5395772769428376,
+    "top_similarity": 0.5395772769428376,
+    "dtc_codes": [
+      "U280087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EBS DTC List"
+  },
+  {
+    "question": "How do I test the CAN-L circuit between the EBS and SDM for U180187?",
+    "target_chunk_id": 118,
+    "n_rivals": 7,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 118,
+    "top_scored_submodule": "EBS DTC List",
+    "target_similarity": 0.6443658121141415,
+    "top_similarity": 0.6443658121141415,
+    "dtc_codes": [
+      "U180187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EBS DTC List"
+  },
+  {
+    "question": "How do I diagnose a missed SDM message on the high-speed CAN bus?",
+    "target_chunk_id": 118,
+    "n_rivals": 7,
+    "rank": 2,
+    "correct": false,
+    "top_scored_chunk_id": 201,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.5946989066391256,
+    "top_similarity": 0.6245040530939255,
+    "dtc_codes": [
+      "U180187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EBS DTC List"
+  },
+  {
+    "question": "Is U260087 an instrument cluster CAN bus fault?",
+    "target_chunk_id": 121,
+    "n_rivals": 17,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 121,
+    "top_scored_submodule": "EBS DTC List",
+    "target_similarity": 0.7022292099276055,
+    "top_similarity": 0.7022292099276055,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EBS DTC List"
+  },
+  {
+    "question": "Can the Electrohydraulic Power Control module cause U260087?",
+    "target_chunk_id": 121,
+    "n_rivals": 17,
+    "rank": 8,
+    "correct": false,
+    "top_scored_chunk_id": 142,
+    "top_scored_submodule": "EPS (DH) DTC List",
+    "target_similarity": 0.5337388216463298,
+    "top_similarity": 0.5701947296886287,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EBS DTC List"
+  },
+  {
+    "question": "U007300 meaning",
+    "target_chunk_id": 137,
+    "n_rivals": 16,
+    "rank": 3,
+    "correct": false,
+    "top_scored_chunk_id": 264,
+    "top_scored_submodule": "MCU DTC List",
+    "target_similarity": 0.508840980500095,
+    "top_similarity": 0.5408584632262511,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EPS (DH) DTC List"
+  },
+  {
+    "question": "Could a faulty Power Steering Control Module cause U007300?",
+    "target_chunk_id": 137,
+    "n_rivals": 16,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 137,
+    "top_scored_submodule": "EPS (DH) DTC List",
+    "target_similarity": 0.7525818364349288,
+    "top_similarity": 0.7525818364349288,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EPS (DH) DTC List"
+  },
+  {
+    "question": "Why does my scanner show lost mileage message from IC?",
+    "target_chunk_id": 142,
+    "n_rivals": 17,
+    "rank": 6,
+    "correct": false,
+    "top_scored_chunk_id": 59,
+    "top_scored_submodule": "BMS (KY) DTC List",
+    "target_similarity": 0.5506504967367298,
+    "top_similarity": 0.6131298609023583,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EPS (DH) DTC List"
+  },
+  {
+    "question": "U26008700",
+    "target_chunk_id": 142,
+    "n_rivals": 17,
+    "rank": 2,
+    "correct": false,
+    "top_scored_chunk_id": 207,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.4200687708944133,
+    "top_similarity": 0.42277160013739024,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EPS (DH) DTC List"
+  },
+  {
+    "question": "Can high system voltage set power steering code C100017?",
+    "target_chunk_id": 143,
+    "n_rivals": 2,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 143,
+    "top_scored_submodule": "EPS (LR) DTC List",
+    "target_similarity": 0.7207819765073634,
+    "top_similarity": 0.7207819765073634,
+    "dtc_codes": [
+      "C100016",
+      "C100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EPS (LR) DTC List"
+  },
+  {
+    "question": "How do I clear historical power steering voltage codes C100016 and C100017?",
+    "target_chunk_id": 143,
+    "n_rivals": 2,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 143,
+    "top_scored_submodule": "EPS (LR) DTC List",
+    "target_similarity": 0.7602999098122272,
+    "top_similarity": 0.7602999098122272,
+    "dtc_codes": [
+      "C100016",
+      "C100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EPS (LR) DTC List"
+  },
+  {
+    "question": "What does U140283 mean on my vehicle?",
+    "target_chunk_id": 154,
+    "n_rivals": 7,
+    "rank": 2,
+    "correct": false,
+    "top_scored_chunk_id": 297,
+    "top_scored_submodule": "TICE DTC List",
+    "target_similarity": 0.531717880656598,
+    "top_similarity": 0.5530644181767471,
+    "dtc_codes": [
+      "U140281",
+      "U140283",
+      "U140287"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EPS (LR) DTC List"
+  },
+  {
+    "question": "What does lost vehicle speed information message from ABS mean?",
+    "target_chunk_id": 154,
+    "n_rivals": 7,
+    "rank": 4,
+    "correct": false,
+    "top_scored_chunk_id": 138,
+    "top_scored_submodule": "EPS (DH) DTC List",
+    "target_similarity": 0.5315841432831916,
+    "top_similarity": 0.5712335105642067,
+    "dtc_codes": [
+      "U140281",
+      "U140283",
+      "U140287"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EPS (LR) DTC List"
+  },
+  {
+    "question": "Can a scan tool clear U198081 and U198087?",
+    "target_chunk_id": 141,
+    "n_rivals": 6,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 314,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.6025954689804973,
+    "top_similarity": 0.623254743056802,
+    "dtc_codes": [
+      "U198081",
+      "U198087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EPS (DH) DTC List"
+  },
+  {
+    "question": "What does U198087 mean?",
+    "target_chunk_id": 141,
+    "n_rivals": 6,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 314,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.5015638461518047,
+    "top_similarity": 0.541209242743216,
+    "dtc_codes": [
+      "U198081",
+      "U198087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EPS (DH) DTC List"
+  },
+  {
+    "question": "What resistance should I measure between DLC pins 6 and 14?",
+    "target_chunk_id": 140,
+    "n_rivals": 16,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 265,
+    "top_scored_submodule": "MCU DTC List",
+    "target_similarity": 0.3239776621698094,
+    "top_similarity": 0.32581880561598364,
+    "dtc_codes": [
+      "U190481",
+      "U190487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EPS (DH) DTC List"
+  },
+  {
+    "question": "Could the power steering control module cause U190481 or U190487?",
+    "target_chunk_id": 140,
+    "n_rivals": 16,
+    "rank": 2,
+    "correct": false,
+    "top_scored_chunk_id": 156,
+    "top_scored_submodule": "EPS (LR) DTC List",
+    "target_similarity": 0.6609290121724504,
+    "top_similarity": 0.6915404335377076,
+    "dtc_codes": [
+      "U190481",
+      "U190487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EPS (DH) DTC List"
+  },
+  {
+    "question": "Why is the key status information missing or incorrect?",
+    "target_chunk_id": 155,
+    "n_rivals": 14,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 155,
+    "top_scored_submodule": "EPS (LR) DTC List",
+    "target_similarity": 0.340202610191517,
+    "top_similarity": 0.340202610191517,
+    "dtc_codes": [
+      "U190386",
+      "U190387"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EPS (LR) DTC List"
+  },
+  {
+    "question": "What is the difference between U190386 and U190387?",
+    "target_chunk_id": 155,
+    "n_rivals": 14,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 155,
+    "top_scored_submodule": "EPS (LR) DTC List",
+    "target_similarity": 0.5027958660163209,
+    "top_similarity": 0.5027958660163209,
+    "dtc_codes": [
+      "U190386",
+      "U190387"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EPS (LR) DTC List"
+  },
+  {
+    "question": "Can a CAN-H or CAN-L wiring fault set U007300?",
+    "target_chunk_id": 153,
+    "n_rivals": 16,
+    "rank": 16,
+    "correct": false,
+    "top_scored_chunk_id": 197,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.6087271501742458,
+    "top_similarity": 0.7308119874261403,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EPS (LR) DTC List"
+  },
+  {
+    "question": "Does U007300 mean the EPS module has lost communication with other control modules?",
+    "target_chunk_id": 153,
+    "n_rivals": 16,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 153,
+    "top_scored_submodule": "EPS (LR) DTC List",
+    "target_similarity": 0.6393100171562817,
+    "top_similarity": 0.6393100171562817,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EPS (LR) DTC List"
+  },
+  {
+    "question": "What resistance should I measure between CAN-H and CAN-L at the data link connector?",
+    "target_chunk_id": 157,
+    "n_rivals": 6,
+    "rank": 4,
+    "correct": false,
+    "top_scored_chunk_id": 358,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.3705449300979753,
+    "top_similarity": 0.42507019124522916,
+    "dtc_codes": [
+      "U198081",
+      "U198087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EPS (LR) DTC List"
+  },
+  {
+    "question": "Why is my steering assistance still normal with a power steering communication code?",
+    "target_chunk_id": 157,
+    "n_rivals": 6,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 157,
+    "top_scored_submodule": "EPS (LR) DTC List",
+    "target_similarity": 0.5877697985733223,
+    "top_similarity": 0.5877697985733223,
+    "dtc_codes": [
+      "U198081",
+      "U198087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EPS (LR) DTC List"
+  },
+  {
+    "question": "Why won’t the front right position light turn on with the light switch?",
+    "target_chunk_id": 176,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 176,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.5561512584012667,
+    "top_similarity": 0.5561512584012667,
+    "dtc_codes": [
+      "B111211"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IBC DTC List"
+  },
+  {
+    "question": "Can the Intelligent Access System Controller cause B111211?",
+    "target_chunk_id": 176,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 176,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.5582996931977937,
+    "top_similarity": 0.5582996931977937,
+    "dtc_codes": [
+      "B111211"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IBC DTC List"
+  },
+  {
+    "question": "How do I check the CAN-H and CAN-L circuits for U140087?",
+    "target_chunk_id": 199,
+    "n_rivals": 7,
+    "rank": 3,
+    "correct": false,
+    "top_scored_chunk_id": 310,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.5883187217203902,
+    "top_similarity": 0.6111954359728906,
+    "dtc_codes": [
+      "U140087",
+      "U140287"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IBC DTC List"
+  },
+  {
+    "question": "Could the Vehicle Stability Control Module be causing lost ABS messages?",
+    "target_chunk_id": 199,
+    "n_rivals": 7,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 199,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.6142687711970605,
+    "top_similarity": 0.6142687711970605,
+    "dtc_codes": [
+      "U140087",
+      "U140287"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IBC DTC List"
+  },
+  {
+    "question": "How do I check for an open or high resistance in the CAN wiring?",
+    "target_chunk_id": 202,
+    "n_rivals": 19,
+    "rank": 7,
+    "correct": false,
+    "top_scored_chunk_id": 104,
+    "top_scored_submodule": "CDU (YBR) DTC List",
+    "target_similarity": 0.46041558850039555,
+    "top_similarity": 0.4774320527757041,
+    "dtc_codes": [
+      "U190287",
+      "U190387",
+      "U190487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IBC DTC List"
+  },
+  {
+    "question": "What is U190387 lost message 4C5 from VCU?",
+    "target_chunk_id": 202,
+    "n_rivals": 19,
+    "rank": 4,
+    "correct": false,
+    "top_scored_chunk_id": 93,
+    "top_scored_submodule": "CDU (TC) DTC List",
+    "target_similarity": 0.5608397270256199,
+    "top_similarity": 0.5831315078876492,
+    "dtc_codes": [
+      "U190287",
+      "U190387",
+      "U190487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IBC DTC List"
+  },
+  {
+    "question": "Why is the ESP OFF light showing when there is a U140287 code?",
+    "target_chunk_id": 211,
+    "n_rivals": 7,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 211,
+    "top_scored_submodule": "IC DTC List",
+    "target_similarity": 0.6466849795470894,
+    "top_similarity": 0.6466849795470894,
+    "dtc_codes": [
+      "U140087",
+      "U140287",
+      "U140687"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IC DTC List"
+  },
+  {
+    "question": "Why is the ESP message lost fault showing?",
+    "target_chunk_id": 211,
+    "n_rivals": 7,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 211,
+    "top_scored_submodule": "IC DTC List",
+    "target_similarity": 0.5590589743101835,
+    "top_similarity": 0.5590589743101835,
+    "dtc_codes": [
+      "U140087",
+      "U140287",
+      "U140687"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IC DTC List"
+  },
+  {
+    "question": "Which CAN wires should be checked for U160087?",
+    "target_chunk_id": 212,
+    "n_rivals": 4,
+    "rank": 3,
+    "correct": false,
+    "top_scored_chunk_id": 298,
+    "top_scored_submodule": "TICE DTC List",
+    "target_similarity": 0.5595084762805284,
+    "top_similarity": 0.5831374817616057,
+    "dtc_codes": [
+      "U160087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IC DTC List"
+  },
+  {
+    "question": "Could an open CAN-H or CAN-L wire cause U160087?",
+    "target_chunk_id": 212,
+    "n_rivals": 4,
+    "rank": 3,
+    "correct": false,
+    "top_scored_chunk_id": 298,
+    "top_scored_submodule": "TICE DTC List",
+    "target_similarity": 0.5330661024363236,
+    "top_similarity": 0.5717472754570184,
+    "dtc_codes": [
+      "U160087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IC DTC List"
+  },
+  {
+    "question": "What does it mean if B056F00 returns after replacing the Instrument Cluster?",
+    "target_chunk_id": 208,
+    "n_rivals": 6,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 208,
+    "top_scored_submodule": "IC DTC List",
+    "target_similarity": 0.7719765738943881,
+    "top_similarity": 0.7719765738943881,
+    "dtc_codes": [
+      "B056F00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IC DTC List"
+  },
+  {
+    "question": "Could the generator charging voltage cause B056F00?",
+    "target_chunk_id": 208,
+    "n_rivals": 6,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 321,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.5814183273010898,
+    "top_similarity": 0.6108470743847302,
+    "dtc_codes": [
+      "B056F00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IC DTC List"
+  },
+  {
+    "question": "How do I tell whether U228187 is caused by wiring or a module?",
+    "target_chunk_id": 205,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 205,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.6230193279513618,
+    "top_similarity": 0.6230193279513618,
+    "dtc_codes": [
+      "U228187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IBC DTC List"
+  },
+  {
+    "question": "Could an open CAN-L wire cause U228187?",
+    "target_chunk_id": 205,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 205,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.598125517793522,
+    "top_similarity": 0.598125517793522,
+    "dtc_codes": [
+      "U228187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IBC DTC List"
+  },
+  {
+    "question": "Why is the DCDC enable signal message lost?",
+    "target_chunk_id": 214,
+    "n_rivals": 19,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 93,
+    "top_scored_submodule": "CDU (TC) DTC List",
+    "target_similarity": 0.4328684412387406,
+    "top_similarity": 0.45096314184198427,
+    "dtc_codes": [
+      "U190287",
+      "U190387",
+      "U190487",
+      "U190687",
+      "U192087",
+      "U193787"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IC DTC List"
+  },
+  {
+    "question": "Why is the vehicle power percentage not displayed?",
+    "target_chunk_id": 214,
+    "n_rivals": 19,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 214,
+    "top_scored_submodule": "IC DTC List",
+    "target_similarity": 0.38421389335170175,
+    "top_similarity": 0.38421389335170175,
+    "dtc_codes": [
+      "U190287",
+      "U190387",
+      "U190487",
+      "U190687",
+      "U192087",
+      "U193787"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IC DTC List"
+  },
+  {
+    "question": "Why is the instrument cluster not receiving the brake pedal signal from EBS?",
+    "target_chunk_id": 220,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 220,
+    "top_scored_submodule": "IC DTC List",
+    "target_similarity": 0.5896226623264997,
+    "top_similarity": 0.5896226623264997,
+    "dtc_codes": [
+      "U2A8A87"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IC DTC List"
+  },
+  {
+    "question": "Could an open circuit or high resistance cause the brake pedal message to be lost?",
+    "target_chunk_id": 220,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 220,
+    "top_scored_submodule": "IC DTC List",
+    "target_similarity": 0.5704015772399967,
+    "top_similarity": 0.5704015772399967,
+    "dtc_codes": [
+      "U2A8A87"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IC DTC List"
+  },
+  {
+    "question": "What should I check first for an Instrument Cluster voltage code?",
+    "target_chunk_id": 209,
+    "n_rivals": 12,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 209,
+    "top_scored_submodule": "IC DTC List",
+    "target_similarity": 0.6686260272797435,
+    "top_similarity": 0.6686260272797435,
+    "dtc_codes": [
+      "B100016",
+      "B100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IC DTC List"
+  },
+  {
+    "question": "What is the difference between B100016 and B100017?",
+    "target_chunk_id": 209,
+    "n_rivals": 12,
+    "rank": 9,
+    "correct": false,
+    "top_scored_chunk_id": 295,
+    "top_scored_submodule": "TICE DTC List",
+    "target_similarity": 0.48682178588781677,
+    "top_similarity": 0.5518193135128593,
+    "dtc_codes": [
+      "B100016",
+      "B100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IC DTC List"
+  },
+  {
+    "question": "What should I check before replacing the instrument cluster for these codes?",
+    "target_chunk_id": 216,
+    "n_rivals": 7,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 216,
+    "top_scored_submodule": "IC DTC List",
+    "target_similarity": 0.6832664541456487,
+    "top_similarity": 0.6832664541456487,
+    "dtc_codes": [
+      "U200387",
+      "U200487",
+      "U200787",
+      "U220187",
+      "U220287"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IC DTC List"
+  },
+  {
+    "question": "What does U200487 mean on my vehicle?",
+    "target_chunk_id": 216,
+    "n_rivals": 7,
+    "rank": 7,
+    "correct": false,
+    "top_scored_chunk_id": 106,
+    "top_scored_submodule": "CDU (YBR) DTC List",
+    "target_similarity": 0.48822992479299687,
+    "top_similarity": 0.6069237673409054,
+    "dtc_codes": [
+      "U200387",
+      "U200487",
+      "U200787",
+      "U220187",
+      "U220287"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IC DTC List"
+  },
+  {
+    "question": "Why is B100017 showing battery voltage high?",
+    "target_chunk_id": 221,
+    "n_rivals": 12,
+    "rank": 11,
+    "correct": false,
+    "top_scored_chunk_id": 322,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.567978993292484,
+    "top_similarity": 0.6978841840167241,
+    "dtc_codes": [
+      "B100016",
+      "B100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "ICE DTC List"
+  },
+  {
+    "question": "What voltage makes the Multimedia Module set B100016 or B100017?",
+    "target_chunk_id": 221,
+    "n_rivals": 12,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 295,
+    "top_scored_submodule": "TICE DTC List",
+    "target_similarity": 0.6746891537202296,
+    "top_similarity": 0.6949999428328243,
+    "dtc_codes": [
+      "B100016",
+      "B100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "ICE DTC List"
+  },
+  {
+    "question": "Can U260087 be an intermittent communication fault?",
+    "target_chunk_id": 224,
+    "n_rivals": 17,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 207,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.5584161411246,
+    "top_similarity": 0.5846403524833756,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "ICE DTC List"
+  },
+  {
+    "question": "Is U260087 an odometer communication fault?",
+    "target_chunk_id": 224,
+    "n_rivals": 17,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 107,
+    "top_scored_submodule": "CDU (YBR) DTC List",
+    "target_similarity": 0.6717701275473387,
+    "top_similarity": 0.6775191885598214,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "ICE DTC List"
+  },
+  {
+    "question": "How many fault-free ignition cycles does it take to clear U260087?",
+    "target_chunk_id": 207,
+    "n_rivals": 17,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 207,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.5630073537038611,
+    "top_similarity": 0.5630073537038611,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IBC DTC List"
+  },
+  {
+    "question": "Could the Intelligent Access System Controller cause U260087?",
+    "target_chunk_id": 207,
+    "n_rivals": 17,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 207,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.6164296420507428,
+    "top_similarity": 0.6164296420507428,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IBC DTC List"
+  },
+  {
+    "question": "What resistance should I measure between CAN-H and CAN-L at the K161 recorder connector?",
+    "target_chunk_id": 213,
+    "n_rivals": 7,
+    "rank": 3,
+    "correct": false,
+    "top_scored_chunk_id": 357,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.3928862362906711,
+    "top_similarity": 0.4190654814605823,
+    "dtc_codes": [
+      "U180087",
+      "U180187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IC DTC List"
+  },
+  {
+    "question": "Could the Vehicle Performance Data Recorder cause U180087 or U180187?",
+    "target_chunk_id": 213,
+    "n_rivals": 7,
+    "rank": 2,
+    "correct": false,
+    "top_scored_chunk_id": 312,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.6275521327586111,
+    "top_similarity": 0.681812479587972,
+    "dtc_codes": [
+      "U180087",
+      "U180187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IC DTC List"
+  },
+  {
+    "question": "Why is U007300 stored for the steering column lock module?",
+    "target_chunk_id": 231,
+    "n_rivals": 16,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 231,
+    "top_scored_submodule": "IESL DTC List",
+    "target_similarity": 0.6590994548871081,
+    "top_similarity": 0.6590994548871081,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IESL DTC List"
+  },
+  {
+    "question": "How do I check the CAN-L wire for an open or high resistance on U007300?",
+    "target_chunk_id": 231,
+    "n_rivals": 16,
+    "rank": 8,
+    "correct": false,
+    "top_scored_chunk_id": 92,
+    "top_scored_submodule": "CDU (TC) DTC List",
+    "target_similarity": 0.6387430527959517,
+    "top_similarity": 0.6735223089470848,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IESL DTC List"
+  },
+  {
+    "question": "What resistance should I measure between DLC pins 6 and 14 for U007300?",
+    "target_chunk_id": 222,
+    "n_rivals": 16,
+    "rank": 13,
+    "correct": false,
+    "top_scored_chunk_id": 103,
+    "top_scored_submodule": "CDU (YBR) DTC List",
+    "target_similarity": 0.44889546075599074,
+    "top_similarity": 0.5046966839654309,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "ICE DTC List"
+  },
+  {
+    "question": "Can U007300 be intermittent and clear after driving cycles?",
+    "target_chunk_id": 222,
+    "n_rivals": 16,
+    "rank": 12,
+    "correct": false,
+    "top_scored_chunk_id": 264,
+    "top_scored_submodule": "MCU DTC List",
+    "target_similarity": 0.5919506610685432,
+    "top_similarity": 0.6614103426317063,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "ICE DTC List"
+  },
+  {
+    "question": "Does U190387 mean the battery current message is missing?",
+    "target_chunk_id": 237,
+    "n_rivals": 19,
+    "rank": 6,
+    "correct": false,
+    "top_scored_chunk_id": 86,
+    "top_scored_submodule": "BMS (LG) DTC List",
+    "target_similarity": 0.5574461413997033,
+    "top_similarity": 0.5849592622392357,
+    "dtc_codes": [
+      "U190287",
+      "U190387",
+      "U190487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "LAM DTC List"
+  },
+  {
+    "question": "How do I diagnose an open CAN wire for the pedestrian alert sound module?",
+    "target_chunk_id": 237,
+    "n_rivals": 19,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 237,
+    "top_scored_submodule": "LAM DTC List",
+    "target_similarity": 0.5912117950327875,
+    "top_similarity": 0.5912117950327875,
+    "dtc_codes": [
+      "U190287",
+      "U190387",
+      "U190487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "LAM DTC List"
+  },
+  {
+    "question": "What does lost message $155 from the VCU mean?",
+    "target_chunk_id": 233,
+    "n_rivals": 19,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 233,
+    "top_scored_submodule": "IESL DTC List",
+    "target_similarity": 0.4762067791558555,
+    "top_similarity": 0.4762067791558555,
+    "dtc_codes": [
+      "U190287",
+      "U190387",
+      "U190482",
+      "U190483",
+      "U190487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IESL DTC List"
+  },
+  {
+    "question": "Why is motor speed or vehicle speed data missing from the VCU?",
+    "target_chunk_id": 233,
+    "n_rivals": 19,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 313,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.4990588226524142,
+    "top_similarity": 0.5135494039978924,
+    "dtc_codes": [
+      "U190287",
+      "U190387",
+      "U190482",
+      "U190483",
+      "U190487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IESL DTC List"
+  },
+  {
+    "question": "How do I clear U260087, and when does it clear by itself?",
+    "target_chunk_id": 238,
+    "n_rivals": 17,
+    "rank": 10,
+    "correct": false,
+    "top_scored_chunk_id": 207,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.5016243488506258,
+    "top_similarity": 0.5722652188969428,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "LAM DTC List"
+  },
+  {
+    "question": "What does U260087 mean?",
+    "target_chunk_id": 238,
+    "n_rivals": 17,
+    "rank": 14,
+    "correct": false,
+    "top_scored_chunk_id": 207,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.4820160166571339,
+    "top_similarity": 0.5678849818376852,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "LAM DTC List"
+  },
+  {
+    "question": "Could a CAN-H or CAN-L wire shorted to ground cause these codes?",
+    "target_chunk_id": 265,
+    "n_rivals": 19,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 140,
+    "top_scored_submodule": "EPS (DH) DTC List",
+    "target_similarity": 0.5313936469358117,
+    "top_similarity": 0.554385401909434,
+    "dtc_codes": [
+      "U190081",
+      "U190087",
+      "U190387",
+      "U190487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "MCU DTC List"
+  },
+  {
+    "question": "What voltage should CAN-H measure at the Hybrid/EV Battery Section connector?",
+    "target_chunk_id": 265,
+    "n_rivals": 19,
+    "rank": 3,
+    "correct": false,
+    "top_scored_chunk_id": 86,
+    "top_scored_submodule": "BMS (LG) DTC List",
+    "target_similarity": 0.5125437999914679,
+    "top_similarity": 0.5481524837741326,
+    "dtc_codes": [
+      "U190081",
+      "U190087",
+      "U190387",
+      "U190487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "MCU DTC List"
+  },
+  {
+    "question": "What does B104C00 mean on a hybrid or EV?",
+    "target_chunk_id": 332,
+    "n_rivals": 2,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 332,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.6405653421778204,
+    "top_similarity": 0.6405653421778204,
+    "dtc_codes": [
+      "B101C00",
+      "B102C00",
+      "B103C00",
+      "B104C00",
+      "B105C00",
+      "B106C00",
+      "B107C00",
+      "B108C00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "How do I clear historical BMS battery fault codes?",
+    "target_chunk_id": 332,
+    "n_rivals": 2,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 332,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.6821056612157562,
+    "top_similarity": 0.6821056612157562,
+    "dtc_codes": [
+      "B101C00",
+      "B102C00",
+      "B103C00",
+      "B104C00",
+      "B105C00",
+      "B106C00",
+      "B107C00",
+      "B108C00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "Can a faulty instrument cluster cause U260087?",
+    "target_chunk_id": 266,
+    "n_rivals": 17,
+    "rank": 8,
+    "correct": false,
+    "top_scored_chunk_id": 121,
+    "top_scored_submodule": "EBS DTC List",
+    "target_similarity": 0.6865372590717674,
+    "top_similarity": 0.7277117694590673,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "MCU DTC List"
+  },
+  {
+    "question": "Will U260087 clear after driving without the fault?",
+    "target_chunk_id": 266,
+    "n_rivals": 17,
+    "rank": 3,
+    "correct": false,
+    "top_scored_chunk_id": 318,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.5097508581242346,
+    "top_similarity": 0.5233616805455118,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "MCU DTC List"
+  },
+  {
+    "question": "What does passenger airbag leakage to battery mean?",
+    "target_chunk_id": 270,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 270,
+    "top_scored_submodule": "SDM DTC List",
+    "target_similarity": 0.5588599683065698,
+    "top_similarity": 0.5588599683065698,
+    "dtc_codes": [
+      "B101500",
+      "B102600",
+      "B103700",
+      "B104800"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "SDM DTC List"
+  },
+  {
+    "question": "Can I drive with the SRS warning lamp on and a passenger airbag circuit code?",
+    "target_chunk_id": 270,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 270,
+    "top_scored_submodule": "SDM DTC List",
+    "target_similarity": 0.6461376023320777,
+    "top_similarity": 0.6461376023320777,
+    "dtc_codes": [
+      "B101500",
+      "B102600",
+      "B103700",
+      "B104800"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "SDM DTC List"
+  },
+  {
+    "question": "Does B108800 indicate an internal fault in the restraint control module?",
+    "target_chunk_id": 280,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 280,
+    "top_scored_submodule": "SDM DTC List",
+    "target_similarity": 0.7301435917844094,
+    "top_similarity": 0.7301435917844094,
+    "dtc_codes": [
+      "B108800"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "SDM DTC List"
+  },
+  {
+    "question": "What is DTC B108800 on the ACU?",
+    "target_chunk_id": 280,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 280,
+    "top_scored_submodule": "SDM DTC List",
+    "target_similarity": 0.6633753539242082,
+    "top_similarity": 0.6633753539242082,
+    "dtc_codes": [
+      "B108800"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "SDM DTC List"
+  },
+  {
+    "question": "What should I check when the restraint module has an invalid configuration?",
+    "target_chunk_id": 267,
+    "n_rivals": 6,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 267,
+    "top_scored_submodule": "SDM DTC List",
+    "target_similarity": 0.5792335518461327,
+    "top_similarity": 0.5792335518461327,
+    "dtc_codes": [
+      "B056F00",
+      "B066F00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "SDM DTC List"
+  },
+  {
+    "question": "Why is F1F5 set to 0x01 with code B066F00?",
+    "target_chunk_id": 267,
+    "n_rivals": 6,
+    "rank": 4,
+    "correct": false,
+    "top_scored_chunk_id": 159,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.4537680654618387,
+    "top_similarity": 0.508361656270814,
+    "dtc_codes": [
+      "B056F00",
+      "B066F00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "SDM DTC List"
+  },
+  {
+    "question": "Why is my airbag warning light on with code B101C00?",
+    "target_chunk_id": 273,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 273,
+    "top_scored_submodule": "SDM DTC List",
+    "target_similarity": 0.7630407480485012,
+    "top_similarity": 0.7630407480485012,
+    "dtc_codes": [
+      "B101C00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "SDM DTC List"
+  },
+  {
+    "question": "What does leakage resistance at the driver airbag pin mean?",
+    "target_chunk_id": 273,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 273,
+    "top_scored_submodule": "SDM DTC List",
+    "target_similarity": 0.5057627503264819,
+    "top_similarity": 0.5057627503264819,
+    "dtc_codes": [
+      "B101C00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "SDM DTC List"
+  },
+  {
+    "question": "What does B102C00 mean?",
+    "target_chunk_id": 275,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 275,
+    "top_scored_submodule": "SDM DTC List",
+    "target_similarity": 0.6221381453681755,
+    "top_similarity": 0.6221381453681755,
+    "dtc_codes": [
+      "B102C00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "SDM DTC List"
+  },
+  {
+    "question": "Can leakage resistance at an unused airbag pin trigger B102C00?",
+    "target_chunk_id": 275,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 275,
+    "top_scored_submodule": "SDM DTC List",
+    "target_similarity": 0.6110695750205183,
+    "top_similarity": 0.6110695750205183,
+    "dtc_codes": [
+      "B102C00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "SDM DTC List"
+  },
+  {
+    "question": "Could the Vehicle Performance Data Recorder cause U007300?",
+    "target_chunk_id": 264,
+    "n_rivals": 16,
+    "rank": 3,
+    "correct": false,
+    "top_scored_chunk_id": 54,
+    "top_scored_submodule": "BMS (KY) DTC List",
+    "target_similarity": 0.637268527207391,
+    "top_similarity": 0.7284938194669737,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "MCU DTC List"
+  },
+  {
+    "question": "Could U007300 cause an intermittent drive motor control problem?",
+    "target_chunk_id": 264,
+    "n_rivals": 16,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 264,
+    "top_scored_submodule": "MCU DTC List",
+    "target_similarity": 0.6600906528699918,
+    "top_similarity": 0.6600906528699918,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "MCU DTC List"
+  },
+  {
+    "question": "Could damaged wiring or a poor connector cause a driver airbag circuit code?",
+    "target_chunk_id": 269,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 269,
+    "top_scored_submodule": "SDM DTC List",
+    "target_similarity": 0.6241542973121222,
+    "top_similarity": 0.6241542973121222,
+    "dtc_codes": [
+      "B101300",
+      "B102400",
+      "B103500",
+      "B104600"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "SDM DTC List"
+  },
+  {
+    "question": "What does B104600 mean on a driver airbag?",
+    "target_chunk_id": 269,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 269,
+    "top_scored_submodule": "SDM DTC List",
+    "target_similarity": 0.596809954223759,
+    "top_similarity": 0.596809954223759,
+    "dtc_codes": [
+      "B101300",
+      "B102400",
+      "B103500",
+      "B104600"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "SDM DTC List"
+  },
+  {
+    "question": "Can the driver seat belt switch or restraint sensing module cause these DTCs?",
+    "target_chunk_id": 271,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 271,
+    "top_scored_submodule": "SDM DTC List",
+    "target_similarity": 0.6259156052464502,
+    "top_similarity": 0.6259156052464502,
+    "dtc_codes": [
+      "B101700",
+      "B102800",
+      "B103900",
+      "B105100"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "SDM DTC List"
+  },
+  {
+    "question": "What does high resistance in the driver buckle retractor circuit mean?",
+    "target_chunk_id": 271,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 271,
+    "top_scored_submodule": "SDM DTC List",
+    "target_similarity": 0.4864219316908641,
+    "top_similarity": 0.4864219316908641,
+    "dtc_codes": [
+      "B101700",
+      "B102800",
+      "B103900",
+      "B105100"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "SDM DTC List"
+  },
+  {
+    "question": "Does B106A00 mean the driver seat belt switch is not recognized?",
+    "target_chunk_id": 278,
+    "n_rivals": 2,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 278,
+    "top_scored_submodule": "SDM DTC List",
+    "target_similarity": 0.757326278539543,
+    "top_similarity": 0.757326278539543,
+    "dtc_codes": [
+      "B106A00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "SDM DTC List"
+  },
+  {
+    "question": "Why is my airbag or restraint warning light on with code B106A00?",
+    "target_chunk_id": 278,
+    "n_rivals": 2,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 278,
+    "top_scored_submodule": "SDM DTC List",
+    "target_similarity": 0.7650983985065832,
+    "top_similarity": 0.7650983985065832,
+    "dtc_codes": [
+      "B106A00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "SDM DTC List"
+  },
+  {
+    "question": "multimedia system fault",
+    "target_chunk_id": 295,
+    "n_rivals": 12,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 221,
+    "top_scored_submodule": "ICE DTC List",
+    "target_similarity": 0.4366662650876405,
+    "top_similarity": 0.47395016535144696,
+    "dtc_codes": [
+      "B100016",
+      "B100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TICE DTC List"
+  },
+  {
+    "question": "navigation screen not working",
+    "target_chunk_id": 295,
+    "n_rivals": 12,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 295,
+    "top_scored_submodule": "TICE DTC List",
+    "target_similarity": 0.26403151149666726,
+    "top_similarity": 0.26403151149666726,
+    "dtc_codes": [
+      "B100016",
+      "B100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TICE DTC List"
+  },
+  {
+    "question": "Does U007300 mean the Multimedia Module needs replacement?",
+    "target_chunk_id": 296,
+    "n_rivals": 16,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 222,
+    "top_scored_submodule": "ICE DTC List",
+    "target_similarity": 0.6700219152131024,
+    "top_similarity": 0.6752580493502366,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TICE DTC List"
+  },
+  {
+    "question": "Could the Instrument Cluster connection affect the multimedia CAN network?",
+    "target_chunk_id": 296,
+    "n_rivals": 16,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 210,
+    "top_scored_submodule": "IC DTC List",
+    "target_similarity": 0.5632060683334282,
+    "top_similarity": 0.5666974851595173,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TICE DTC List"
+  },
+  {
+    "question": "What does B056F00 mean on a vehicle?",
+    "target_chunk_id": 294,
+    "n_rivals": 6,
+    "rank": 6,
+    "correct": false,
+    "top_scored_chunk_id": 321,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.5703090103495987,
+    "top_similarity": 0.6311614372588248,
+    "dtc_codes": [
+      "B056F00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TICE DTC List"
+  },
+  {
+    "question": "Does B056F00 mean the multimedia module needs replacement?",
+    "target_chunk_id": 294,
+    "n_rivals": 6,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 294,
+    "top_scored_submodule": "TICE DTC List",
+    "target_similarity": 0.6854035735191857,
+    "top_similarity": 0.6854035735191857,
+    "dtc_codes": [
+      "B056F00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TICE DTC List"
+  },
+  {
+    "question": "Which VCU message is lost with U193787?",
+    "target_chunk_id": 300,
+    "n_rivals": 19,
+    "rank": 2,
+    "correct": false,
+    "top_scored_chunk_id": 93,
+    "top_scored_submodule": "CDU (TC) DTC List",
+    "target_similarity": 0.5842557854790926,
+    "top_similarity": 0.5887643576912976,
+    "dtc_codes": [
+      "U190287",
+      "U190387",
+      "U190487",
+      "U190687",
+      "U193787"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TICE DTC List"
+  },
+  {
+    "question": "What does code U190287 mean?",
+    "target_chunk_id": 300,
+    "n_rivals": 19,
+    "rank": 5,
+    "correct": false,
+    "top_scored_chunk_id": 285,
+    "top_scored_submodule": "SDM DTC List",
+    "target_similarity": 0.5886204241700576,
+    "top_similarity": 0.6501046584061465,
+    "dtc_codes": [
+      "U190287",
+      "U190387",
+      "U190487",
+      "U190687",
+      "U193787"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TICE DTC List"
+  },
+  {
+    "question": "Why is the Vehicle Performance Data Recorder showing a low battery voltage code?",
+    "target_chunk_id": 304,
+    "n_rivals": 12,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 304,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.6885793738068327,
+    "top_similarity": 0.6885793738068327,
+    "dtc_codes": [
+      "B100016",
+      "B100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "UCU DTC List"
+  },
+  {
+    "question": "Could a blown fuse cause the Vehicle Performance Data Recorder voltage code?",
+    "target_chunk_id": 304,
+    "n_rivals": 12,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 304,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.5782306229935913,
+    "top_similarity": 0.5782306229935913,
+    "dtc_codes": [
+      "B100016",
+      "B100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "UCU DTC List"
+  },
+  {
+    "question": "What causes U200A87 on the high-speed CAN network?",
+    "target_chunk_id": 292,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 292,
+    "top_scored_submodule": "TBOX DTC List",
+    "target_similarity": 0.6748813505558123,
+    "top_similarity": 0.6748813505558123,
+    "dtc_codes": [
+      "U200A87"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TBOX DTC List"
+  },
+  {
+    "question": "What is message $319 from the IBC?",
+    "target_chunk_id": 292,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 292,
+    "top_scored_submodule": "TBOX DTC List",
+    "target_similarity": 0.4277733794440486,
+    "top_similarity": 0.4277733794440486,
+    "dtc_codes": [
+      "U200A87"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TBOX DTC List"
+  },
+  {
+    "question": "What does U180187 mean on a vehicle scan?",
+    "target_chunk_id": 299,
+    "n_rivals": 7,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 299,
+    "top_scored_submodule": "TICE DTC List",
+    "target_similarity": 0.6475404777354753,
+    "top_similarity": 0.6475404777354753,
+    "dtc_codes": [
+      "U180187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TICE DTC List"
+  },
+  {
+    "question": "What CAN communication problem causes U180187?",
+    "target_chunk_id": 299,
+    "n_rivals": 7,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 299,
+    "top_scored_submodule": "TICE DTC List",
+    "target_similarity": 0.6177064352438227,
+    "top_similarity": 0.6177064352438227,
+    "dtc_codes": [
+      "U180187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TICE DTC List"
+  },
+  {
+    "question": "Could the SDM be causing the airbag indicator or seat belt status message loss?",
+    "target_chunk_id": 312,
+    "n_rivals": 7,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 312,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.650939479274315,
+    "top_similarity": 0.650939479274315,
+    "dtc_codes": [
+      "U180087",
+      "U180187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "UCU DTC List"
+  },
+  {
+    "question": "What do codes U180087 and U180187 mean together?",
+    "target_chunk_id": 312,
+    "n_rivals": 7,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 312,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.6114784216706606,
+    "top_similarity": 0.6114784216706606,
+    "dtc_codes": [
+      "U180087",
+      "U180187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "UCU DTC List"
+  },
+  {
+    "question": "What does U260087 mean on the instrument cluster?",
+    "target_chunk_id": 318,
+    "n_rivals": 17,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 318,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.6837153479952189,
+    "top_similarity": 0.6837153479952189,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "UCU DTC List"
+  },
+  {
+    "question": "What should CAN-H and CAN-L resistance measure with a module connector disconnected?",
+    "target_chunk_id": 318,
+    "n_rivals": 17,
+    "rank": 9,
+    "correct": false,
+    "top_scored_chunk_id": 238,
+    "top_scored_submodule": "LAM DTC List",
+    "target_similarity": 0.3530161957000989,
+    "top_similarity": 0.3949669257914009,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "UCU DTC List"
+  },
+  {
+    "question": "What does “vehicle mileage information message from IC lost” mean?",
+    "target_chunk_id": 293,
+    "n_rivals": 17,
+    "rank": 6,
+    "correct": false,
+    "top_scored_chunk_id": 107,
+    "top_scored_submodule": "CDU (YBR) DTC List",
+    "target_similarity": 0.5564001748890726,
+    "top_similarity": 0.6204443693882528,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TBOX DTC List"
+  },
+  {
+    "question": "What does U260087 mean compared with U260C87 or U261187?",
+    "target_chunk_id": 293,
+    "n_rivals": 17,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 207,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.5457724237993338,
+    "top_similarity": 0.5588429011527295,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TBOX DTC List"
+  },
+  {
+    "question": "What CAN bus resistance should I measure for this IBC message lost diagnosis?",
+    "target_chunk_id": 301,
+    "n_rivals": 7,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 301,
+    "top_scored_submodule": "TICE DTC List",
+    "target_similarity": 0.597858371462206,
+    "top_similarity": 0.597858371462206,
+    "dtc_codes": [
+      "U200087",
+      "U220187",
+      "U200387",
+      "U200487",
+      "U201087",
+      "U220287"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TICE DTC List"
+  },
+  {
+    "question": "What does U201087 mean on my vehicle?",
+    "target_chunk_id": 301,
+    "n_rivals": 7,
+    "rank": 5,
+    "correct": false,
+    "top_scored_chunk_id": 106,
+    "top_scored_submodule": "CDU (YBR) DTC List",
+    "target_similarity": 0.45794628232253887,
+    "top_similarity": 0.5266288519614539,
+    "dtc_codes": [
+      "U200087",
+      "U220187",
+      "U200387",
+      "U200487",
+      "U201087",
+      "U220287"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TICE DTC List"
+  },
+  {
+    "question": "What does U260087 mean for the lost vehicle mileage message?",
+    "target_chunk_id": 302,
+    "n_rivals": 17,
+    "rank": 11,
+    "correct": false,
+    "top_scored_chunk_id": 107,
+    "top_scored_submodule": "CDU (YBR) DTC List",
+    "target_similarity": 0.6492306802350778,
+    "top_similarity": 0.7176722418992408,
+    "dtc_codes": [
+      "U260087",
+      "U260C87",
+      "U261187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TICE DTC List"
+  },
+  {
+    "question": "Can an intermittent connection cause U260087, U260C87, or U261187?",
+    "target_chunk_id": 302,
+    "n_rivals": 17,
+    "rank": 9,
+    "correct": false,
+    "top_scored_chunk_id": 207,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.5697571175982119,
+    "top_similarity": 0.634309287234686,
+    "dtc_codes": [
+      "U260087",
+      "U260C87",
+      "U261187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TICE DTC List"
+  },
+  {
+    "question": "What should resistance be between QWL09 X2 terminal 9 and K161 terminal 37?",
+    "target_chunk_id": 291,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 291,
+    "top_scored_submodule": "TBOX DTC List",
+    "target_similarity": 0.32176154916934396,
+    "top_similarity": 0.32176154916934396,
+    "dtc_codes": [
+      "U007305"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TBOX DTC List"
+  },
+  {
+    "question": "How do I test CAN-H for a short to ground or power?",
+    "target_chunk_id": 291,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 291,
+    "top_scored_submodule": "TBOX DTC List",
+    "target_similarity": 0.48496369620602353,
+    "top_similarity": 0.48496369620602353,
+    "dtc_codes": [
+      "U007305"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TBOX DTC List"
+  },
+  {
+    "question": "Is U007302 an intermittent CAN communication fault?",
+    "target_chunk_id": 290,
+    "n_rivals": 2,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 307,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.6660704451868281,
+    "top_similarity": 0.692631652179264,
+    "dtc_codes": [
+      "U007302"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TBOX DTC List"
+  },
+  {
+    "question": "Could an open or high-resistance CAN wire cause U007302?",
+    "target_chunk_id": 290,
+    "n_rivals": 2,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 290,
+    "top_scored_submodule": "TBOX DTC List",
+    "target_similarity": 0.6558985056137712,
+    "top_similarity": 0.6558985056137712,
+    "dtc_codes": [
+      "U007302"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TBOX DTC List"
+  },
+  {
+    "question": "How do I diagnose U160087 on the CAN-H and CAN-L circuits?",
+    "target_chunk_id": 311,
+    "n_rivals": 4,
+    "rank": 4,
+    "correct": false,
+    "top_scored_chunk_id": 356,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.5738649412073815,
+    "top_similarity": 0.6272226247279545,
+    "dtc_codes": [
+      "U160087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "UCU DTC List"
+  },
+  {
+    "question": "What should I check before replacing the EPS module for U160087?",
+    "target_chunk_id": 311,
+    "n_rivals": 4,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 298,
+    "top_scored_submodule": "TICE DTC List",
+    "target_similarity": 0.6198249113218914,
+    "top_similarity": 0.6313504441460982,
+    "dtc_codes": [
+      "U160087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "UCU DTC List"
+  },
+  {
+    "question": "What should CAN resistance measure when diagnosing U140287?",
+    "target_chunk_id": 297,
+    "n_rivals": 7,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 297,
+    "top_scored_submodule": "TICE DTC List",
+    "target_similarity": 0.5766122790842242,
+    "top_similarity": 0.5766122790842242,
+    "dtc_codes": [
+      "U140287"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TICE DTC List"
+  },
+  {
+    "question": "Why is my vehicle stability warning light on with U140287?",
+    "target_chunk_id": 297,
+    "n_rivals": 7,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 297,
+    "top_scored_submodule": "TICE DTC List",
+    "target_similarity": 0.6289077161077578,
+    "top_similarity": 0.6289077161077578,
+    "dtc_codes": [
+      "U140287"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "TICE DTC List"
+  },
+  {
+    "question": "What does lost OBC message $486 mean?",
+    "target_chunk_id": 315,
+    "n_rivals": 4,
+    "rank": 3,
+    "correct": false,
+    "top_scored_chunk_id": 215,
+    "top_scored_submodule": "IC DTC List",
+    "target_similarity": 0.47633431227028333,
+    "top_similarity": 0.5324168255060114,
+    "dtc_codes": [
+      "U1A8087",
+      "U1A8487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "UCU DTC List"
+  },
+  {
+    "question": "How do I test the CAN-H wire between the battery charger and Vehicle Performance Data Recorder?",
+    "target_chunk_id": 315,
+    "n_rivals": 4,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 315,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.5790957539785399,
+    "top_similarity": 0.5790957539785399,
+    "dtc_codes": [
+      "U1A8087",
+      "U1A8487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "UCU DTC List"
+  },
+  {
+    "question": "Can the Intelligent Access System Controller Assembly cause these lost-message codes?",
+    "target_chunk_id": 317,
+    "n_rivals": 5,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 317,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.6620217008384721,
+    "top_similarity": 0.6620217008384721,
+    "dtc_codes": [
+      "U200087",
+      "U200A87",
+      "U220287"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "UCU DTC List"
+  },
+  {
+    "question": "Do I need to replace the Vehicle Performance Data Recorder for these codes?",
+    "target_chunk_id": 317,
+    "n_rivals": 5,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 317,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.5843531712896133,
+    "top_similarity": 0.5843531712896133,
+    "dtc_codes": [
+      "U200087",
+      "U200A87",
+      "U220287"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "UCU DTC List"
+  },
+  {
+    "question": "What modules should be checked if the CAN wiring tests pass?",
+    "target_chunk_id": 320,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 320,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.47997811872924245,
+    "top_similarity": 0.47997811872924245,
+    "dtc_codes": [
+      "U280087",
+      "U280387"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "UCU DTC List"
+  },
+  {
+    "question": "What does lost AC message $279 mean?",
+    "target_chunk_id": 320,
+    "n_rivals": 1,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 122,
+    "top_scored_submodule": "EBS DTC List",
+    "target_similarity": 0.5578340576379032,
+    "top_similarity": 0.587642235802495,
+    "dtc_codes": [
+      "U280087",
+      "U280387"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "UCU DTC List"
+  },
+  {
+    "question": "Can low battery voltage set B056F00?",
+    "target_chunk_id": 321,
+    "n_rivals": 6,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 321,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.641982968494321,
+    "top_similarity": 0.641982968494321,
+    "dtc_codes": [
+      "B056F00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "How do I check the Hybrid/EV Battery Section ground, B+, and IGN circuits for B056F00?",
+    "target_chunk_id": 321,
+    "n_rivals": 6,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 321,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.721153547633442,
+    "top_similarity": 0.721153547633442,
+    "dtc_codes": [
+      "B056F00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "Could a CAN circuit short to power cause ABS or ESP message-loss codes?",
+    "target_chunk_id": 355,
+    "n_rivals": 7,
+    "rank": 2,
+    "correct": false,
+    "top_scored_chunk_id": 310,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.6181682613686073,
+    "top_similarity": 0.6489351468293604,
+    "dtc_codes": [
+      "U140087",
+      "U140287",
+      "U140387",
+      "U140487",
+      "U140587",
+      "U140787"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "Can the Hybrid/EV Battery Section cause these ABS or ESP communication codes?",
+    "target_chunk_id": 355,
+    "n_rivals": 7,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 355,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.6914584067272161,
+    "top_similarity": 0.6914584067272161,
+    "dtc_codes": [
+      "U140087",
+      "U140287",
+      "U140387",
+      "U140487",
+      "U140587",
+      "U140787"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "Why does my hybrid show a motor or inverter fault?",
+    "target_chunk_id": 337,
+    "n_rivals": 3,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 337,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.6299355425465306,
+    "top_similarity": 0.6299355425465306,
+    "dtc_codes": [
+      "B103400",
+      "B103500",
+      "B103600",
+      "B10441C",
+      "B10451C",
+      "B104800",
+      "B104900",
+      "B105000",
+      "B105100",
+      "B114C00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "What do B10441C and B10451C mean on my vehicle?",
+    "target_chunk_id": 337,
+    "n_rivals": 3,
+    "rank": 2,
+    "correct": false,
+    "top_scored_chunk_id": 269,
+    "top_scored_submodule": "SDM DTC List",
+    "target_similarity": 0.46279354003284556,
+    "top_similarity": 0.48513090867622066,
+    "dtc_codes": [
+      "B103400",
+      "B103500",
+      "B103600",
+      "B10441C",
+      "B10451C",
+      "B104800",
+      "B104900",
+      "B105000",
+      "B105100",
+      "B114C00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "Why is the driver seat belt status message invalid?",
+    "target_chunk_id": 357,
+    "n_rivals": 7,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 357,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.556400727407867,
+    "top_similarity": 0.556400727407867,
+    "dtc_codes": [
+      "U180181",
+      "U180187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "Why is driver seat belt status not updating?",
+    "target_chunk_id": 357,
+    "n_rivals": 7,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 357,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.4829173827564095,
+    "top_similarity": 0.4829173827564095,
+    "dtc_codes": [
+      "U180181",
+      "U180187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "What should I check when U007300 is stored?",
+    "target_chunk_id": 354,
+    "n_rivals": 16,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 264,
+    "top_scored_submodule": "MCU DTC List",
+    "target_similarity": 0.6182262314635165,
+    "top_similarity": 0.6381269409377065,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "Why does my scan tool show U007300?",
+    "target_chunk_id": 354,
+    "n_rivals": 16,
+    "rank": 3,
+    "correct": false,
+    "top_scored_chunk_id": 84,
+    "top_scored_submodule": "BMS (LG) DTC List",
+    "target_similarity": 0.6406695678517383,
+    "top_similarity": 0.6764247161835807,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "Is U160087 a CAN communication fault between the EPS and hybrid battery section?",
+    "target_chunk_id": 356,
+    "n_rivals": 4,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 356,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.6759227009639714,
+    "top_similarity": 0.6759227009639714,
+    "dtc_codes": [
+      "U160087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "What does U160087 mean?",
+    "target_chunk_id": 356,
+    "n_rivals": 4,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 356,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.5581897710095393,
+    "top_similarity": 0.5581897710095393,
+    "dtc_codes": [
+      "U160087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "Could a short to ground or power on the CAN circuit set U198381?",
+    "target_chunk_id": 358,
+    "n_rivals": 6,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 18,
+    "top_scored_submodule": "ABS DTC List",
+    "target_similarity": 0.5313360581559589,
+    "top_similarity": 0.5404642973664392,
+    "dtc_codes": [
+      "U198087",
+      "U198187",
+      "U198287",
+      "U198381",
+      "U198481"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "How do I diagnose an open or high-resistance CAN circuit for U198087?",
+    "target_chunk_id": 358,
+    "n_rivals": 6,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 314,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.6109892456356261,
+    "top_similarity": 0.6125566113518065,
+    "dtc_codes": [
+      "U198087",
+      "U198187",
+      "U198287",
+      "U198381",
+      "U198481"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "What does an invalid OBC output current message mean?",
+    "target_chunk_id": 361,
+    "n_rivals": 4,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 361,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.5825081359045768,
+    "top_similarity": 0.5825081359045768,
+    "dtc_codes": [
+      "U1A8081",
+      "U1A8087",
+      "U1A8187",
+      "U1A8281",
+      "U1A8381",
+      "U1A8487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "Could a CAN H or CAN L circuit short to ground or power cause U1A8087?",
+    "target_chunk_id": 361,
+    "n_rivals": 4,
+    "rank": 2,
+    "correct": false,
+    "top_scored_chunk_id": 315,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.5071323690025294,
+    "top_similarity": 0.5207443403792021,
+    "dtc_codes": [
+      "U1A8081",
+      "U1A8087",
+      "U1A8187",
+      "U1A8281",
+      "U1A8381",
+      "U1A8487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "Why does the vehicle ignore a remote power on or power off request?",
+    "target_chunk_id": 363,
+    "n_rivals": 2,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 363,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.39726851638370886,
+    "top_similarity": 0.39726851638370886,
+    "dtc_codes": [
+      "U1C0087",
+      "U1C0387"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "What does U1C0087 mean on a hybrid or electric vehicle?",
+    "target_chunk_id": 363,
+    "n_rivals": 2,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 363,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.6727115581664976,
+    "top_similarity": 0.6727115581664976,
+    "dtc_codes": [
+      "U1C0087",
+      "U1C0387"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "What is the vehicle mileage information message $120 lost from IC fault?",
+    "target_chunk_id": 367,
+    "n_rivals": 17,
+    "rank": 11,
+    "correct": false,
+    "top_scored_chunk_id": 107,
+    "top_scored_submodule": "CDU (YBR) DTC List",
+    "target_similarity": 0.5921382520609808,
+    "top_similarity": 0.6618541071718936,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "Why does U260087 return after clearing the code?",
+    "target_chunk_id": 367,
+    "n_rivals": 17,
+    "rank": 3,
+    "correct": false,
+    "top_scored_chunk_id": 207,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.537357774222266,
+    "top_similarity": 0.5766902672341813,
+    "dtc_codes": [
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "VCU DTC List"
+  },
+  {
+    "question": "How many missing CAN message cycles trigger U190487?",
+    "target_chunk_id": 32,
+    "n_rivals": 16,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 223,
+    "top_scored_submodule": "ICE DTC List",
+    "target_similarity": 0.628594954959001,
+    "top_similarity": 0.637276727379276,
+    "dtc_codes": [
+      "U190487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "AC DTC List"
+  },
+  {
+    "question": "U190487 meaning on a hybrid or electric vehicle",
+    "target_chunk_id": 32,
+    "n_rivals": 16,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 285,
+    "top_scored_submodule": "SDM DTC List",
+    "target_similarity": 0.5695942514190335,
+    "top_similarity": 0.5713190401651521,
+    "dtc_codes": [
+      "U190487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "AC DTC List"
+  },
+  {
+    "question": "How long does battery voltage have to be low or high to set P100016 or P100017?",
+    "target_chunk_id": 30,
+    "n_rivals": 4,
+    "rank": 2,
+    "correct": false,
+    "top_scored_chunk_id": 90,
+    "top_scored_submodule": "CDU (TC) DTC List",
+    "target_similarity": 0.6398225870122023,
+    "top_similarity": 0.6637072010525579,
+    "dtc_codes": [
+      "P100016",
+      "P100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (KY) DTC List"
+  },
+  {
+    "question": "What is the difference between P100016 and P100017?",
+    "target_chunk_id": 30,
+    "n_rivals": 4,
+    "rank": 2,
+    "correct": false,
+    "top_scored_chunk_id": 90,
+    "top_scored_submodule": "CDU (TC) DTC List",
+    "target_similarity": 0.5155988575021266,
+    "top_similarity": 0.5355035328794802,
+    "dtc_codes": [
+      "P100016",
+      "P100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (KY) DTC List"
+  },
+  {
+    "question": "What does U1A8487 mean on a hybrid or EV?",
+    "target_chunk_id": 58,
+    "n_rivals": 4,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 361,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.5583402178242336,
+    "top_similarity": 0.5688778215263599,
+    "dtc_codes": [
+      "U1A8087",
+      "U1A8487",
+      "U1A8687"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (KY) DTC List"
+  },
+  {
+    "question": "How do I diagnose lost CAN messages from the battery charger?",
+    "target_chunk_id": 58,
+    "n_rivals": 4,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 88,
+    "top_scored_submodule": "BMS (LG) DTC List",
+    "target_similarity": 0.6799028921815808,
+    "top_similarity": 0.6898384724819985,
+    "dtc_codes": [
+      "U1A8087",
+      "U1A8487",
+      "U1A8687"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (KY) DTC List"
+  },
+  {
+    "question": "What does U180187 mean on the Hybrid/EV battery pack?",
+    "target_chunk_id": 55,
+    "n_rivals": 7,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 85,
+    "top_scored_submodule": "BMS (LG) DTC List",
+    "target_similarity": 0.6406120173466823,
+    "top_similarity": 0.6629730554867184,
+    "dtc_codes": [
+      "U180187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (KY) DTC List"
+  },
+  {
+    "question": "How do I diagnose U180187 on the CAN bus?",
+    "target_chunk_id": 55,
+    "n_rivals": 7,
+    "rank": 5,
+    "correct": false,
+    "top_scored_chunk_id": 357,
+    "top_scored_submodule": "VCU DTC List",
+    "target_similarity": 0.6486912927433605,
+    "top_similarity": 0.6825097323276288,
+    "dtc_codes": [
+      "U180187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (KY) DTC List"
+  },
+  {
+    "question": "Does U198087 mean the motor control module is not communicating with the battery pack?",
+    "target_chunk_id": 57,
+    "n_rivals": 6,
+    "rank": 2,
+    "correct": false,
+    "top_scored_chunk_id": 87,
+    "top_scored_submodule": "BMS (LG) DTC List",
+    "target_similarity": 0.6188859967632457,
+    "top_similarity": 0.6305444361593493,
+    "dtc_codes": [
+      "U198087",
+      "U198187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (KY) DTC List"
+  },
+  {
+    "question": "Does U198187 indicate a lost CAN message between the battery pack and MCU?",
+    "target_chunk_id": 57,
+    "n_rivals": 6,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 57,
+    "top_scored_submodule": "BMS (KY) DTC List",
+    "target_similarity": 0.6500513214431543,
+    "top_similarity": 0.6500513214431543,
+    "dtc_codes": [
+      "U198087",
+      "U198187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (KY) DTC List"
+  },
+  {
+    "question": "How do I test power and ground at the K33 HVAC control module for B100016?",
+    "target_chunk_id": 60,
+    "n_rivals": 12,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 60,
+    "top_scored_submodule": "BMS (LG) DTC List",
+    "target_similarity": 0.6333704219607845,
+    "top_similarity": 0.6333704219607845,
+    "dtc_codes": [
+      "B100016",
+      "B100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (LG) DTC List"
+  },
+  {
+    "question": "What should the battery voltage be when diagnosing HVAC B100016 or B100017?",
+    "target_chunk_id": 60,
+    "n_rivals": 12,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 19,
+    "top_scored_submodule": "AC DTC List",
+    "target_similarity": 0.7299294340856389,
+    "top_similarity": 0.7431050365448503,
+    "dtc_codes": [
+      "B100016",
+      "B100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (LG) DTC List"
+  },
+  {
+    "question": "Why is the high-voltage power-on request message missing?",
+    "target_chunk_id": 86,
+    "n_rivals": 19,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 214,
+    "top_scored_submodule": "IC DTC List",
+    "target_similarity": 0.4176959185556739,
+    "top_similarity": 0.4249140971373129,
+    "dtc_codes": [
+      "U190287",
+      "U190387",
+      "U190487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (LG) DTC List"
+  },
+  {
+    "question": "Could an open or high-resistance CAN wire cause these VCU communication codes?",
+    "target_chunk_id": 86,
+    "n_rivals": 19,
+    "rank": 9,
+    "correct": false,
+    "top_scored_chunk_id": 93,
+    "top_scored_submodule": "CDU (TC) DTC List",
+    "target_similarity": 0.6189929206986476,
+    "top_similarity": 0.6479046739682112,
+    "dtc_codes": [
+      "U190287",
+      "U190387",
+      "U190487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "BMS (LG) DTC List"
+  },
+  {
+    "question": "Why is the battery charging current or voltage request missing?",
+    "target_chunk_id": 94,
+    "n_rivals": 2,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 94,
+    "top_scored_submodule": "CDU (TC) DTC List",
+    "target_similarity": 0.4440259416756617,
+    "top_similarity": 0.4440259416756617,
+    "dtc_codes": [
+      "U1A0087",
+      "U1A0787"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "CDU (TC) DTC List"
+  },
+  {
+    "question": "Why does U1A0087 return after clearing the codes?",
+    "target_chunk_id": 94,
+    "n_rivals": 2,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 94,
+    "top_scored_submodule": "CDU (TC) DTC List",
+    "target_similarity": 0.6038807876284933,
+    "top_similarity": 0.6038807876284933,
+    "dtc_codes": [
+      "U1A0087",
+      "U1A0787"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "CDU (TC) DTC List"
+  },
+  {
+    "question": "Could an open or high-resistance Battery Charger ground cause P100016?",
+    "target_chunk_id": 97,
+    "n_rivals": 4,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 90,
+    "top_scored_submodule": "CDU (TC) DTC List",
+    "target_similarity": 0.6253241752557217,
+    "top_similarity": 0.652430548278993,
+    "dtc_codes": [
+      "P100016",
+      "P100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "CDU (YBR) DTC List"
+  },
+  {
+    "question": "How do I check Battery Charger B+ at T18 terminal 4?",
+    "target_chunk_id": 97,
+    "n_rivals": 4,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 90,
+    "top_scored_submodule": "CDU (TC) DTC List",
+    "target_similarity": 0.5167985737236865,
+    "top_similarity": 0.5270597080475061,
+    "dtc_codes": [
+      "P100016",
+      "P100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "CDU (YBR) DTC List"
+  },
+  {
+    "question": "What does U190287 mean for CAN message 155?",
+    "target_chunk_id": 104,
+    "n_rivals": 19,
+    "rank": 4,
+    "correct": false,
+    "top_scored_chunk_id": 32,
+    "top_scored_submodule": "AC DTC List",
+    "target_similarity": 0.5807128550104632,
+    "top_similarity": 0.6029816615352649,
+    "dtc_codes": [
+      "U190287",
+      "U190387",
+      "U190487",
+      "U190687"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "CDU (YBR) DTC List"
+  },
+  {
+    "question": "What should I check if these codes return after clearing them?",
+    "target_chunk_id": 104,
+    "n_rivals": 19,
+    "rank": 5,
+    "correct": false,
+    "top_scored_chunk_id": 265,
+    "top_scored_submodule": "MCU DTC List",
+    "target_similarity": 0.5534379180580422,
+    "top_similarity": 0.5712843068923275,
+    "dtc_codes": [
+      "U190287",
+      "U190387",
+      "U190487",
+      "U190687"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "CDU (YBR) DTC List"
+  },
+  {
+    "question": "What should I check for a Park Brake Module battery voltage code?",
+    "target_chunk_id": 108,
+    "n_rivals": 12,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 108,
+    "top_scored_submodule": "EBS DTC List",
+    "target_similarity": 0.721723267537793,
+    "top_similarity": 0.721723267537793,
+    "dtc_codes": [
+      "B100016",
+      "B100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EBS DTC List"
+  },
+  {
+    "question": "Could high battery voltage trigger a park brake fault code?",
+    "target_chunk_id": 108,
+    "n_rivals": 12,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 108,
+    "top_scored_submodule": "EBS DTC List",
+    "target_similarity": 0.6757972540186291,
+    "top_similarity": 0.6757972540186291,
+    "dtc_codes": [
+      "B100016",
+      "B100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EBS DTC List"
+  },
+  {
+    "question": "C100017 battery voltage high power steering fault meaning",
+    "target_chunk_id": 123,
+    "n_rivals": 2,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 143,
+    "top_scored_submodule": "EPS (LR) DTC List",
+    "target_similarity": 0.645015047897956,
+    "top_similarity": 0.664836098223784,
+    "dtc_codes": [
+      "C100016",
+      "C100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EPS (DH) DTC List"
+  },
+  {
+    "question": "Will historical power steering voltage codes clear after 40 ignition cycles?",
+    "target_chunk_id": 123,
+    "n_rivals": 2,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 143,
+    "top_scored_submodule": "EPS (LR) DTC List",
+    "target_similarity": 0.6068882948513398,
+    "top_similarity": 0.6138474788976603,
+    "dtc_codes": [
+      "C100016",
+      "C100017"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EPS (DH) DTC List"
+  },
+  {
+    "question": "Why are node-loss or message-loss codes not reported with U007303?",
+    "target_chunk_id": 116,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 116,
+    "top_scored_submodule": "EBS DTC List",
+    "target_similarity": 0.5454525459150086,
+    "top_similarity": 0.5454525459150086,
+    "dtc_codes": [
+      "U007303"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EBS DTC List"
+  },
+  {
+    "question": "Why does CAN resistance measure about 120 ohms with the recorder or engine control module disconnected?",
+    "target_chunk_id": 116,
+    "n_rivals": 1,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 308,
+    "top_scored_submodule": "UCU DTC List",
+    "target_similarity": 0.4694043544936942,
+    "top_similarity": 0.5169502745327967,
+    "dtc_codes": [
+      "U007303"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EBS DTC List"
+  },
+  {
+    "question": "Can a loose connector cause the U190481 or U190487 code?",
+    "target_chunk_id": 156,
+    "n_rivals": 16,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 285,
+    "top_scored_submodule": "SDM DTC List",
+    "target_similarity": 0.6213757149899162,
+    "top_similarity": 0.6310033423531396,
+    "dtc_codes": [
+      "U190481",
+      "U190487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EPS (LR) DTC List"
+  },
+  {
+    "question": "How do I diagnose U190481 and U190487 on the high-speed CAN network?",
+    "target_chunk_id": 156,
+    "n_rivals": 16,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 156,
+    "top_scored_submodule": "EPS (LR) DTC List",
+    "target_similarity": 0.7035275499986705,
+    "top_similarity": 0.7035275499986705,
+    "dtc_codes": [
+      "U190481",
+      "U190487"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EPS (LR) DTC List"
+  },
+  {
+    "question": "Could an open or shorted CAN wire cause U260081 or U260087?",
+    "target_chunk_id": 158,
+    "n_rivals": 17,
+    "rank": 12,
+    "correct": false,
+    "top_scored_chunk_id": 207,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.5667095625127497,
+    "top_similarity": 0.627877404357857,
+    "dtc_codes": [
+      "U260081",
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EPS (LR) DTC List"
+  },
+  {
+    "question": "Could a loose Instrument Cluster connector cause U260087?",
+    "target_chunk_id": 158,
+    "n_rivals": 17,
+    "rank": 16,
+    "correct": false,
+    "top_scored_chunk_id": 121,
+    "top_scored_submodule": "EBS DTC List",
+    "target_similarity": 0.5828363892617247,
+    "top_similarity": 0.6706722073880389,
+    "dtc_codes": [
+      "U260081",
+      "U260087"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "EPS (LR) DTC List"
+  },
+  {
+    "question": "Can a scan tool clear DTC B056F00?",
+    "target_chunk_id": 159,
+    "n_rivals": 6,
+    "rank": 2,
+    "correct": false,
+    "top_scored_chunk_id": 287,
+    "top_scored_submodule": "TBOX DTC List",
+    "target_similarity": 0.5991669677778347,
+    "top_similarity": 0.6290759755131983,
+    "dtc_codes": [
+      "B056F00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IBC DTC List"
+  },
+  {
+    "question": "What does DTC B056F00 C101 not configured mean?",
+    "target_chunk_id": 159,
+    "n_rivals": 6,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 159,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.6840440616529332,
+    "top_similarity": 0.6840440616529332,
+    "dtc_codes": [
+      "B056F00"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IBC DTC List"
+  },
+  {
+    "question": "Could the instrument cluster cause U228187?",
+    "target_chunk_id": 218,
+    "n_rivals": 1,
+    "rank": 0,
+    "correct": true,
+    "top_scored_chunk_id": 218,
+    "top_scored_submodule": "IC DTC List",
+    "target_similarity": 0.6714289792902692,
+    "top_similarity": 0.6714289792902692,
+    "dtc_codes": [
+      "U228187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IC DTC List"
+  },
+  {
+    "question": "Should I replace the steering column lock module for U228187?",
+    "target_chunk_id": 218,
+    "n_rivals": 1,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 205,
+    "top_scored_submodule": "IBC DTC List",
+    "target_similarity": 0.5848184880998872,
+    "top_similarity": 0.5974436252192605,
+    "dtc_codes": [
+      "U228187"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IC DTC List"
+  },
+  {
+    "question": "Why can’t one of my vehicle modules communicate with the others?",
+    "target_chunk_id": 197,
+    "n_rivals": 16,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 222,
+    "top_scored_submodule": "ICE DTC List",
+    "target_similarity": 0.49378229708101795,
+    "top_similarity": 0.4971727291936766,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IBC DTC List"
+  },
+  {
+    "question": "What causes a U007300 fault code?",
+    "target_chunk_id": 197,
+    "n_rivals": 16,
+    "rank": 1,
+    "correct": false,
+    "top_scored_chunk_id": 264,
+    "top_scored_submodule": "MCU DTC List",
+    "target_similarity": 0.6788387618428491,
+    "top_similarity": 0.6841021895892371,
+    "dtc_codes": [
+      "U007300"
+    ],
+    "model_line": "MG_COMET_EV",
+    "target_submodule": "IBC DTC List"
+  }
+]

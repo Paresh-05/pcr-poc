@@ -45,7 +45,7 @@ class OpenAILLM:
         if purpose == "embed":
             return {}
         effort = effort_override if effort_override is not None else self.effort
-        extra = {"reasoning_effort": effort} if effort else {}
+        extra = {"reasoning": {"effort": effort}} if effort else {}
         if self.service_tier:
             extra["service_tier"] = self.service_tier
         return extra
@@ -58,7 +58,7 @@ class OpenAILLM:
             # Drop whichever extra the gateway rejected and retry once with what's left, rather than
             # failing the whole call over an unsupported knob (e.g. "ultrafast" not valid for every model).
             dropped = False
-            if "reasoning_effort" in msg and (effort_override or self.effort):
+            if "reasoning" in msg and (effort_override or self.effort):
                 self.effort = None
                 dropped = True
             if "service_tier" in msg and self.service_tier:
@@ -90,17 +90,17 @@ class OpenAILLM:
         )
         started = time.monotonic()
         try:
-            completion = await self._call(
-                self.client.chat.completions.parse, purpose, effort, model=self.model, messages=messages, response_format=schema
+            response = await self._call(
+                self.client.responses.parse, purpose, effort, model=self.model, input=messages, text_format=schema
             )
             elapsed_ms = int((time.monotonic() - started) * 1000)
-            usage = usage_from_response(completion)
+            usage = usage_from_response(response)
             logger.info(
                 "structured call OK (native): purpose=%s model=%s latency=%dms input_tokens=%s output_tokens=%s",
                 purpose, self.model, elapsed_ms, usage.input_tokens if usage else None, usage.output_tokens if usage else None,
             )
-            await self._record(completion, purpose, self.model, started)
-            parsed = completion.choices[0].message.parsed
+            await self._record(response, purpose, self.model, started)
+            parsed = response.output_parsed
             if parsed is not None:
                 return parsed
         except (BadRequestError, LengthFinishReasonError, ValidationError) as exc:
@@ -112,12 +112,12 @@ class OpenAILLM:
             + json.dumps(schema.model_json_schema()),
         }
         started = time.monotonic()
-        completion = await self._call(self.client.chat.completions.create, purpose, effort, model=self.model, messages=messages)
+        response = await self._call(self.client.responses.create, purpose, effort, model=self.model, input=messages)
         elapsed_ms = int((time.monotonic() - started) * 1000)
-        usage = usage_from_response(completion)
+        usage = usage_from_response(response)
         logger.info(
             "structured call OK (prompted-JSON fallback): purpose=%s model=%s latency=%dms input_tokens=%s output_tokens=%s",
             purpose, self.model, elapsed_ms, usage.input_tokens if usage else None, usage.output_tokens if usage else None,
         )
-        await self._record(completion, purpose, self.model, started)
-        return _extract_json(completion.choices[0].message.content or "", schema)
+        await self._record(response, purpose, self.model, started)
+        return _extract_json(response.output_text or "", schema)

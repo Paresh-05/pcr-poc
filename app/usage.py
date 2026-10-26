@@ -56,16 +56,30 @@ def compute_cost(price: Price | None, usage: Usage) -> Decimal | None:
 
 
 def usage_from_response(resp) -> Usage | None:
-    """Read token counts from an OpenAI-style response; None if the provider sent no usage."""
+    """Read token counts from an OpenAI-style response; None if the provider sent no usage.
+
+    Supports both the Responses API shape (input_tokens/output_tokens, input_tokens_details.cached_tokens,
+    output_tokens_details.reasoning_tokens) - used by LLM.structured() - and the Chat Completions / Embeddings
+    shape (prompt_tokens/completion_tokens, prompt_tokens_details.cached_tokens,
+    completion_tokens_details.reasoning_tokens) - still used by LLM.embed().
+    """
     u = getattr(resp, "usage", None)
     if u is None:
         return None
-    cached = getattr(getattr(u, "prompt_tokens_details", None), "cached_tokens", 0) or 0
-    reasoning = getattr(getattr(u, "completion_tokens_details", None), "reasoning_tokens", 0) or 0
-    # Embeddings responses have no completion_tokens (no output text); treat as 0.
+    input_tokens = getattr(u, "input_tokens", None)
+    if input_tokens is not None:  # Responses API
+        cached = getattr(getattr(u, "input_tokens_details", None), "cached_tokens", 0) or 0
+        reasoning = getattr(getattr(u, "output_tokens_details", None), "reasoning_tokens", 0) or 0
+        output_tokens = getattr(u, "output_tokens", 0) or 0
+    else:  # Chat Completions / Embeddings API
+        cached = getattr(getattr(u, "prompt_tokens_details", None), "cached_tokens", 0) or 0
+        reasoning = getattr(getattr(u, "completion_tokens_details", None), "reasoning_tokens", 0) or 0
+        input_tokens = getattr(u, "prompt_tokens", 0) or 0
+        # Embeddings responses have no completion_tokens (no output text); treat as 0.
+        output_tokens = getattr(u, "completion_tokens", 0) or 0
     return Usage(
-        input_tokens=getattr(u, "prompt_tokens", 0) or 0,
-        output_tokens=getattr(u, "completion_tokens", 0) or 0,
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
         cached_input_tokens=cached,
         reasoning_tokens=reasoning,
     )

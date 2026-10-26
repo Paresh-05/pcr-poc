@@ -339,7 +339,7 @@ async def _get_or_build_tree(
     for attempt in range(1, 3):  # try once, retry once on a malformed tree
         logger.info("Tree build attempt %d/2: dtc_code=%s model_line=%s evidence_scope=%s cases=%d manual_chunks=%d",
                     attempt, dtc_code, model_line, ev.scope, len(ev.cases), len(ev.manual_chunks))
-        candidate = await llm.structured(system, user, DiagnosisTree, purpose="tree_build", effort="high")
+        candidate = await llm.structured(system, user, DiagnosisTree, purpose="tree_build", effort="medium")
         try:
             _validate_tree(candidate)
             tree = candidate
